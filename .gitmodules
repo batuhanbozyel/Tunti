@@ -1,0 +1,3 @@
+[submodule "Tunti/vendor/spdlog"]
+	path = Tunti/vendor/spdlog
+	url = https://github.com/gabime/spdlog
