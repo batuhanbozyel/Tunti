@@ -10,6 +10,12 @@ workspace "Tunti"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+-- Include directories relative to root folder (solution directory)
+IncludeDir = {}
+IncludeDir["GLFW"] = "Tunti/vendor/GLFW/include"
+
+include "Tunti/vendor/GLFW"
+
 project "Tunti"
 	location "Tunti"
 	kind "SharedLib"
@@ -17,6 +23,9 @@ project "Tunti"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+	pchheader "tpch.h"
+	pchsource "Tunti/src/tpch.cpp"
 
 	files
 	{
@@ -26,7 +35,15 @@ project "Tunti"
 
 	includedirs
 	{
-		"%{prj.name}/vendor/spdlog/include"
+		"%{prj.name}/src",
+		"%{prj.name}/vendor/spdlog/include",
+		"%{IncludeDir.GLFW}"
+	}
+
+	links
+	{
+		"GLFW",
+		"opengl32.lib"
 	}
 
 	filter "system:windows"

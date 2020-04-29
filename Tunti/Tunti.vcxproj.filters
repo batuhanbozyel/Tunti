@@ -4,6 +4,9 @@
     <Filter Include="Tunti">
       <UniqueIdentifier>{1916310E-852A-59BF-4EAC-FC1EBA7F55F0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Tunti\Events">
+      <UniqueIdentifier>{DDCB3F93-C92E-CF37-72B4-07EE5EF69ABA}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Tunti.h" />
@@ -16,9 +19,24 @@
     <ClInclude Include="src\Tunti\EntryPoint.h">
       <Filter>Tunti</Filter>
     </ClInclude>
+    <ClInclude Include="src\Tunti\Events\ApplicationEvent.h">
+      <Filter>Tunti\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tunti\Events\Event.h">
+      <Filter>Tunti\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tunti\Events\KeyEvent.h">
+      <Filter>Tunti\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tunti\Events\MouseEvent.h">
+      <Filter>Tunti\Events</Filter>
+    </ClInclude>
     <ClInclude Include="src\Tunti\Log.h">
       <Filter>Tunti</Filter>
     </ClInclude>
+    <ClInclude Include="src\tpch.h" />
+    <ClInclude Include="src\Tunti\Window.h" />
+    <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Tunti\Application.cpp">
@@ -27,5 +45,7 @@
     <ClCompile Include="src\Tunti\Log.cpp">
       <Filter>Tunti</Filter>
     </ClCompile>
+    <ClCompile Include="src\tpch.cpp" />
+    <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
   </ItemGroup>
 </Project>
