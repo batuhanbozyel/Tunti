@@ -3,6 +3,7 @@
 // For use by Tunti applications
 
 #include "Tunti/Application.h"
+#include "Tunti/Layer.h"
 #include "Tunti/Log.h"
 
 // Entry Point
