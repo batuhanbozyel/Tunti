@@ -2,8 +2,8 @@
 
 #include "tpch.h"
 
-#include "Tunti/Core.h"
-#include "Tunti/Events/Event.h"
+#include "Core.h"
+#include "Events/Event.h"
 
 namespace Tunti
 {

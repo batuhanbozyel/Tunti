@@ -4,3 +4,6 @@
 [submodule "Tunti/vendor/GLFW"]
 	path = Tunti/vendor/GLFW
 	url = https://github.com/TheCherno/glfw
+[submodule "Tunti/vendor/imgui"]
+	path = Tunti/vendor/imgui
+	url = https://github.com/TheCherno/imgui

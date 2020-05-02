@@ -24,6 +24,7 @@ public:
 	SandBox()
 	{
 		PushLayer(new ExampleLayer());
+		PushOverlay(new Tunti::ImGuiLayer());
 	}
 
 	~SandBox()

@@ -1,4 +1,5 @@
 #include "tpch.h"
+#include <glad/glad.h>
 #include "WindowsWindow.h"
 
 #include "Tunti/Events/ApplicationEvent.h"
@@ -47,6 +48,10 @@ namespace Tunti
 
 		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(m_Window);
+
+		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+		T_CORE_ASSERT(status, "Failed to initialize Glad!");
+
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 		SetVSync(true);
 

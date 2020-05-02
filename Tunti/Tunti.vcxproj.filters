@@ -13,6 +13,9 @@
     <Filter Include="Tunti\Events">
       <UniqueIdentifier>{DDCB3F93-C92E-CF37-72B4-07EE5EF69ABA}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Tunti\ImGui">
+      <UniqueIdentifier>{03FAA1A7-6FAF-1A9D-F8A3-1474645811A1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h">
@@ -40,6 +43,9 @@
     <ClInclude Include="src\Tunti\Events\MouseEvent.h">
       <Filter>Tunti\Events</Filter>
     </ClInclude>
+    <ClInclude Include="src\Tunti\ImGui\ImGuiLayer.h">
+      <Filter>Tunti\ImGui</Filter>
+    </ClInclude>
     <ClInclude Include="src\Tunti\Layer.h">
       <Filter>Tunti</Filter>
     </ClInclude>
@@ -53,6 +59,7 @@
       <Filter>Tunti</Filter>
     </ClInclude>
     <ClInclude Include="src\tpch.h" />
+    <ClInclude Include="src\Platform\OpenGL\imgui_impl_opengl3.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp">
@@ -60,6 +67,9 @@
     </ClCompile>
     <ClCompile Include="src\Tunti\Application.cpp">
       <Filter>Tunti</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tunti\ImGui\ImGuiLayer.cpp">
+      <Filter>Tunti\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="src\Tunti\Layer.cpp">
       <Filter>Tunti</Filter>
@@ -71,5 +81,6 @@
       <Filter>Tunti</Filter>
     </ClCompile>
     <ClCompile Include="src\tpch.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\imgui_impl_opengl3.cpp" />
   </ItemGroup>
 </Project>

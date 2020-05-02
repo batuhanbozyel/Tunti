@@ -13,8 +13,12 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 -- Include directories relative to root folder (solution directory)
 IncludeDir = {}
 IncludeDir["GLFW"] = "Tunti/vendor/GLFW/include"
+IncludeDir["Glad"] = "Tunti/vendor/Glad/include"
+IncludeDir["ImGui"] = "Tunti/vendor/imgui"
 
 include "Tunti/vendor/GLFW"
+include "Tunti/vendor/Glad"
+include "Tunti/vendor/imgui"
 
 project "Tunti"
 	location "Tunti"
@@ -37,12 +41,16 @@ project "Tunti"
 	{
 		"%{prj.name}/src",
 		"%{prj.name}/vendor/spdlog/include",
-		"%{IncludeDir.GLFW}"
+		"%{IncludeDir.GLFW}",
+		"%{IncludeDir.Glad}",
+		"%{IncludeDir.ImGui}"
 	}
 
 	links
 	{
 		"GLFW",
+		"Glad",
+		"ImGui",
 		"opengl32.lib"
 	}
 
