@@ -67,6 +67,8 @@
     <ClInclude Include="src\tpch.h" />
     <ClInclude Include="src\Tunti\Input.h" />
     <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
+    <ClInclude Include="src\Tunti\KeyCodes.h" />
+    <ClInclude Include="src\Tunti\MouseButtonCodes.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\OpenGL\imgui_impl_opengl3.cpp">

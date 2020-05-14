@@ -1,10 +1,8 @@
 #include "tpch.h"
 #include "Application.h"
-
-#include "Tunti/Log.h"
-
 #include <glad/glad.h>
 
+#include "Log.h"
 #include "Input.h"
 
 namespace Tunti
@@ -60,9 +58,6 @@ namespace Tunti
 			
 			for (Layer* layer : m_LayerStack)
 				layer->OnUpdate();
-
-			auto [x, y] = Input::GetMousePos();
-			T_CORE_TRACE("{0}, {1}", x, y);
 
 			m_Window->OnUpdate();
 		}

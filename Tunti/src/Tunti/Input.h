@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Tunti/Core.h"
+#include "Core.h"
 
 namespace Tunti
 {

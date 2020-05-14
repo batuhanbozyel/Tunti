@@ -162,9 +162,11 @@
     <ClInclude Include="src\Tunti\Events\MouseEvent.h" />
     <ClInclude Include="src\Tunti\ImGui\ImGuiLayer.h" />
     <ClInclude Include="src\Tunti\Input.h" />
+    <ClInclude Include="src\Tunti\KeyCodes.h" />
     <ClInclude Include="src\Tunti\Layer.h" />
     <ClInclude Include="src\Tunti\LayerStack.h" />
     <ClInclude Include="src\Tunti\Log.h" />
+    <ClInclude Include="src\Tunti\MouseButtonCodes.h" />
     <ClInclude Include="src\Tunti\Window.h" />
     <ClInclude Include="src\tpch.h" />
   </ItemGroup>
