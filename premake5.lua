@@ -16,6 +16,7 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "Tunti/vendor/GLFW/include"
 IncludeDir["Glad"] = "Tunti/vendor/Glad/include"
 IncludeDir["ImGui"] = "Tunti/vendor/imgui"
+IncludeDir["glm"] = "Tunti/vendor/glm"
 
 group "Dependencies"
 	include "Tunti/vendor/GLFW"
@@ -39,7 +40,15 @@ project "Tunti"
 	files
 	{
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/vendor/glm/glm/**.hpp",
+		"%{prj.name}/vendor/glm/glm/**.inl"
+	}
+
+	defines
+	{
+		"_CRT_SECURE_NO_WARNINGS",
+		"GLFW_INCLUDE_NONE"
 	}
 
 	includedirs
@@ -48,7 +57,8 @@ project "Tunti"
 		"%{prj.name}/vendor/spdlog/include",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
-		"%{IncludeDir.ImGui}"
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.glm}"
 	}
 
 	links
@@ -60,7 +70,6 @@ project "Tunti"
 	}
 
 	filter "system:windows"
-		cppdialect "C++17"
 		systemversion "latest"
 
 		defines
@@ -93,6 +102,7 @@ project "Sandbox"
 	location "Sandbox"
 	kind "ConsoleApp"
 	language "C++"
+	cppdialect "C++17"
 	staticruntime "off"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
@@ -107,7 +117,8 @@ project "Sandbox"
 	includedirs
 	{
 		"Tunti/vendor/spdlog/include",
-		"Tunti/src"
+		"Tunti/src",
+		"Tunti/vendor/glm"
 	}
 
 	links
@@ -116,7 +127,6 @@ project "Sandbox"
 	}
 
 	filter "system:windows"
-		cppdialect "C++17"
 		systemversion "latest"
 
 		defines
