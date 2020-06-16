@@ -12,7 +12,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "Tunti/Log.h"
+#include "Tunti/Core/Log.h"
 
 #ifdef T_PLATFORM_WINDOWS
 	#include <Windows.h>

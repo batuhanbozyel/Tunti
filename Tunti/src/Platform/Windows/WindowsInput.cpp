@@ -2,7 +2,7 @@
 #include "WindowsInput.h"
 
 #include <GLFW/glfw3.h>
-#include "Tunti/Application.h"
+#include "Tunti/Core/Application.h"
 
 namespace Tunti
 {

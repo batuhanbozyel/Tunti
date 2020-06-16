@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Tunti/Input.h"
+#include "Tunti/Core/Input.h"
 
 namespace Tunti
 {

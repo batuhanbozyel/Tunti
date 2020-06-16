@@ -2,16 +2,16 @@
 
 // For use by Tunti applications
 
-#include "Tunti/Application.h"
-#include "Tunti/Layer.h"
-#include "Tunti/Log.h"
+#include "Tunti/Core/Application.h"
+#include "Tunti/Core/Layer.h"
+#include "Tunti/Core/Log.h"
 
-#include "Tunti/Input.h"
-#include "Tunti/KeyCodes.h"
-#include "Tunti/MouseButtonCodes.h"
+#include "Tunti/Core/Input.h"
+#include "Tunti/Core/KeyCodes.h"
+#include "Tunti/Core/MouseButtonCodes.h"
 
 #include "Tunti/ImGui/ImGuiLayer.h"
 
 // Entry Point
 
-#include "Tunti/EntryPoint.h"
+#include "Tunti/Core/EntryPoint.h"

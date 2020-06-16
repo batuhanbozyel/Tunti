@@ -145,8 +145,6 @@ namespace Tunti
 		});
 	}
 
-	
-
 	void WindowsWindow::Shutdown()
 	{
 		glfwDestroyWindow(m_Window);
@@ -160,12 +158,9 @@ namespace Tunti
 
 	void WindowsWindow::SetVSync(bool enabled)
 	{
-		if (enabled)
-			glfwSwapInterval(1);
-		else
-			glfwSwapInterval(0);
-
 		m_Data.VSync = enabled;
+		glfwSwapInterval(enabled);
+		T_WARN(enabled ? "VSync Enabled" : "VSync Disabled");
 	}
 
 	bool WindowsWindow::IsVsync() const

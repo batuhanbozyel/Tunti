@@ -51,15 +51,6 @@
     <ClInclude Include="src\Tunti.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\Tunti\Application.h">
-      <Filter>src\Tunti</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Tunti\Core.h">
-      <Filter>src\Tunti</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Tunti\EntryPoint.h">
-      <Filter>src\Tunti</Filter>
-    </ClInclude>
     <ClInclude Include="src\Tunti\Events\ApplicationEvent.h">
       <Filter>src\Tunti\Events</Filter>
     </ClInclude>
@@ -74,27 +65,6 @@
     </ClInclude>
     <ClInclude Include="src\Tunti\ImGui\ImGuiLayer.h">
       <Filter>src\Tunti\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Tunti\Input.h">
-      <Filter>src\Tunti</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Tunti\KeyCodes.h">
-      <Filter>src\Tunti</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Tunti\Layer.h">
-      <Filter>src\Tunti</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Tunti\LayerStack.h">
-      <Filter>src\Tunti</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Tunti\Log.h">
-      <Filter>src\Tunti</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Tunti\MouseButtonCodes.h">
-      <Filter>src\Tunti</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Tunti\Window.h">
-      <Filter>src\Tunti</Filter>
     </ClInclude>
     <ClInclude Include="src\tpch.h">
       <Filter>src</Filter>
@@ -1323,6 +1293,36 @@
     <ClInclude Include="vendor\glm\glm\vector_relational.hpp">
       <Filter>vendor\glm\glm</Filter>
     </ClInclude>
+    <ClInclude Include="src\Tunti\Core\Window.h">
+      <Filter>src\Tunti</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tunti\Core\Application.h">
+      <Filter>src\Tunti</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tunti\Core\EntryPoint.h">
+      <Filter>src\Tunti</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tunti\Core\Input.h">
+      <Filter>src\Tunti</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tunti\Core\KeyCodes.h">
+      <Filter>src\Tunti</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tunti\Core\Layer.h">
+      <Filter>src\Tunti</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tunti\Core\LayerStack.h">
+      <Filter>src\Tunti</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tunti\Core\Log.h">
+      <Filter>src\Tunti</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tunti\Core\MouseButtonCodes.h">
+      <Filter>src\Tunti</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tunti\Core\Base.h">
+      <Filter>src\Tunti</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp">
@@ -1331,26 +1331,26 @@
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp">
       <Filter>src\Platform\Windows</Filter>
     </ClCompile>
-    <ClCompile Include="src\Tunti\Application.cpp">
-      <Filter>src\Tunti</Filter>
-    </ClCompile>
     <ClCompile Include="src\Tunti\ImGui\ImGuiBuild.cpp">
       <Filter>src\Tunti\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="src\Tunti\ImGui\ImGuiLayer.cpp">
       <Filter>src\Tunti\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="src\Tunti\Layer.cpp">
-      <Filter>src\Tunti</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Tunti\LayerStack.cpp">
-      <Filter>src\Tunti</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Tunti\Log.cpp">
-      <Filter>src\Tunti</Filter>
-    </ClCompile>
     <ClCompile Include="src\tpch.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tunti\Core\Application.cpp">
+      <Filter>src\Tunti</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tunti\Core\Layer.cpp">
+      <Filter>src\Tunti</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tunti\Core\LayerStack.cpp">
+      <Filter>src\Tunti</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tunti\Core\Log.cpp">
+      <Filter>src\Tunti</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

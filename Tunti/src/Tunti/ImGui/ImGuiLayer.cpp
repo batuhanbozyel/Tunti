@@ -5,7 +5,7 @@
 #include "examples/imgui_impl_glfw.h"
 #include "examples/imgui_impl_opengl3.h"
 
-#include "Tunti/Application.h"
+#include "Tunti/Core/Application.h"
 
 // Temporary
 #include <glad/glad.h>

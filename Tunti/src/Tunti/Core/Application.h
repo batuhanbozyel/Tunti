@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Core.h"
+#include "Base.h"
 #include "Window.h"
 #include "LayerStack.h"
 
-#include "Events/Event.h"
-#include "Events/ApplicationEvent.h"
+#include "Tunti/Events/Event.h"
+#include "Tunti/Events/ApplicationEvent.h"
 
-#include "ImGui/ImGuiLayer.h"
+#include "Tunti/ImGui/ImGuiLayer.h"
 
 namespace Tunti
 {

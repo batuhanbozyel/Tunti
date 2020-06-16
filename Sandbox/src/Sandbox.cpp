@@ -10,11 +10,18 @@ public:
 
 	void OnUpdate() override
 	{
+		if (Tunti::Input::IsKeyPressed(T_KEY_E))
+		{
+			Tunti::Application::Get().GetWindow().SetVSync(true);
+		}
+		if (Tunti::Input::IsKeyPressed(T_KEY_D))
+		{
+			Tunti::Application::Get().GetWindow().SetVSync(false);
+		}
 	}
 
 	void OnEvent(Tunti::Event& event) override
 	{
-		T_TRACE("{0}", event);
 	}
 };
 

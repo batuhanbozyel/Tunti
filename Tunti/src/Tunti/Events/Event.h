@@ -1,7 +1,7 @@
 #pragma once
 
 #include "tpch.h"
-#include "Tunti/Core.h"
+#include "Tunti/Core/Base.h"
 
 namespace Tunti 
 {

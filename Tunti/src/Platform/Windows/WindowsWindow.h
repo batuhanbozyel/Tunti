@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Tunti/Window.h"
+#include "Tunti/Core/Window.h"
 
 #include <GLFW/glfw3.h>
 
