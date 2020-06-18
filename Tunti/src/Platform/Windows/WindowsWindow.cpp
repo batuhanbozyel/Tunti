@@ -1,20 +1,14 @@
 #include "tpch.h"
-#include <glad/glad.h>
 #include "WindowsWindow.h"
 
 #include "Tunti/Events/ApplicationEvent.h"
 #include "Tunti/Events/MouseEvent.h"
 #include "Tunti/Events/KeyEvent.h"
 
+#include "Platform/OpenGL/OpenGLContext.h"
+
 namespace Tunti
 {
-	static bool s_GLFWInitialized = false;
-
-	static void GLFWErrorCallback(int error, const char* description)
-	{
-		T_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
-	}
-
 	Window* Window::Create(const WindowProps& props)
 	{
 		return new WindowsWindow(props);
@@ -37,26 +31,15 @@ namespace Tunti
 		m_Data.Height = props.Height;
 
 		T_CORE_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
+		
+		m_Context = new OpenGLContext((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
+		m_Context->Init();
 
-		if (!s_GLFWInitialized)
-		{
-			int success = glfwInit();
-			T_CORE_ASSERT(success, "Could not initialize GLFW!");
-			glfwSetErrorCallback(GLFWErrorCallback);
-			s_GLFWInitialized = true;
-		}
-
-		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
-		glfwMakeContextCurrent(m_Window);
-
-		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-		T_CORE_ASSERT(status, "Failed to initialize Glad!");
-
-		glfwSetWindowUserPointer(m_Window, &m_Data);
+		glfwSetWindowUserPointer((GLFWwindow*)m_Context->GetWindowHandle(), &m_Data);
 		SetVSync(true);
 
 		// Set GLFW callbacks
-		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)
+		glfwSetWindowSizeCallback((GLFWwindow*)m_Context->GetWindowHandle(), [](GLFWwindow* window, int width, int height)
 		{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 				data.Width = width;
@@ -66,14 +49,14 @@ namespace Tunti
 				data.EventCallback(event);
 		});
 
-		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window)
+		glfwSetWindowCloseCallback((GLFWwindow*)m_Context->GetWindowHandle(), [](GLFWwindow* window)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			WindowCloseEvent event;
 			data.EventCallback(event);
 		});
 
-		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+		glfwSetKeyCallback((GLFWwindow*)m_Context->GetWindowHandle(), [](GLFWwindow* window, int key, int scancode, int action, int mods)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
@@ -100,14 +83,14 @@ namespace Tunti
 			}
 		});
 
-		glfwSetCharCallback(m_Window, [](GLFWwindow* window, unsigned int keycode)
+		glfwSetCharCallback((GLFWwindow*)m_Context->GetWindowHandle(), [](GLFWwindow* window, unsigned int keycode)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			KeyTypedEvent event(keycode);
 			data.EventCallback(event);
 		});
 
-		glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods)
+		glfwSetMouseButtonCallback((GLFWwindow*)m_Context->GetWindowHandle(), [](GLFWwindow* window, int button, int action, int mods)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
@@ -128,7 +111,7 @@ namespace Tunti
 			}
 		});
 
-		glfwSetScrollCallback(m_Window, [](GLFWwindow* window, double xOffset, double yOffset)
+		glfwSetScrollCallback((GLFWwindow*)m_Context->GetWindowHandle(), [](GLFWwindow* window, double xOffset, double yOffset)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
@@ -136,7 +119,7 @@ namespace Tunti
 			data.EventCallback(event);
 		});
 
-		glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double xPos, double yPos)
+		glfwSetCursorPosCallback((GLFWwindow*)m_Context->GetWindowHandle(), [](GLFWwindow* window, double xPos, double yPos)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
@@ -147,13 +130,13 @@ namespace Tunti
 
 	void WindowsWindow::Shutdown()
 	{
-		glfwDestroyWindow(m_Window);
+		glfwDestroyWindow((GLFWwindow*)m_Context->GetWindowHandle());
 	}
 
 	void WindowsWindow::OnUpdate()
 	{
 		glfwPollEvents();
-		glfwSwapBuffers(m_Window);
+		m_Context->SwapBuffers();
 	}
 
 	void WindowsWindow::SetVSync(bool enabled)

@@ -1323,6 +1323,8 @@
     <ClInclude Include="src\Tunti\Core\Base.h">
       <Filter>src\Tunti</Filter>
     </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
+    <ClInclude Include="src\Tunti\Renderer\GraphicsContext.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp">
@@ -1352,5 +1354,6 @@
     <ClCompile Include="src\Tunti\Core\Log.cpp">
       <Filter>src\Tunti</Filter>
     </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp" />
   </ItemGroup>
 </Project>

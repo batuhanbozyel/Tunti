@@ -4,6 +4,8 @@
 
 #include <GLFW/glfw3.h>
 
+#include "Tunti/Renderer/GraphicsContext.h"
+
 namespace Tunti
 {
 	class WindowsWindow : public Window 
@@ -22,18 +24,18 @@ namespace Tunti
 		void SetVSync(bool enabled) override;
 		bool IsVsync() const override;
 
-		inline void* GetNativeWindow() const override { return m_Window; }
+		inline void* GetNativeWindow() const override { return m_Context->GetWindowHandle(); }
 	private:
 		virtual void Init(const WindowProps& props);
 		virtual void Shutdown();
 	private:
-		GLFWwindow* m_Window;
+		GraphicsContext* m_Context;
 
 		struct WindowData
 		{
-			std::string Title;
-			unsigned int Width, Height;
-			bool VSync;
+			std::string Title = "Tunti Engine";
+			unsigned int Width = 1280, Height = 720;
+			bool VSync = true;
 
 			EventCallbackFn EventCallback;
 		};
