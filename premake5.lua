@@ -114,7 +114,8 @@ project "Sandbox"
 	{
 		"Tunti/vendor/spdlog/include",
 		"Tunti/src",
-		"Tunti/vendor/glm"
+		"Tunti/vendor/glm",
+		"Tunti/vendor/imgui"
 	}
 
 	links

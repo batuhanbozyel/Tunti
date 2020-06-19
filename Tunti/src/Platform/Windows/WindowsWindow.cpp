@@ -141,9 +141,12 @@ namespace Tunti
 
 	void WindowsWindow::SetVSync(bool enabled)
 	{
-		m_Data.VSync = enabled;
-		glfwSwapInterval(enabled);
-		T_WARN(enabled ? "VSync Enabled" : "VSync Disabled");
+		if (enabled ^ m_Data.VSync)
+		{
+			m_Data.VSync = enabled;
+			glfwSwapInterval(enabled);
+			T_WARN(enabled ? "VSync Enabled" : "VSync Disabled");
+		}
 	}
 
 	bool WindowsWindow::IsVsync() const

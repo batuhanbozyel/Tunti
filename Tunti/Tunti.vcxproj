@@ -140,18 +140,15 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLShader.h" />
     <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="src\Tunti.h" />
     <ClInclude Include="src\Tunti\Core\Application.h" />
     <ClInclude Include="src\Tunti\Core\Base.h" />
     <ClInclude Include="src\Tunti\Core\EntryPoint.h" />
-    <ClInclude Include="src\Tunti\Events\ApplicationEvent.h" />
-    <ClInclude Include="src\Tunti\Events\Event.h" />
-    <ClInclude Include="src\Tunti\Events\KeyEvent.h" />
-    <ClInclude Include="src\Tunti\Events\MouseEvent.h" />
-    <ClInclude Include="src\Tunti\ImGui\ImGuiLayer.h" />
     <ClInclude Include="src\Tunti\Core\Input.h" />
     <ClInclude Include="src\Tunti\Core\KeyCodes.h" />
     <ClInclude Include="src\Tunti\Core\Layer.h" />
@@ -159,8 +156,16 @@
     <ClInclude Include="src\Tunti\Core\Log.h" />
     <ClInclude Include="src\Tunti\Core\MouseButtonCodes.h" />
     <ClInclude Include="src\Tunti\Core\Window.h" />
-    <ClInclude Include="src\tpch.h" />
+    <ClInclude Include="src\Tunti\Events\ApplicationEvent.h" />
+    <ClInclude Include="src\Tunti\Events\Event.h" />
+    <ClInclude Include="src\Tunti\Events\KeyEvent.h" />
+    <ClInclude Include="src\Tunti\Events\MouseEvent.h" />
+    <ClInclude Include="src\Tunti\ImGui\ImGuiLayer.h" />
+    <ClInclude Include="src\Tunti\Renderer\Buffer.h" />
     <ClInclude Include="src\Tunti\Renderer\GraphicsContext.h" />
+    <ClInclude Include="src\Tunti\Renderer\Renderer.h" />
+    <ClInclude Include="src\Tunti\Renderer\Shader.h" />
+    <ClInclude Include="src\tpch.h" />
     <ClInclude Include="vendor\glm\glm\common.hpp" />
     <ClInclude Include="vendor\glm\glm\detail\_features.hpp" />
     <ClInclude Include="vendor\glm\glm\detail\_fixes.hpp" />
@@ -571,18 +576,23 @@
     <ClInclude Include="vendor\glm\glm\vector_relational.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLShader.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="src\Tunti\Core\Application.cpp" />
-    <ClCompile Include="src\Tunti\ImGui\ImGuiBuild.cpp" />
-    <ClCompile Include="src\Tunti\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\Tunti\Core\Layer.cpp" />
     <ClCompile Include="src\Tunti\Core\LayerStack.cpp" />
     <ClCompile Include="src\Tunti\Core\Log.cpp" />
+    <ClCompile Include="src\Tunti\ImGui\ImGuiBuild.cpp" />
+    <ClCompile Include="src\Tunti\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\tpch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\Tunti\Renderer\Buffer.cpp" />
+    <ClCompile Include="src\Tunti\Renderer\Renderer.cpp" />
+    <ClCompile Include="src\Tunti\Renderer\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="vendor\GLFW\GLFW.vcxproj">

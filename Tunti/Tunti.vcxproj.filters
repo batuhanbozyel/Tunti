@@ -7,17 +7,26 @@
     <Filter Include="src\Platform">
       <UniqueIdentifier>{21CA02E5-0D2D-9289-B6B2-CA3FA2F45D0C}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Platform\OpenGL">
+      <UniqueIdentifier>{35A49437-A105-7245-2A73-B8F796D3A804}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Platform\Windows">
       <UniqueIdentifier>{5B054582-4794-CE4B-F0B2-E246DC20DFF1}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Tunti">
       <UniqueIdentifier>{7024EEB3-DC8E-A22A-25CD-53D09176807F}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Tunti\Core">
+      <UniqueIdentifier>{C88E1F5B-B45C-1361-9DF0-8387895DEFC5}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Tunti\Events">
       <UniqueIdentifier>{547260A6-406B-7FF8-699D-647D55F55E04}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Tunti\ImGui">
       <UniqueIdentifier>{9A2D7CBF-06B9-E983-0FCA-6C787BD44584}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Tunti\Renderer">
+      <UniqueIdentifier>{166641B7-024A-020D-6BAA-FC5F57ADEC8E}</UniqueIdentifier>
     </Filter>
     <Filter Include="vendor">
       <UniqueIdentifier>{B3738122-9F15-ACF8-88D0-BF4C74113349}</UniqueIdentifier>
@@ -42,6 +51,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLShader.h">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClInclude>
     <ClInclude Include="src\Platform\Windows\WindowsInput.h">
       <Filter>src\Platform\Windows</Filter>
     </ClInclude>
@@ -50,6 +65,36 @@
     </ClInclude>
     <ClInclude Include="src\Tunti.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tunti\Core\Application.h">
+      <Filter>src\Tunti\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tunti\Core\Base.h">
+      <Filter>src\Tunti\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tunti\Core\EntryPoint.h">
+      <Filter>src\Tunti\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tunti\Core\Input.h">
+      <Filter>src\Tunti\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tunti\Core\KeyCodes.h">
+      <Filter>src\Tunti\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tunti\Core\Layer.h">
+      <Filter>src\Tunti\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tunti\Core\LayerStack.h">
+      <Filter>src\Tunti\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tunti\Core\Log.h">
+      <Filter>src\Tunti\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tunti\Core\MouseButtonCodes.h">
+      <Filter>src\Tunti\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tunti\Core\Window.h">
+      <Filter>src\Tunti\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Tunti\Events\ApplicationEvent.h">
       <Filter>src\Tunti\Events</Filter>
@@ -65,6 +110,12 @@
     </ClInclude>
     <ClInclude Include="src\Tunti\ImGui\ImGuiLayer.h">
       <Filter>src\Tunti\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tunti\Renderer\GraphicsContext.h">
+      <Filter>src\Tunti\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tunti\Renderer\Shader.h">
+      <Filter>src\Tunti\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\tpch.h">
       <Filter>src</Filter>
@@ -1293,45 +1344,34 @@
     <ClInclude Include="vendor\glm\glm\vector_relational.hpp">
       <Filter>vendor\glm\glm</Filter>
     </ClInclude>
-    <ClInclude Include="src\Tunti\Core\Window.h">
-      <Filter>src\Tunti</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Tunti\Core\Application.h">
-      <Filter>src\Tunti</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Tunti\Core\EntryPoint.h">
-      <Filter>src\Tunti</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Tunti\Core\Input.h">
-      <Filter>src\Tunti</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Tunti\Core\KeyCodes.h">
-      <Filter>src\Tunti</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Tunti\Core\Layer.h">
-      <Filter>src\Tunti</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Tunti\Core\LayerStack.h">
-      <Filter>src\Tunti</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Tunti\Core\Log.h">
-      <Filter>src\Tunti</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Tunti\Core\MouseButtonCodes.h">
-      <Filter>src\Tunti</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Tunti\Core\Base.h">
-      <Filter>src\Tunti</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
-    <ClInclude Include="src\Tunti\Renderer\GraphicsContext.h" />
+    <ClInclude Include="src\Tunti\Renderer\Buffer.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
+    <ClInclude Include="src\Tunti\Renderer\Renderer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLShader.cpp">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClCompile>
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp">
       <Filter>src\Platform\Windows</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp">
       <Filter>src\Platform\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tunti\Core\Application.cpp">
+      <Filter>src\Tunti\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tunti\Core\Layer.cpp">
+      <Filter>src\Tunti\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tunti\Core\LayerStack.cpp">
+      <Filter>src\Tunti\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tunti\Core\Log.cpp">
+      <Filter>src\Tunti\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Tunti\ImGui\ImGuiBuild.cpp">
       <Filter>src\Tunti\ImGui</Filter>
@@ -1342,18 +1382,9 @@
     <ClCompile Include="src\tpch.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Tunti\Core\Application.cpp">
-      <Filter>src\Tunti</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Tunti\Core\Layer.cpp">
-      <Filter>src\Tunti</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Tunti\Core\LayerStack.cpp">
-      <Filter>src\Tunti</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Tunti\Core\Log.cpp">
-      <Filter>src\Tunti</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />
+    <ClCompile Include="src\Tunti\Renderer\Shader.cpp" />
+    <ClCompile Include="src\Tunti\Renderer\Renderer.cpp" />
+    <ClCompile Include="src\Tunti\Renderer\Buffer.cpp" />
   </ItemGroup>
 </Project>
