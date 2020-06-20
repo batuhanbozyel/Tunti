@@ -12,5 +12,7 @@ namespace Tunti
 			case RendererAPI::None:     T_CORE_ASSERT(false, "Shader: Renderer API is not specified!"); return nullptr;
 			case RendererAPI::OpenGL:   return new OpenGLShader(vertexSrc, fragmentSrc);
 		}
+		T_CORE_ASSERT(false, "Shader: Unknown Renderer API specified!"); 
+		return nullptr;
 	}
 }

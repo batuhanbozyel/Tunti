@@ -12,6 +12,8 @@ namespace Tunti
 			case RendererAPI::None:     T_CORE_ASSERT(false, "VertexBuffer: Renderer API is not specified!"); return nullptr;
 			case RendererAPI::OpenGL:   return new OpenGLVertexBuffer(vertices, size);
 		}
+		T_CORE_ASSERT(false, "VertexBuffer: Unknown Renderer API specified!");
+		return nullptr;
 	}
 
 	IndexBuffer* IndexBuffer::Create(uint32_t* indices, uint32_t size)
@@ -21,5 +23,7 @@ namespace Tunti
 			case RendererAPI::None:     T_CORE_ASSERT(false, "IndexBuffer: Renderer API is not specified!"); return nullptr;
 			case RendererAPI::OpenGL:   return new OpenGLIndexBuffer(indices, size);
 		}
+		T_CORE_ASSERT(false, "IndexBuffer: Unknown Renderer API specified!");
+		return nullptr;
 	}
 }

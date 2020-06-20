@@ -1347,6 +1347,7 @@
     <ClInclude Include="src\Tunti\Renderer\Buffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
     <ClInclude Include="src\Tunti\Renderer\Renderer.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLRendererCommand.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp">
@@ -1386,5 +1387,7 @@
     <ClCompile Include="src\Tunti\Renderer\Shader.cpp" />
     <ClCompile Include="src\Tunti\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Tunti\Renderer\Buffer.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLRendererCommand.cpp" />
+    <ClCompile Include="src\Tunti\Renderer\GraphicsContext.cpp" />
   </ItemGroup>
 </Project>

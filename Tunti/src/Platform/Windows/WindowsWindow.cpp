@@ -5,7 +5,7 @@
 #include "Tunti/Events/MouseEvent.h"
 #include "Tunti/Events/KeyEvent.h"
 
-#include "Platform/OpenGL/OpenGLContext.h"
+#include "Tunti/Renderer/GraphicsContext.h"
 
 namespace Tunti
 {
@@ -32,7 +32,7 @@ namespace Tunti
 
 		T_CORE_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 		
-		m_Context = new OpenGLContext((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
+		m_Context.reset(GraphicsContext::Create((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr));
 		m_Context->Init();
 
 		glfwSetWindowUserPointer((GLFWwindow*)m_Context->GetWindowHandle(), &m_Data);

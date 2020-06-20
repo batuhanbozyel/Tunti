@@ -8,15 +8,16 @@ namespace Tunti
 	class OpenGLContext : public GraphicsContext
 	{
 	public:
-		OpenGLContext(int width, int height, const char* title, GLFWmonitor* monitor, GLFWwindow* share);
-
 		virtual void Init() override;
 		virtual void SwapBuffers() override;
 
 		inline void* GetWindowHandle() const override { return m_WindowHandle; }
 	private:
+		OpenGLContext(int width, int height, const char* title, GLFWmonitor* monitor, GLFWwindow* share);
+	private:
 		GLFWwindow* m_WindowHandle;
 		static bool s_GLFWInitialized;
+		friend GraphicsContext;
 	};
 
 	class GLFWContext

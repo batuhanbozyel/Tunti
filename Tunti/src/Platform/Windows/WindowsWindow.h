@@ -29,7 +29,7 @@ namespace Tunti
 		virtual void Init(const WindowProps& props);
 		virtual void Shutdown();
 	private:
-		GraphicsContext* m_Context;
+		std::unique_ptr<GraphicsContext> m_Context;
 
 		struct WindowData
 		{

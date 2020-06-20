@@ -5,6 +5,7 @@
 #include "Log.h"
 #include "Input.h"
 
+#include "Tunti/Renderer/Renderer.h"
 #include "Tunti/Renderer/Shader.h"
 #include "Tunti/Renderer/Buffer.h"
 
@@ -30,6 +31,8 @@ namespace Tunti
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
 
+		Renderer::Init();
+
 		glGenVertexArrays(1, &m_VertexArray);
 		glBindVertexArray(m_VertexArray);
 
@@ -47,7 +50,7 @@ namespace Tunti
 
 		unsigned int indices[3] = { 0, 1, 2 };
 
-		m_IndexBuffer.reset(IndexBuffer::Create(indices, sizeof(indices)));
+		m_IndexBuffer.reset(IndexBuffer::Create(indices, 3));
 
 		std::string vertexSrc = R"(
 			#version 330 core
@@ -111,12 +114,12 @@ namespace Tunti
 	{
 		while (m_Running) 
 		{
-			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT);
+			Renderer::ClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
+			Renderer::Clear();
 			
 			m_Shader->Bind();
 			glBindVertexArray(m_VertexArray);
-			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
+			glDrawElements(GL_TRIANGLES, m_IndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
 
 			for (Layer* layer : m_LayerStack)
 				layer->OnUpdate();
