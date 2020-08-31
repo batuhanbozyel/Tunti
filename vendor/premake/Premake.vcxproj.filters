@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="..">
+      <UniqueIdentifier>{61705900-4DFC-870B-B6AA-880BA255880B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\Doge">
+      <UniqueIdentifier>{4F847D47-BB63-FCE2-C47B-87B930DA6244}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\Doge\vendor">
+      <UniqueIdentifier>{CC4B856F-B819-7975-A1AD-E99B8D1A55DA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\Doge\vendor\GLAD">
+      <UniqueIdentifier>{D345E3BC-3FA7-C0CA-C814-077D3475F789}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\Doge\vendor\GLFW">
+      <UniqueIdentifier>{8B46E3BC-F7A7-C0CA-8015-077DEC75F789}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\Sandbox">
+      <UniqueIdentifier>{3F7B6B1D-2B33-AD6A-943A-86C68011485B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\TuntiEditor">
+      <UniqueIdentifier>{6B0123E3-57CF-16E9-4063-870F2CD0F24D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\TuntiEditor\vendor">
+      <UniqueIdentifier>{6871AFDB-D4DD-6AD6-9DD1-023409FD8C3E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\TuntiEditor\vendor\imgui">
+      <UniqueIdentifier>{D2ECB4D2-3EFA-E2B8-C7E0-DEA333EDAE6F}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Doge\premake5.lua">
+      <Filter>..\Doge</Filter>
+    </None>
+    <None Include="..\..\Doge\vendor\GLAD\premake5.lua">
+      <Filter>..\Doge\vendor\GLAD</Filter>
+    </None>
+    <None Include="..\..\Doge\vendor\GLFW\premake5.lua">
+      <Filter>..\Doge\vendor\GLFW</Filter>
+    </None>
+    <None Include="..\..\Sandbox\premake5.lua">
+      <Filter>..\Sandbox</Filter>
+    </None>
+    <None Include="..\..\TuntiEditor\premake5.lua">
+      <Filter>..\TuntiEditor</Filter>
+    </None>
+    <None Include="..\..\TuntiEditor\vendor\imgui\premake5.lua">
+      <Filter>..\TuntiEditor\vendor\imgui</Filter>
+    </None>
+    <None Include="..\..\premake5.lua">
+      <Filter>..</Filter>
+    </None>
+    <None Include="premake5.lua" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,226 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "test/ext/test-ext_vector_int2_sized.exe"
+		},
+		{
+			"path" : "test/ext/test-ext_vector_int2_sized.pdb"
+		}
+	],
+	"backtrace" : 2,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_executable",
+			"glmCreateTestGTC",
+			"add_compile_options",
+			"add_definitions",
+			"target_link_libraries"
+		],
+		"files" : 
+		[
+			"test/CMakeLists.txt",
+			"test/ext/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 41,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 229,
+				"parent" : 1
+			},
+			{
+				"file" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 65,
+				"parent" : 3
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 86,
+				"parent" : 3
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 222,
+				"parent" : 3
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 223,
+				"parent" : 3
+			},
+			{
+				"command" : 3,
+				"file" : 0,
+				"line" : 224,
+				"parent" : 3
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 234,
+				"parent" : 1
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1  "
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "/Za"
+				},
+				{
+					"backtrace" : 5,
+					"fragment" : "/fp:precise"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "/W4"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "/WX"
+				},
+				{
+					"backtrace" : 7,
+					"fragment" : "/wd4309"
+				},
+				{
+					"backtrace" : 7,
+					"fragment" : "/wd4324"
+				},
+				{
+					"backtrace" : 7,
+					"fragment" : "/wd4389"
+				},
+				{
+					"backtrace" : 7,
+					"fragment" : "/wd4127"
+				},
+				{
+					"backtrace" : 7,
+					"fragment" : "/wd4267"
+				},
+				{
+					"backtrace" : 7,
+					"fragment" : "/wd4146"
+				},
+				{
+					"backtrace" : 7,
+					"fragment" : "/wd4201"
+				},
+				{
+					"backtrace" : 7,
+					"fragment" : "/wd4464"
+				},
+				{
+					"backtrace" : 7,
+					"fragment" : "/wd4514"
+				},
+				{
+					"backtrace" : 7,
+					"fragment" : "/wd4701"
+				},
+				{
+					"backtrace" : 7,
+					"fragment" : "/wd4820"
+				},
+				{
+					"backtrace" : 7,
+					"fragment" : "/wd4365"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 8,
+					"define" : "_CRT_SECURE_NO_WARNINGS"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 9,
+					"path" : "C:/dev/GitHub/RendererFramework/Sandbox/vendor/glm/glm/.."
+				}
+			],
+			"language" : "CXX",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		}
+	],
+	"id" : "test-ext_vector_int2_sized::@84bc9087c80d145699a9",
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1",
+				"role" : "flags"
+			},
+			{
+				"fragment" : "/machine:x64 /debug /INCREMENTAL /subsystem:console",
+				"role" : "flags"
+			},
+			{
+				"fragment" : "kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib",
+				"role" : "libraries"
+			}
+		],
+		"language" : "CXX"
+	},
+	"name" : "test-ext_vector_int2_sized",
+	"nameOnDisk" : "test-ext_vector_int2_sized.exe",
+	"paths" : 
+	{
+		"build" : "test/ext",
+		"source" : "test/ext"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "test/ext/ext_vector_int2_sized.cpp",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "EXECUTABLE"
+}
