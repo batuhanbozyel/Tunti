@@ -27,12 +27,12 @@ namespace Doge
 		void PopLayer(Layer* layer);
 		void PopOverlay(Layer* overlay);
 
-		inline const Window* GetActiveWindow() const { return m_ActiveWindow; }
+		inline static const Window* GetActiveWindow() { return s_ActiveWindow; }
 		inline static const Application* GetInstance() { return s_Instance; }
-	protected:
+
 		// Application Utility Methods
-		void DisableCursor();
-		void EnableCursor();
+		static void DisableCursor();
+		static void EnableCursor();
 	private:
 		// Application Event Handling Methods
 		void OnEvent(Event& e);
@@ -44,7 +44,7 @@ namespace Doge
 		bool OnMouseButtonPress(MouseButtonPressedEvent& e);
 		bool OnMouseMove(MouseMovedEvent& e);
 	private:
-		Window* m_ActiveWindow;
+		static Window* s_ActiveWindow;
 		LayerStack m_LayerStack;
 		Timestep m_FrameTime = 0.0f;
 	private:

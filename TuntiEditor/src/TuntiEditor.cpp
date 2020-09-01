@@ -4,11 +4,7 @@
 namespace TEditor
 {
 	TuntiEditor::TuntiEditor()
-		: Application("Tunti Editor"),
-		m_EditorLayer(new EditorLayer),
-		m_SceneFramebuffer(std::make_unique<Doge::Framebuffer>(Doge::FramebufferSpecification(
-			GetActiveWindow()->GetWindowProps().Width,
-			GetActiveWindow()->GetWindowProps().Height)))
+		: Application("Tunti Editor"), m_EditorLayer(new EditorLayer())
 	{
 		PushOverlay(m_EditorLayer);
 	}
@@ -23,9 +19,7 @@ namespace TEditor
 		Doge::Renderer::ClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		Doge::Renderer::Clear();
 
-		m_EditorLayer->Begin();
-		m_EditorLayer->OnImGuiRender();
-		m_EditorLayer->End();
+		m_EditorLayer->OnUpdate(dt);
 	}
 }
 

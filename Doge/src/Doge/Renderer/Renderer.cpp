@@ -125,7 +125,6 @@ namespace Doge
 		glViewport(x, y, width, height);
 	}
 
-
 	void Renderer::ClearColor(const glm::vec4& color)
 	{
 		glClearColor(color.r, color.g, color.b, color.a);

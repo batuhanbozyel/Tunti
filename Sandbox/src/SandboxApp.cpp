@@ -29,9 +29,6 @@ public:
 
 	virtual void OnUpdate(float dt) override
 	{
-		Doge::Renderer::ClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
-		Doge::Renderer::Clear();
-
 		Doge::Renderer::GetCamera()->Rotate(Doge::Input::GetMousePos());
 
 		if (Doge::Input::IsKeyPressed(KEY_ESCAPE)) Shutdown();
@@ -52,6 +49,8 @@ public:
 			Doge::Renderer::Submit(renderData);
 		}
 
+		Doge::Renderer::ClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
+		Doge::Renderer::Clear();
 		Doge::Renderer::DrawIndexed();
 	}
 private:

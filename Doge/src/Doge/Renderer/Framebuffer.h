@@ -23,6 +23,10 @@ namespace Doge
 
 		void Bind() const;
 		void Unbind() const;
+
+		uint32_t GetColorAttachment() const { return m_ColorAttachment; }
+		uint32_t GetViewportWidth() const { return m_Specification.Width; }
+		uint32_t GetViewportHeight() const { return m_Specification.Height; }
 	private:
 		void Construct();
 	private:

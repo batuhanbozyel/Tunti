@@ -9,6 +9,7 @@ namespace Doge
 	constexpr RendererMode RenderMode = RendererMode::_3D;
 	// Application Initialization and Shutdown Methods
 	Application* Application::s_Instance = nullptr;
+	Window* Application::s_ActiveWindow = nullptr;
 
 	Application::Application(const std::string& appName)
 	{
@@ -18,9 +19,9 @@ namespace Doge
 
 		Window* window = new Window(appName);
 		window->SetEventCallbackFn(BIND_EVENT_FN(OnEvent));
-		m_ActiveWindow = window;
+		s_ActiveWindow = window;
 
-		Renderer::Init(RenderMode, m_ActiveWindow->GetWindowProps());
+		Renderer::Init(RenderMode, s_ActiveWindow->GetWindowProps());
 
 		LOG_TRACE("Application started running!");
 	}
@@ -28,13 +29,13 @@ namespace Doge
 	Application::~Application()
 	{
 		LOG_TRACE("Application terminating!");
-		delete m_ActiveWindow;
+		delete s_ActiveWindow;
 		Context::GLFWTerminate();
 	}
 
 	void Application::Run()
 	{
-		while (!glfwWindowShouldClose(m_ActiveWindow->GetNativeWindow()))
+		while (!glfwWindowShouldClose(s_ActiveWindow->GetNativeWindow()))
 		{
 			float dt = m_FrameTime.DeltaTime();
 
@@ -42,13 +43,13 @@ namespace Doge
 
 			m_LayerStack.OnUpdate(dt);
 
-			m_ActiveWindow->OnUpdate();
+			s_ActiveWindow->OnUpdate();
 		}
 	}
 
 	void Application::Shutdown() const
 	{
-		glfwSetWindowShouldClose(m_ActiveWindow->GetNativeWindow(), GLFW_TRUE);
+		glfwSetWindowShouldClose(s_ActiveWindow->GetNativeWindow(), GLFW_TRUE);
 	}
 
 	void Application::PushLayer(Layer* layer)
@@ -85,14 +86,14 @@ namespace Doge
 
 	bool Application::OnWindowClose(WindowCloseEvent& e)
 	{
-		glfwSetWindowShouldClose(m_ActiveWindow->GetNativeWindow(), GLFW_TRUE);
+		glfwSetWindowShouldClose(s_ActiveWindow->GetNativeWindow(), GLFW_TRUE);
 		return true;
 	}
 
 	bool Application::OnWindowResize(WindowResizeEvent& e)
 	{
-		glfwSetWindowSize(m_ActiveWindow->GetNativeWindow(), e.GetWidth(), e.GetHeight());
-		m_ActiveWindow->OnWindowResize(e);
+		glfwSetWindowSize(s_ActiveWindow->GetNativeWindow(), e.GetWidth(), e.GetHeight());
+		s_ActiveWindow->OnWindowResize(e);
 
 		Renderer::GetCamera()->SetProjection(static_cast<float>(e.GetWidth()), static_cast<float>(e.GetHeight()));
 		Renderer::SetViewport(0, 0, e.GetWidth(), e.GetHeight());
@@ -118,18 +119,18 @@ namespace Doge
 
 	void Application::DisableCursor()
 	{
-		glfwSetInputMode(m_ActiveWindow->GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		glfwSetInputMode(s_ActiveWindow->GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 		if (glfwRawMouseMotionSupported())
-			glfwSetInputMode(m_ActiveWindow->GetNativeWindow(), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+			glfwSetInputMode(s_ActiveWindow->GetNativeWindow(), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 	}
 
 	void Application::EnableCursor()
 	{
-		glfwSetInputMode(m_ActiveWindow->GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		glfwSetInputMode(s_ActiveWindow->GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
 		if (glfwRawMouseMotionSupported())
-			glfwSetInputMode(m_ActiveWindow->GetNativeWindow(), GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
+			glfwSetInputMode(s_ActiveWindow->GetNativeWindow(), GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
 	}
 
 }

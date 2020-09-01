@@ -110,9 +110,11 @@
     </ClCompile>
     <ClCompile Include="src\ImGuiBuild.cpp" />
     <ClCompile Include="src\Editor\EditorLayer.cpp" />
+    <ClCompile Include="src\Editor\SceneFrame.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\TuntiEditor.h" />
     <ClInclude Include="src\Editor\EditorLayer.h" />
+    <ClInclude Include="src\Editor\SceneFrame.h" />
   </ItemGroup>
 </Project>

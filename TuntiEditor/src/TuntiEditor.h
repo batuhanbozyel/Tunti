@@ -13,7 +13,6 @@ namespace TEditor
 		virtual void OnUpdate(float dt) override;
 	private:
 		EditorLayer* m_EditorLayer;
-		std::unique_ptr<Doge::Framebuffer> m_SceneFramebuffer;
 	};
 }
 
