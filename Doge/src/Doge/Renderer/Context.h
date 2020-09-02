@@ -18,7 +18,6 @@ namespace Doge
 		void PollEvents();
 		void SwapBuffers();
 
-		inline GLFWwindow* SetWindow(GLFWwindow* window) { m_Window = window; }
 		inline GLFWwindow* GetNativeWindow() const { return m_Window; }
 	private:
 		GLFWwindow* m_Window;

@@ -11,13 +11,13 @@ namespace Doge
 	Application* Application::s_Instance = nullptr;
 	Window* Application::s_ActiveWindow = nullptr;
 
-	Application::Application(const std::string& appName)
+	Application::Application(const std::string& appName, const WindowFlag& flag)
 	{
 		LOG_ASSERT(s_Instance == nullptr, "Application already exists!");
 		s_Instance = this;
 		Log::Init();
 
-		Window* window = new Window(appName);
+		Window* window = new Window(WindowProps(), flag);
 		window->SetEventCallbackFn(BIND_EVENT_FN(OnEvent));
 		s_ActiveWindow = window;
 
@@ -76,12 +76,23 @@ namespace Doge
 
 	void Application::OnEvent(Event& e)
 	{
+		for (auto it = m_LayerStack.GetOverlays().rbegin(); it != m_LayerStack.GetOverlays().rend(); it++)
+		{
+			if (e.Handled)
+				break;
+			(*it)->OnEvent(e);
+		}
+
+		for (auto it = m_LayerStack.GetLayers().rbegin(); it != m_LayerStack.GetLayers().rend(); it++)
+		{
+			if (e.Handled)
+				break;
+			(*it)->OnEvent(e);
+		}
+
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResize));
-		dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(OnKeyPress));
-		dispatcher.Dispatch<MouseMovedEvent>(BIND_EVENT_FN(OnMouseMove));
-		dispatcher.Dispatch<MouseButtonPressedEvent>(BIND_EVENT_FN(OnMouseButtonPress));
 	}
 
 	bool Application::OnWindowClose(WindowCloseEvent& e)
@@ -99,21 +110,6 @@ namespace Doge
 		Renderer::SetViewport(0, 0, e.GetWidth(), e.GetHeight());
 
 		LOG_TRACE(e.ToString());
-		return true;
-	}
-
-	bool Application::OnKeyPress(KeyPressedEvent& e)
-	{
-		return true;
-	}
-
-	bool Application::OnMouseButtonPress(MouseButtonPressedEvent& e)
-	{
-		return true;
-	}
-
-	bool Application::OnMouseMove(MouseMovedEvent& e)
-	{
 		return true;
 	}
 

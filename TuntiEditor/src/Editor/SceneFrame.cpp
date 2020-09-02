@@ -23,7 +23,7 @@ namespace TEditor
 			}
 	}
 
-	void SceneFrame::Render(float dt)
+	void SceneFrame::OnUpdate(float dt)
 	{
 		Doge::Renderer::GetCamera()->Rotate(Doge::Input::GetMousePos());
 
@@ -31,7 +31,10 @@ namespace TEditor
 		if (Doge::Input::IsKeyPressed(KEY_A)) Doge::Renderer::GetCamera()->Move(KEY_A, dt);
 		if (Doge::Input::IsKeyPressed(KEY_S)) Doge::Renderer::GetCamera()->Move(KEY_S, dt);
 		if (Doge::Input::IsKeyPressed(KEY_D)) Doge::Renderer::GetCamera()->Move(KEY_D, dt);
+	}
 
+	void SceneFrame::Render()
+	{
 		for (const auto& renderData : m_RenderDatas)
 		{
 			Doge::Renderer::Submit(renderData);
@@ -43,4 +46,10 @@ namespace TEditor
 		Doge::Renderer::DrawIndexed();
 		m_SceneFramebuffer->Unbind();
 	}
+
+	void SceneFrame::Resize(uint32_t viewportWidth, uint32_t viewportHeight)
+	{
+		m_SceneFramebuffer->Resize(viewportWidth, viewportHeight);
+	}
+
 }

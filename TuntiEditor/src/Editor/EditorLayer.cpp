@@ -3,12 +3,11 @@
 
 namespace TEditor
 {
-	bool EditorLayer::s_FirstRun = true;
-
 	EditorLayer::EditorLayer()
-		: m_Scene(1280, 487)
+		: m_Scene(Doge::Application::GetActiveWindow()->GetWindowProps().Width,
+				  Doge::Application::GetActiveWindow()->GetWindowProps().Height)
 	{
-
+		
 	}
 
 	void EditorLayer::OnAttach()
@@ -53,57 +52,85 @@ namespace TEditor
 			e.Handled |= e.IsInCategory(Doge::EventCategoryMouse) & io.WantCaptureMouse;
 			e.Handled |= e.IsInCategory(Doge::EventCategoryKeyboard) & io.WantCaptureKeyboard;
 		}
+		Doge::EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<Doge::KeyPressedEvent>(BIND_EVENT_FN(OnKeyPress));
 	}
 
 	void EditorLayer::OnUpdate(float dt)
 	{
-		if (Doge::Input::IsKeyPressed(KEY_ESCAPE))
+		m_Scene.Render();
+
+		ImGuiBeginRender();
+
+		MenuBarView();
+		SceneView(dt);
+		StatsView();
+
+		ImGuiEndRender();
+
+		if (m_ScenePlay)
 		{
-			m_BlockEvents = true;
-			Doge::Application::EnableCursor();
+			m_Scene.OnUpdate(dt);
 		}
-
-		if (s_FirstRun)
-		{
-			m_Scene.Render(dt);
-			s_FirstRun = false;
-		}
-
-		if (!m_BlockEvents)
-			m_Scene.Render(dt);
-
-		ImGuiRender();
 	}
 
-	void EditorLayer::Begin()
+	void EditorLayer::StopScenePlay()
+	{
+		m_BlockEvents = true;
+		m_ScenePlay = false;
+		Doge::Application::EnableCursor();
+	}
+
+	void EditorLayer::StartScenePlay()
+	{
+		m_BlockEvents = false;
+		m_ScenePlay = true;
+		Doge::Application::DisableCursor();
+	}
+
+	void EditorLayer::MenuBarView()
+	{
+		if (ImGui::BeginMenuBar())
+		{
+			if (ImGui::BeginMenu("File"))
+			{
+				if (ImGui::MenuItem("Exit")) Doge::Application::GetInstance()->Shutdown();
+				ImGui::EndMenu();
+			}
+			ImGui::EndMenuBar();
+		}
+	}
+
+	void EditorLayer::SceneView(float dt)
+	{
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
+		ImGui::Begin("Scene");
+		ImVec2 viewportSize = ImGui::GetContentRegionAvail();
+		m_Scene.Resize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
+
+		if (ImGui::Button(">"))
+		{
+			StartScenePlay();
+		}
+
+		ImGui::Image(reinterpret_cast<void*>(m_Scene.GetSceneTexture()), viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::End();
+		ImGui::PopStyleVar();
+	}
+
+	void EditorLayer::StatsView()
+	{
+		ImGui::Begin("Renderer Stats");
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::SameLine();
+		ImGui::End();
+	}
+
+	void EditorLayer::ImGuiBeginRender()
 	{
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-	}
-
-	void EditorLayer::End()
-	{
-		ImGuiIO& io = ImGui::GetIO();
-		const Doge::Application* app = Doge::Application::GetInstance();
-		io.DisplaySize = ImVec2((float)app->GetActiveWindow()->GetWindowProps().Width, (float)app->GetActiveWindow()->GetWindowProps().Height);
-
-		// Rendering
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-		{
-			GLFWwindow* backup_current_context = glfwGetCurrentContext();
-			ImGui::UpdatePlatformWindows();
-			ImGui::RenderPlatformWindowsDefault();
-			glfwMakeContextCurrent(backup_current_context);
-		}
-	}
-
-	void EditorLayer::ImGuiRender()
-	{
-		Begin();
 		// Note: Switch this to true to enable dockspace
 		static bool dockspaceOpen = true;
 		static bool opt_fullscreen_persistant = true;
@@ -149,35 +176,36 @@ namespace TEditor
 			ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
 			ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 		}
+	}
 
-		if (ImGui::BeginMenuBar())
+	void EditorLayer::ImGuiEndRender()
+	{
+		ImGui::End();
+
+		const Doge::Application* app = Doge::Application::GetInstance();
+		ImGuiIO& io = ImGui::GetIO();
+		io.DisplaySize = ImVec2((float)app->GetActiveWindow()->GetWindowProps().Width, (float)app->GetActiveWindow()->GetWindowProps().Height);
+
+		// Rendering
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
-			if (ImGui::BeginMenu("File"))
-			{
-				if (ImGui::MenuItem("Exit")) Doge::Application::GetInstance()->Shutdown();
-				ImGui::EndMenu();
-			}
-
-			ImGui::EndMenuBar();
+			GLFWwindow* backup_current_context = glfwGetCurrentContext();
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+			glfwMakeContextCurrent(backup_current_context);
 		}
+	}
 
-		ImGui::Begin("Scene");
-		if (ImGui::Button(">"))
+	bool EditorLayer::OnKeyPress(Doge::KeyPressedEvent& e)
+	{
+		if (e.GetKeyCode() == KEY_ESCAPE)
 		{
-			m_BlockEvents = !m_BlockEvents;
-			if (m_BlockEvents) Doge::Application::EnableCursor();
-			else Doge::Application::DisableCursor();
+			StopScenePlay();
+			return true;
 		}
-		ImGui::Image((void*)m_Scene.GetSceneTexture(), ImVec2(m_Scene.GetWidth(), m_Scene.GetHeight()), ImVec2(0, 1), ImVec2(1, 0));
-		ImGui::End();
-
-		ImGui::Begin("Renderer Stats");
-		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		ImGui::SameLine();
-		ImGui::End();
-
-		ImGui::End();
-
-		End();
+		return false;
 	}
 }

@@ -9,7 +9,10 @@ namespace TEditor
 		SceneFrame(uint32_t viewportWidth, uint32_t viewportHeight);
 		~SceneFrame() = default;
 
-		void Render(float dt);
+		void OnUpdate(float dt);
+		void Render();
+
+		void Resize(uint32_t viewportWidth, uint32_t viewportHeight);
 
 		uint32_t GetSceneTexture() const { return m_SceneFramebuffer->GetColorAttachment(); }
 		uint32_t GetWidth() const { return m_SceneFramebuffer->GetViewportWidth(); }
@@ -17,6 +20,5 @@ namespace TEditor
 	private:
 		std::unique_ptr<Doge::Framebuffer> m_SceneFramebuffer;
 		std::vector<Doge::RenderData> m_RenderDatas;
-		bool isMouseVisible = false;
 	};
 }

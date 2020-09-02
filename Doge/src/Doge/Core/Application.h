@@ -14,7 +14,7 @@ namespace Doge
 	class Application
 	{
 	public:
-		Application(const std::string& appName = "Doge");
+		Application(const std::string& appName = "Doge", const WindowFlag& flag = WindowFlag::CustomWindow);
 		~Application();
 
 		void Run();
@@ -27,22 +27,18 @@ namespace Doge
 		void PopLayer(Layer* layer);
 		void PopOverlay(Layer* overlay);
 
-		inline static const Window* GetActiveWindow() { return s_ActiveWindow; }
-		inline static const Application* GetInstance() { return s_Instance; }
-
 		// Application Utility Methods
 		static void DisableCursor();
 		static void EnableCursor();
+
+		inline static const Window* GetActiveWindow() { return s_ActiveWindow; }
+		inline static const Application* GetInstance() { return s_Instance; }
 	private:
 		// Application Event Handling Methods
 		void OnEvent(Event& e);
 
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
-
-		bool OnKeyPress(KeyPressedEvent& e);
-		bool OnMouseButtonPress(MouseButtonPressedEvent& e);
-		bool OnMouseMove(MouseMovedEvent& e);
 	private:
 		static Window* s_ActiveWindow;
 		LayerStack m_LayerStack;

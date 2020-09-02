@@ -6,6 +6,14 @@
 
 namespace Doge
 {
+	enum class WindowFlag
+	{
+		BorderlessFullscreen,
+		ExclusiveFullscreen,
+		MaximizedWindow,
+		CustomWindow
+	};
+
 	struct WindowProps
 	{
 		WindowProps(const std::string& title = "SandboxApp",
@@ -30,7 +38,7 @@ namespace Doge
 	class Window
 	{
 	public:
-		Window(const WindowProps& props = WindowProps());
+		Window(const WindowProps& props = WindowProps(), const WindowFlag& flag = WindowFlag::CustomWindow);
 		~Window();
 
 		void OnUpdate();
@@ -42,6 +50,8 @@ namespace Doge
 
 		inline GLFWwindow* GetNativeWindow() const { return m_Context->GetNativeWindow(); }
 		inline const WindowProps& GetWindowProps() const { return m_Props; }
+	private:
+		GLFWwindow* CreateNativeWindow(const WindowFlag& flag);
 	private:
 		std::unique_ptr<Context> m_Context;
 		WindowProps m_Props;

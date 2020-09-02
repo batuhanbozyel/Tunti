@@ -6,11 +6,12 @@
 
 namespace Doge
 {
-	Window::Window(const WindowProps& props)
+	Window::Window(const WindowProps& props, const WindowFlag& flag)
 		: m_Props(props)
 	{
 		Context::GLFWInit();
-		GLFWwindow* windowContext = glfwCreateWindow(props.Width, props.Height, props.Title.c_str(), props.Monitor, props.Share);
+
+		GLFWwindow* windowContext = CreateNativeWindow(flag);
 		LOG_ASSERT(windowContext, "Window creation failed");
 		m_Context.reset(new Context(windowContext));
 
@@ -148,4 +149,58 @@ namespace Doge
 			glfwSwapInterval(enabled);
 		}
 	}
+
+	GLFWwindow* Window::CreateNativeWindow(const WindowFlag& flag)
+	{
+		switch (flag)
+		{
+		case WindowFlag::BorderlessFullscreen:
+		{
+			GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+			const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+			m_Props.Width = mode->width;
+			m_Props.Height = mode->height;
+			m_Props.Monitor = monitor;
+
+			glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+			glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+			glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+			glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+
+			return glfwCreateWindow(mode->width, mode->height, m_Props.Title.c_str(), monitor, nullptr);
+		}
+		case WindowFlag::ExclusiveFullscreen:
+		{
+			GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+			const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+			m_Props.Width = mode->width;
+			m_Props.Height = mode->height;
+			m_Props.Monitor = monitor;
+
+			return glfwCreateWindow(mode->width, mode->height, m_Props.Title.c_str(), monitor, nullptr);
+		}
+		case WindowFlag::MaximizedWindow:
+		{
+			glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+			GLFWwindow* window = glfwCreateWindow(m_Props.Width, m_Props.Height, m_Props.Title.c_str(), nullptr, nullptr);
+
+			int width, height;
+			glfwGetWindowSize(window, &width, &height);
+			m_Props.Width = width;
+			m_Props.Height = height;
+
+			return window;
+		}
+		case WindowFlag::CustomWindow:
+		{
+			return glfwCreateWindow(m_Props.Width, m_Props.Height, m_Props.Title.c_str(), nullptr, nullptr);
+		}
+		}
+
+		LOG_ASSERT(nullptr, "Native Window initialization failed!");
+		return nullptr;
+	}
+
 }

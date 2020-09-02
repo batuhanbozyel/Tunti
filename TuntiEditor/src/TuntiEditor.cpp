@@ -4,7 +4,7 @@
 namespace TEditor
 {
 	TuntiEditor::TuntiEditor()
-		: Application("Tunti Editor"), m_EditorLayer(new EditorLayer())
+		: Application("Tunti Editor", Doge::WindowFlag::MaximizedWindow), m_EditorLayer(new EditorLayer)
 	{
 		PushOverlay(m_EditorLayer);
 	}
@@ -18,8 +18,6 @@ namespace TEditor
 	{
 		Doge::Renderer::ClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		Doge::Renderer::Clear();
-
-		m_EditorLayer->OnUpdate(dt);
 	}
 }
 

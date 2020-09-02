@@ -18,16 +18,21 @@ namespace TEditor
 		virtual void OnDetach() override;
 		virtual void OnEvent(Doge::Event& e) override;
 		virtual void OnUpdate(float dt) override;
+
+		void StopScenePlay();
+		void StartScenePlay();
 	private:
-		static void Begin();
-		static void End();
+		void MenuBarView();
+		void StatsView();
+		void SceneView(float dt);
 
-		void ImGuiRender();
+		void ImGuiBeginRender();
+		void ImGuiEndRender();
 
-		inline void BlockEvents(bool block) { m_BlockEvents = block; }
+		bool OnKeyPress(Doge::KeyPressedEvent& e);
 	private:
 		bool m_BlockEvents = true;
+		bool m_ScenePlay = false;
 		SceneFrame m_Scene;
-		static bool s_FirstRun;
 	};
 }

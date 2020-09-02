@@ -5,7 +5,7 @@ class SandboxApp : public Doge::Application
 {
 public:
 	SandboxApp()
-		: Application("SandboxApp")
+		: Application("SandboxApp", Doge::WindowFlag::CustomWindow)
 	{
 		const Doge::Shader* shader = Doge::ShaderLibrary::CreateShader("assets/shaders/PhongLighting.glsl");
 
