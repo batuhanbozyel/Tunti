@@ -18,8 +18,7 @@ namespace Doge
 		inline void SetPosition(const glm::vec3& position) { m_Position = position; }
 
 		// To be defined in Inherited Camera classes
-		virtual void SetProjection(float left, float right, float bottom, float top) {}
-		virtual void SetProjection(float width, float height) {}
+		virtual void SetProjection(float width, float height) = 0;
 
 		virtual const glm::vec3 GetViewDirection() const { return m_Position; }
 	protected:
