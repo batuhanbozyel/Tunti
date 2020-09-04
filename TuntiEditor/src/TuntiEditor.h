@@ -9,8 +9,6 @@ namespace TEditor
 	public:
 		TuntiEditor();
 		~TuntiEditor();
-
-		virtual void OnUpdate(float dt) override;
 	private:
 		EditorLayer* m_EditorLayer;
 	};

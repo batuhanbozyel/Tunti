@@ -13,12 +13,6 @@ namespace TEditor
 	{
 		PopOverlay(m_EditorLayer);
 	}
-
-	void TuntiEditor::OnUpdate(float dt)
-	{
-		Doge::Renderer::ClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
-		Doge::Renderer::Clear();
-	}
 }
 
 Doge::Application* CreateApplication()

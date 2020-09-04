@@ -20,5 +20,6 @@ namespace TEditor
 	private:
 		std::unique_ptr<Doge::Framebuffer> m_SceneFramebuffer;
 		std::vector<Doge::RenderData> m_RenderDatas;
+		Doge::PerspectiveCamera m_Camera;
 	};
 }
