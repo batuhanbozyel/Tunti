@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Renderer.h"
+#include "RendererCommands.h"
 
 #include "Shader.h"
 #include "Texture.h"
@@ -14,8 +15,6 @@
 
 namespace Doge
 {
-	std::unique_ptr<Camera> Renderer::s_Camera = nullptr;
-
 	std::unique_ptr<Doge::Framebuffer> Renderer::s_Framebuffer = nullptr;
 	std::unique_ptr<VertexArray> Renderer::s_VertexArray = nullptr;
 	std::unique_ptr<UniformBuffer> Renderer::s_ViewProjectionUniformBuffer = nullptr;
@@ -24,7 +23,7 @@ namespace Doge
 
 	const Shader* Renderer::s_LastShaderState = nullptr;
 
-	void Renderer::Init(const RendererMode& mode, const WindowProps& props)
+	void Renderer::Init(const WindowProps& props)
 	{
 		TextureManager::Init();
 
@@ -53,18 +52,6 @@ namespace Doge
 		s_LightingUniformBuffer->SetData(&ambient.x, sizeof(glm::vec3), sizeof(glm::vec4) * 2);
 		s_LightingUniformBuffer->SetData(&diffuse.x, sizeof(glm::vec3), sizeof(glm::vec4) * 3);
 		s_LightingUniformBuffer->SetData(&specular.x, sizeof(glm::vec3), sizeof(glm::vec4) * 4);
-
-		switch (mode)
-		{
-		case RendererMode::_2D: 	s_Camera.reset(new OrthographicCamera(static_cast<float>(props.Width), static_cast<float>(props.Height)));
-			LOG_TRACE("Renderer2D initialization succeed!");
-			break;
-		case RendererMode::_3D: 	s_Camera.reset(new PerspectiveCamera(60.0f, static_cast<float>(props.Width), static_cast<float>(props.Height)));
-			LOG_TRACE("Renderer3D initialization succeed!");
-			break;
-		default:					LOG_ASSERT(false, "Renderer initialization failed!");
-			break;
-		}
 	}
 
 	void Renderer::Submit(const RenderData& data)
@@ -72,17 +59,39 @@ namespace Doge
 		s_RenderQueue[data.material].emplace(data);
 	}
 
-	void Renderer::DrawIndexed()
+	void Renderer::PrepareBufferObjects(const Camera& camera)
 	{
 		// Set Uniform Buffer properties
 		s_ViewProjectionUniformBuffer->Bind();
-		s_ViewProjectionUniformBuffer->SetData(&s_Camera->GetViewMatrix()[0], sizeof(glm::mat4), 0);
-		s_ViewProjectionUniformBuffer->SetData(&s_Camera->GetProjectionMatrix()[0], sizeof(glm::mat4), sizeof(glm::mat4));
+		s_ViewProjectionUniformBuffer->SetData(&camera.GetViewMatrix()[0], sizeof(glm::mat4), 0);
+		s_ViewProjectionUniformBuffer->SetData(&camera.GetProjectionMatrix()[0], sizeof(glm::mat4), sizeof(glm::mat4));
 
 		s_LightingUniformBuffer->Bind();
-		s_LightingUniformBuffer->SetData(&s_Camera->GetPosition()[0], sizeof(glm::vec3), 0);
+		s_LightingUniformBuffer->SetData(&camera.GetPosition()[0], sizeof(glm::vec3), 0);
 		// Temporary: Light direction is set same as Camera direction
-		s_LightingUniformBuffer->SetData(&s_Camera->GetViewDirection()[0], sizeof(glm::vec3), sizeof(glm::vec4));
+		s_LightingUniformBuffer->SetData(&camera.GetViewDirection()[0], sizeof(glm::vec3), sizeof(glm::vec4));
+	}
+
+	void Renderer::RenderObjectIndexed(const RenderData& renderData)
+	{
+		// Bind Buffers
+		uint32_t binding = 0;
+		for (const auto& vertexBuffer : renderData.VBOs)
+		{
+			s_VertexArray->BindVertexBuffer(vertexBuffer, binding);
+			binding++;
+		}
+		s_VertexArray->BindIndexBuffer(renderData.IBO);
+
+		glDrawElements(GL_TRIANGLES, renderData.IBO->GetCount(), GL_UNSIGNED_INT, nullptr);
+	}
+
+	void Renderer::DrawIndexed(const Camera& camera)
+	{
+		RendererCommands::ClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
+		RendererCommands::Clear();
+
+		PrepareBufferObjects(camera);
 
 		for (auto& materialLayer : s_RenderQueue)
 		{
@@ -102,37 +111,9 @@ namespace Doge
 				// Set Unique Material properties and the Model matrix
 				renderData.material->SetModifiedUniforms();
 				renderData.material->GetShaderRef().SetUniformMat4("u_Model", renderData.modelMatrix);
-
-				// Bind Buffers
-				uint32_t binding = 0;
-				for (const auto& vertexBuffer : renderData.VBOs)
-				{
-					s_VertexArray->BindVertexBuffer(vertexBuffer, binding);
-					binding++;
-				}
-				s_VertexArray->BindIndexBuffer(renderData.IBO);
-
-				glDrawElements(GL_TRIANGLES, renderData.IBO->GetCount(), GL_UNSIGNED_INT, nullptr);
+				RenderObjectIndexed(renderData);
 				renderQueue.pop();
 			}
 		}
 	}
-
-	// Render Commands
-
-	void Renderer::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
-	{
-		glViewport(x, y, width, height);
-	}
-
-	void Renderer::ClearColor(const glm::vec4& color)
-	{
-		glClearColor(color.r, color.g, color.b, color.a);
-	}
-
-	void Renderer::Clear()
-	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	}
-
 }

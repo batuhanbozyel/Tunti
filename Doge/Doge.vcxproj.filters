@@ -1637,6 +1637,7 @@
     </ClInclude>
     <ClInclude Include="src\Doge\Core\Layer.h" />
     <ClInclude Include="src\Doge\Core\LayerStack.h" />
+    <ClInclude Include="src\Doge\Renderer\RendererCommands.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Doge\Core\Application.cpp">
@@ -1697,5 +1698,6 @@
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
     <ClCompile Include="src\Doge\Core\LayerStack.cpp" />
+    <ClCompile Include="src\Doge\Renderer\RendererCommands.cpp" />
   </ItemGroup>
 </Project>

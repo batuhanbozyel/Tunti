@@ -2,11 +2,11 @@
 #include "Application.h"
 
 #include "Doge/Renderer/Renderer.h"
+#include "Doge/Renderer/RendererCommands.h"
 #include "Doge/Utility/Camera.h"
 
 namespace Doge
 {
-	constexpr RendererMode RenderMode = RendererMode::_3D;
 	// Application Initialization and Shutdown Methods
 	Application* Application::s_Instance = nullptr;
 	Window* Application::s_ActiveWindow = nullptr;
@@ -21,7 +21,7 @@ namespace Doge
 		window->SetEventCallbackFn(BIND_EVENT_FN(OnEvent));
 		s_ActiveWindow = window;
 
-		Renderer::Init(RenderMode, s_ActiveWindow->GetWindowProps());
+		Renderer::Init(s_ActiveWindow->GetWindowProps());
 
 		LOG_TRACE("Application started running!");
 	}
@@ -106,8 +106,7 @@ namespace Doge
 		glfwSetWindowSize(s_ActiveWindow->GetNativeWindow(), e.GetWidth(), e.GetHeight());
 		s_ActiveWindow->OnWindowResize(e);
 
-		Renderer::GetCamera()->SetProjection(static_cast<float>(e.GetWidth()), static_cast<float>(e.GetHeight()));
-		Renderer::SetViewport(0, 0, e.GetWidth(), e.GetHeight());
+		RendererCommands::SetViewport(0, 0, e.GetWidth(), e.GetHeight());
 
 		LOG_TRACE(e.ToString());
 		return true;

@@ -123,6 +123,7 @@
     <ClInclude Include="src\Doge\Renderer\Pipeline.h" />
     <ClInclude Include="src\Doge\Renderer\RenderDataManager.h" />
     <ClInclude Include="src\Doge\Renderer\Renderer.h" />
+    <ClInclude Include="src\Doge\Renderer\RendererCommands.h" />
     <ClInclude Include="src\Doge\Renderer\Shader.h" />
     <ClInclude Include="src\Doge\Renderer\ShaderDataType.h" />
     <ClInclude Include="src\Doge\Renderer\Texture.h" />
@@ -640,6 +641,7 @@
     <ClCompile Include="src\Doge\Renderer\Pipeline.cpp" />
     <ClCompile Include="src\Doge\Renderer\RenderDataManager.cpp" />
     <ClCompile Include="src\Doge\Renderer\Renderer.cpp" />
+    <ClCompile Include="src\Doge\Renderer\RendererCommands.cpp" />
     <ClCompile Include="src\Doge\Renderer\Shader.cpp" />
     <ClCompile Include="src\Doge\Renderer\Texture.cpp" />
     <ClCompile Include="src\Doge\Renderer\VertexArray.cpp" />

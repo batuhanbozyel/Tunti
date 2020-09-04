@@ -7,6 +7,7 @@
 
 // Renderer
 #include "Doge/Renderer/Renderer.h"
+#include "Doge/Renderer/RendererCommands.h"
 #include "Doge/Renderer/Framebuffer.h"
 #include "Doge/Renderer/Texture.h"
 #include "Doge/Renderer/Shader.h"
