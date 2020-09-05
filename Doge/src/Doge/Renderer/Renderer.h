@@ -27,11 +27,12 @@ namespace Doge
 	class Renderer
 	{
 	public:
-		static void Init(const RendererAPI& api, const WindowProps& props);
+		static void Init(const WindowProps& props);
 
 		static void Submit(const RenderData& data);
 		static void RenderIndexed(const Camera& camera);
 
+		static void SetAPI(const RendererAPI& api) { s_API = api; }
 		static const RendererAPI& GetAPI() { return s_API; }
 	private:
 		static void PrepareBufferObjects(const Camera& camera);

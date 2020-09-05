@@ -135,6 +135,7 @@
     <ClInclude Include="src\Doge\Utility\SceneObject3D.h" />
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLFramebuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLRendererCommands.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLShaderDataType.h" />
@@ -643,6 +644,7 @@
     <ClCompile Include="src\Doge\Core\Log.cpp" />
     <ClCompile Include="src\Doge\Core\Window.cpp" />
     <ClCompile Include="src\Doge\Renderer\Buffer.cpp" />
+    <ClCompile Include="src\Doge\Renderer\Context.cpp" />
     <ClCompile Include="src\Doge\Renderer\Framebuffer.cpp" />
     <ClCompile Include="src\Doge\Renderer\Pipeline.cpp" />
     <ClCompile Include="src\Doge\Renderer\RenderDataManager.cpp" />

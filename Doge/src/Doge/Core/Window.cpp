@@ -13,7 +13,7 @@ namespace Doge
 
 		GLFWwindow* windowContext = CreateNativeWindow(flag);
 		LOG_ASSERT(windowContext, "Window creation failed");
-		m_Context.reset(new Context(windowContext));
+		m_Context = Context::Create(windowContext);
 
 		glfwSetWindowUserPointer(windowContext, &m_Props);
 		glfwSwapInterval(props.VSync);

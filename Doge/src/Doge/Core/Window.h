@@ -53,7 +53,7 @@ namespace Doge
 	private:
 		GLFWwindow* CreateNativeWindow(const WindowFlag& flag);
 	private:
-		std::unique_ptr<Context> m_Context;
+		std::shared_ptr<Context> m_Context;
 		WindowProps m_Props;
 	};
 }

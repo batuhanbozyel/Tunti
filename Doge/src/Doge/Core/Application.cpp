@@ -17,11 +17,12 @@ namespace Doge
 		s_Instance = this;
 		Log::Init();
 
+		Renderer::SetAPI(Doge::RendererAPI::OpenGL);
 		Window* window = new Window(WindowProps(), flag);
 		window->SetEventCallbackFn(BIND_EVENT_FN(OnEvent));
 		s_ActiveWindow = window;
 
-		Renderer::Init(Doge::RendererAPI::OpenGL ,s_ActiveWindow->GetWindowProps());
+		Renderer::Init(s_ActiveWindow->GetWindowProps());
 
 		LOG_TRACE("Application started running!");
 	}

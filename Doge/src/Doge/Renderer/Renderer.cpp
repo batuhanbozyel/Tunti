@@ -25,9 +25,8 @@ namespace Doge
 
 	const Shader* Renderer::s_LastShaderState = nullptr;
 
-	void Renderer::Init(const RendererAPI& api, const WindowProps& props)
+	void Renderer::Init(const WindowProps& props)
 	{
-		s_API = api;
 		TextureManager::Init();
 		RendererCommands::Init();
 

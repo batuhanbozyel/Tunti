@@ -8,8 +8,7 @@ namespace Doge
 	class Context
 	{
 	public:
-		Context(GLFWwindow* window);
-		~Context();
+		static std::shared_ptr<Context> Create(GLFWwindow* window);
 
 		static void GLFWInit();
 		static void GLFWTerminate();
@@ -19,7 +18,7 @@ namespace Doge
 		void SwapBuffers();
 
 		inline GLFWwindow* GetNativeWindow() const { return m_Window; }
-	private:
+	protected:
 		GLFWwindow* m_Window;
 		static bool s_Initialized;
 		friend Window;
