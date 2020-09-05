@@ -103,15 +103,17 @@ namespace TEditor
 
 	void EditorLayer::SceneView(float dt)
 	{
+		static bool dockspaceOpen = true;
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
-		ImGui::Begin("Scene");
+		ImGui::Begin("Scene", &dockspaceOpen, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground);
 		ImVec2 viewportSize = ImGui::GetContentRegionAvail();
-		m_Scene.Resize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
 
 		if (ImGui::Button(">"))
 		{
+			ImVec2 buttonSize = ImGui::GetContentRegionAvail();
 			StartScenePlay();
 		}
+		m_Scene.Resize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
 
 		ImGui::Image(reinterpret_cast<void*>(m_Scene.GetSceneTexture()), viewportSize, ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::End();
@@ -201,7 +203,7 @@ namespace TEditor
 
 	bool EditorLayer::OnKeyPress(Doge::KeyPressedEvent& e)
 	{
-		if (e.GetKeyCode() == KEY_ESCAPE)
+		if (e.GetKeyCode() == Doge::Key::Escape)
 		{
 			StopScenePlay();
 			return true;

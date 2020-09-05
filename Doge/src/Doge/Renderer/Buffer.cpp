@@ -1,134 +1,113 @@
 #include "pch.h"
 #include "Buffer.h"
+#include "Renderer.h"
+
+#include "Platform/OpenGL/OpenGLBuffer.h"
 
 namespace Doge
 {
+	uint32_t BufferElement::GetComponentCount() const
+	{
+		switch (Type)
+		{
+		case ShaderDataType::Float:   return 1;
+		case ShaderDataType::Float2:  return 2;
+		case ShaderDataType::Float3:  return 3;
+		case ShaderDataType::Float4:  return 4;
+		case ShaderDataType::Mat3:    return 3 * 3;
+		case ShaderDataType::Mat4:    return 4 * 4;
+		case ShaderDataType::Int:     return 1;
+		case ShaderDataType::Int2:    return 2;
+		case ShaderDataType::Int3:    return 3;
+		case ShaderDataType::Int4:    return 4;
+		case ShaderDataType::UInt:    return 1;
+		case ShaderDataType::UInt2:   return 2;
+		case ShaderDataType::UInt3:   return 3;
+		case ShaderDataType::UInt4:   return 4;
+		case ShaderDataType::Bool:    return 1;
+		}
+
+		LOG_ASSERT(false, "Unknown ShaderDataType specified!");
+		return 0;
+	}
+
 	/////////// VertexBuffer ///////////
 
-	VertexBuffer::VertexBuffer(uint32_t size)
+	std::shared_ptr<VertexBuffer> VertexBuffer::Create(uint32_t size)
 	{
-		glCreateBuffers(1, &m_RendererID);
-		glNamedBufferStorage(m_RendererID, size, nullptr, GL_DYNAMIC_STORAGE_BIT);
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!");  return nullptr;
+		case RendererAPI::OpenGL: return std::make_shared<OpenGLVertexBuffer>(size);
+		}
+
+		LOG_ASSERT(false, "RendererAPI initialization failed!");
+		return nullptr;
 	}
 
-	VertexBuffer::VertexBuffer(const float* vertices, uint32_t size)
+	std::shared_ptr<VertexBuffer> VertexBuffer::Create(const float* vertices, uint32_t size)
 	{
-		glCreateBuffers(1, &m_RendererID);
-		glNamedBufferStorage(m_RendererID, size, vertices, GL_DYNAMIC_STORAGE_BIT);
-	}
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!");  return nullptr;
+		case RendererAPI::OpenGL: return std::make_shared<OpenGLVertexBuffer>(vertices, size);
+		}
 
-	VertexBuffer::~VertexBuffer()
-	{
-		glDeleteBuffers(1, &m_RendererID);
-	}
-
-	void VertexBuffer::Bind() const
-	{
-		glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
-	}
-
-	void VertexBuffer::Unbind() const
-	{
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-	}
-
-	void VertexBuffer::SetData(const float* vertices, uint32_t offset, uint32_t size)
-	{
-		glNamedBufferSubData(m_RendererID, offset, size, vertices);
+		LOG_ASSERT(false, "RendererAPI initialization failed!");
+		return nullptr;
 	}
 
 	/////////// IndexBuffer ///////////
 
-	IndexBuffer::IndexBuffer(uint32_t count)
-		: m_Count(count)
+	std::shared_ptr<IndexBuffer> IndexBuffer::Create(uint32_t count)
 	{
-		glCreateBuffers(1, &m_RendererID);
-		glNamedBufferStorage(m_RendererID, count * sizeof(uint32_t), nullptr, GL_DYNAMIC_STORAGE_BIT);
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!");  return nullptr;
+		case RendererAPI::OpenGL: return std::make_shared<OpenGLIndexBuffer>(count);
+		}
+
+		LOG_ASSERT(false, "RendererAPI initialization failed!");
+		return nullptr;
 	}
 
-	IndexBuffer::IndexBuffer(const uint32_t* indices, uint32_t count)
-		: m_Count(count)
+	std::shared_ptr<IndexBuffer> IndexBuffer::Create(const uint32_t* indices, uint32_t count)
 	{
-		glCreateBuffers(1, &m_RendererID);
-		glNamedBufferStorage(m_RendererID, count * sizeof(uint32_t), indices, GL_DYNAMIC_STORAGE_BIT);
-	}
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!");  return nullptr;
+		case RendererAPI::OpenGL: return std::make_shared<OpenGLIndexBuffer>(indices, count);
+		}
 
-	IndexBuffer::~IndexBuffer()
-	{
-		glDeleteBuffers(1, &m_RendererID);
-	}
-
-	void IndexBuffer::Bind() const
-	{
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererID);
-	}
-
-	void IndexBuffer::Unbind() const
-	{
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	}
-
-	void IndexBuffer::SetData(const uint32_t* indices, uint32_t offset, uint32_t count)
-	{
-		glNamedBufferSubData(m_RendererID, offset, sizeof(uint32_t) * count, indices);
+		LOG_ASSERT(false, "RendererAPI initialization failed!");
+		return nullptr;
 	}
 
 	/////////// ShaderStorageBuffer ///////////
 
-	ShaderStorageBuffer::ShaderStorageBuffer(uint32_t size, uint32_t location)
-		: m_Location(location)
+	std::shared_ptr<ShaderStorageBuffer> ShaderStorageBuffer::Create(uint32_t size, uint32_t location)
 	{
-		glCreateBuffers(1, &m_RendererID);
-		glNamedBufferStorage(m_RendererID, size, nullptr, GL_DYNAMIC_STORAGE_BIT);
-	}
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!");  return nullptr;
+		case RendererAPI::OpenGL: return std::make_shared<OpenGLShaderStorageBuffer>(size, location);
+		}
 
-	ShaderStorageBuffer::~ShaderStorageBuffer()
-	{
-		glDeleteBuffers(1, &m_RendererID);
+		LOG_ASSERT(false, "RendererAPI initialization failed!");
+		return nullptr;
 	}
-
-	void ShaderStorageBuffer::Bind() const
-	{
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_Location, m_RendererID);
-	}
-
-	void ShaderStorageBuffer::Unbind() const
-	{
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_Location, 0);
-	}
-
-	void ShaderStorageBuffer::SetData(const void* data, uint32_t offset, uint32_t size)
-	{
-		glNamedBufferSubData(m_RendererID, offset, size, data);
-	}
-
+	
 	/////////// UniformBuffer ///////////
 
-	UniformBuffer::UniformBuffer(uint32_t size, uint32_t location)
-		: m_Location(location)
+	std::shared_ptr<UniformBuffer> UniformBuffer::Create(uint32_t size, uint32_t location)
 	{
-		glCreateBuffers(1, &m_RendererID);
-		glNamedBufferStorage(m_RendererID, size, nullptr, GL_DYNAMIC_STORAGE_BIT);
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!");  return nullptr;
+		case RendererAPI::OpenGL: return std::make_shared<OpenGLUniformBuffer>(size, location);
+		}
 
-	}
-
-	UniformBuffer::~UniformBuffer()
-	{
-		glDeleteBuffers(1, &m_RendererID);
-	}
-
-	void UniformBuffer::Bind() const
-	{
-		glBindBufferBase(GL_UNIFORM_BUFFER, m_Location, m_RendererID);
-	}
-
-	void UniformBuffer::Unbind() const
-	{
-		glBindBufferBase(GL_UNIFORM_BUFFER, m_Location, 0);
-	}
-
-	void UniformBuffer::SetData(const void* data, uint32_t size, uint32_t offset)
-	{
-		glNamedBufferSubData(m_RendererID, offset, size, data);
+		LOG_ASSERT(false, "RendererAPI initialization failed!");
+		return nullptr;
 	}
 }

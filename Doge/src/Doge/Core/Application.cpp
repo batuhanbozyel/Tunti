@@ -21,7 +21,7 @@ namespace Doge
 		window->SetEventCallbackFn(BIND_EVENT_FN(OnEvent));
 		s_ActiveWindow = window;
 
-		Renderer::Init(s_ActiveWindow->GetWindowProps());
+		Renderer::Init(Doge::RendererAPI::OpenGL ,s_ActiveWindow->GetWindowProps());
 
 		LOG_TRACE("Application started running!");
 	}

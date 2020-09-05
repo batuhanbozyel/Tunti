@@ -58,16 +58,16 @@ namespace Doge
 		constexpr float speed = 0.004f;
 		switch (keyCode)
 		{
-		case KEY_W:
+		case Key::W:
 			m_Position += speed * m_Front * dt;
 			break;
-		case KEY_S:
+		case Key::S:
 			m_Position -= speed * m_Front * dt;
 			break;
-		case KEY_A:
+		case Key::A:
 			m_Position -= speed * glm::normalize(glm::cross(m_Front, m_Up)) * dt;
 			break;
-		case KEY_D:
+		case Key::D:
 			m_Position += speed * glm::normalize(glm::cross(m_Front, m_Up)) * dt;
 			break;
 		}

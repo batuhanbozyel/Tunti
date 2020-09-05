@@ -3,10 +3,10 @@
 namespace TEditor
 {
 	SceneFrame::SceneFrame(uint32_t viewportWidth, uint32_t viewportHeight)
-		: m_SceneFramebuffer(std::make_unique<Doge::Framebuffer>(Doge::FramebufferSpecification(viewportWidth, viewportHeight))),
+		: m_SceneFramebuffer(Doge::Framebuffer::Create(Doge::FramebufferSpecification(viewportWidth, viewportHeight))),
 		m_Camera(60.0f, viewportWidth, viewportHeight)
 	{
-		const Doge::Shader* shader = Doge::ShaderLibrary::CreateShader("assets/shaders/PhongLighting.glsl");
+		std::shared_ptr<Doge::Shader> shader = Doge::ShaderLibrary::CreateShader("assets/shaders/PhongLighting.glsl");
 
 		std::shared_ptr<Doge::Material> material = std::make_shared<Doge::Material>(*shader);
 		material->SetBaseColor(glm::vec3(1.0f));
@@ -28,10 +28,10 @@ namespace TEditor
 	{
 		m_Camera.Rotate(Doge::Input::GetMousePos());
 
-		if (Doge::Input::IsKeyPressed(KEY_W)) m_Camera.Move(KEY_W, dt);
-		if (Doge::Input::IsKeyPressed(KEY_A)) m_Camera.Move(KEY_A, dt);
-		if (Doge::Input::IsKeyPressed(KEY_S)) m_Camera.Move(KEY_S, dt);
-		if (Doge::Input::IsKeyPressed(KEY_D)) m_Camera.Move(KEY_D, dt);
+		if (Doge::Input::IsKeyPressed(Doge::Key::W)) m_Camera.Move(Doge::Key::W, dt);
+		if (Doge::Input::IsKeyPressed(Doge::Key::A)) m_Camera.Move(Doge::Key::A, dt);
+		if (Doge::Input::IsKeyPressed(Doge::Key::S)) m_Camera.Move(Doge::Key::S, dt);
+		if (Doge::Input::IsKeyPressed(Doge::Key::D)) m_Camera.Move(Doge::Key::D, dt);
 	}
 
 	void SceneFrame::Render()
@@ -44,7 +44,7 @@ namespace TEditor
 		m_SceneFramebuffer->Bind();
 		Doge::RendererCommands::ClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		Doge::RendererCommands::Clear();
-		Doge::Renderer::DrawIndexed(m_Camera);
+		Doge::Renderer::RenderIndexed(m_Camera);
 		m_SceneFramebuffer->Unbind();
 	}
 

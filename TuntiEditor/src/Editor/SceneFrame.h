@@ -18,7 +18,7 @@ namespace TEditor
 		uint32_t GetWidth() const { return m_SceneFramebuffer->GetViewportWidth(); }
 		uint32_t GetHeight() const { return m_SceneFramebuffer->GetViewportHeight(); }
 	private:
-		std::unique_ptr<Doge::Framebuffer> m_SceneFramebuffer;
+		std::shared_ptr<Doge::Framebuffer> m_SceneFramebuffer;
 		std::vector<Doge::RenderData> m_RenderDatas;
 		Doge::PerspectiveCamera m_Camera;
 	};

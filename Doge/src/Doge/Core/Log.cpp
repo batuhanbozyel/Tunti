@@ -23,7 +23,6 @@ namespace Doge
 			spdlog::register_logger(s_Logger);
 			s_Logger->set_level(spdlog::level::trace);
 			s_Logger->flush_on(spdlog::level::trace);
-
 		}
 	}
 }

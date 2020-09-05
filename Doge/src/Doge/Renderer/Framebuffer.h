@@ -4,6 +4,8 @@ namespace Doge
 {
 	struct FramebufferSpecification
 	{
+		FramebufferSpecification() = default;
+
 		FramebufferSpecification(uint32_t width, uint32_t height)
 			: Width(width), Height(height) {}
 
@@ -16,21 +18,19 @@ namespace Doge
 	class Framebuffer
 	{
 	public:
-		Framebuffer(const FramebufferSpecification& specification);
-		~Framebuffer();
+		static std::shared_ptr<Framebuffer> Create(const FramebufferSpecification& specification);
 
 		void Resize(uint32_t width, uint32_t height);
 
-		void Bind() const;
-		void Unbind() const;
+		virtual void Bind() const = 0;
+		virtual void Unbind() const = 0;
 
 		uint32_t GetColorAttachment() const { return m_ColorAttachment; }
 		uint32_t GetViewportWidth() const { return m_Specification.Width; }
 		uint32_t GetViewportHeight() const { return m_Specification.Height; }
-	private:
-		void Construct();
-	private:
-		uint32_t m_RendererID;
+	protected:
+		virtual void Construct() = 0;
+	protected:
 		uint32_t m_ColorAttachment, m_DepthAttachment;
 		FramebufferSpecification m_Specification;
 	};

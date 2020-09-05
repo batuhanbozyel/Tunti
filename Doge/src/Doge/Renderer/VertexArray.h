@@ -6,17 +6,16 @@ namespace Doge
 	class VertexArray
 	{
 	public:
-		VertexArray();
-		~VertexArray();
+		static std::shared_ptr<VertexArray> Create();
 
-		void Bind() const;
-		void Unbind() const;
+		virtual void Bind() const = 0;
+		virtual void Unbind() const = 0;
 
-		void BindVertexBuffer(const std::shared_ptr<VertexBuffer>& vertexBuffer, uint32_t binding);
-		void BindIndexBuffer(const std::shared_ptr<IndexBuffer>& indexBuffer);
+		virtual void BindVertexBuffer(const std::shared_ptr<VertexBuffer>& vertexBuffer, uint32_t binding) = 0;
+		virtual void BindIndexBuffer(const std::shared_ptr<IndexBuffer>& indexBuffer) = 0;
 
-		void SetBufferLayout(const BufferLayout& layout, uint32_t slot);
-	private:
+		virtual void SetBufferLayout(const BufferLayout& layout, uint32_t binding) = 0;
+	protected:
 		uint32_t m_RendererID;
 		uint32_t m_VertexAttribIndex = 0;
 	};

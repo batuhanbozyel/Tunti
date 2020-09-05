@@ -6,6 +6,7 @@
 #include "Texture.h"
 #include "VertexArray.h"
 #include "Framebuffer.h"
+#include "ShaderDataType.h"
 
 #include "Doge/Core/Window.h"
 
@@ -15,21 +16,24 @@
 
 namespace Doge
 {
-	std::unique_ptr<Doge::Framebuffer> Renderer::s_Framebuffer = nullptr;
-	std::unique_ptr<VertexArray> Renderer::s_VertexArray = nullptr;
-	std::unique_ptr<UniformBuffer> Renderer::s_ViewProjectionUniformBuffer = nullptr;
-	std::unique_ptr<UniformBuffer> Renderer::s_LightingUniformBuffer = nullptr;
+	RendererAPI Renderer::s_API = RendererAPI::None;
+	std::shared_ptr<Doge::Framebuffer> Renderer::s_Framebuffer = nullptr;
+	std::shared_ptr<VertexArray> Renderer::s_VertexArray = nullptr;
+	std::shared_ptr<UniformBuffer> Renderer::s_ViewProjectionUniformBuffer = nullptr;
+	std::shared_ptr<UniformBuffer> Renderer::s_LightingUniformBuffer = nullptr;
 	std::unordered_map<std::shared_ptr<Material>, std::queue<RenderData>> Renderer::s_RenderQueue;
 
 	const Shader* Renderer::s_LastShaderState = nullptr;
 
-	void Renderer::Init(const WindowProps& props)
+	void Renderer::Init(const RendererAPI& api, const WindowProps& props)
 	{
+		s_API = api;
 		TextureManager::Init();
+		RendererCommands::Init();
 
-		s_Framebuffer.reset(new Framebuffer(	FramebufferSpecification(props.Width, props.Height)));
+		s_Framebuffer = Framebuffer::Create(	FramebufferSpecification(props.Width, props.Height));
 
-		s_VertexArray.reset(new VertexArray);
+		s_VertexArray = VertexArray::Create();
 		s_VertexArray->Bind();
 
 		s_VertexArray->SetBufferLayout({
@@ -40,9 +44,9 @@ namespace Doge
 			}, 0);
 
 		// ViewProjection Uniform Buffer: binding = 1
-		s_ViewProjectionUniformBuffer.reset(new UniformBuffer(sizeof(glm::mat4) * 2, 1));
+		s_ViewProjectionUniformBuffer = UniformBuffer::Create(sizeof(glm::mat4) * 2, 1);
 		// Lighting Uniform buffer: binding = 2
-		s_LightingUniformBuffer.reset(new UniformBuffer(sizeof(glm::vec4) * 5, 2));
+		s_LightingUniformBuffer = UniformBuffer::Create(sizeof(glm::vec4) * 5, 2);
 
 		// Set Lighting properties
 		s_LightingUniformBuffer->Bind();
@@ -83,10 +87,10 @@ namespace Doge
 		}
 		s_VertexArray->BindIndexBuffer(renderData.IBO);
 
-		glDrawElements(GL_TRIANGLES, renderData.IBO->GetCount(), GL_UNSIGNED_INT, nullptr);
+		RendererCommands::DrawIndexed(renderData.IBO->GetCount());
 	}
 
-	void Renderer::DrawIndexed(const Camera& camera)
+	void Renderer::RenderIndexed(const Camera& camera)
 	{
 		RendererCommands::ClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		RendererCommands::Clear();

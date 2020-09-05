@@ -2,6 +2,7 @@
 #include "RenderDataManager.h"
 
 #include "Buffer.h"
+#include "ShaderDataType.h"
 
 #include "Doge/Utility/Mesh.h"
 
@@ -15,7 +16,7 @@ namespace Doge
 	RenderData RenderDataManager::Construct(const Mesh& mesh, const std::shared_ptr<Material>& material, const glm::mat4& model)
 	{
 		std::vector<std::shared_ptr<VertexBuffer>> vertexBuffers;
-		std::shared_ptr<VertexBuffer> vertexBuffer = std::make_shared<VertexBuffer>(&mesh.GetVertices().data()->Position.x,
+		std::shared_ptr<VertexBuffer> vertexBuffer = VertexBuffer::Create(&mesh.GetVertices().data()->Position.x,
 			static_cast<uint32_t>(mesh.GetVertices().size() * sizeof(Vertex)));
 		vertexBuffer->SetLayout({
 			{ ShaderDataType::Float4, "a_Position" },
@@ -25,7 +26,7 @@ namespace Doge
 			});
 		vertexBuffers.push_back(vertexBuffer);
 
-		std::shared_ptr<IndexBuffer> indexBuffer = std::make_shared<IndexBuffer>(mesh.GetIndices().data(),
+		std::shared_ptr<IndexBuffer> indexBuffer = IndexBuffer::Create(mesh.GetIndices().data(),
 			static_cast<uint32_t>(mesh.GetIndices().size()));
 
 		return RenderData(vertexBuffers, indexBuffer, material, model);

@@ -1638,6 +1638,13 @@
     <ClInclude Include="src\Doge\Core\Layer.h" />
     <ClInclude Include="src\Doge\Core\LayerStack.h" />
     <ClInclude Include="src\Doge\Renderer\RendererCommands.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLFramebuffer.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLRendererCommands.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLShaderDataType.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLShader.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLTexture.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLVertexArray.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Doge\Core\Application.cpp">
@@ -1653,9 +1660,6 @@
       <Filter>src\Doge\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Doge\Renderer\Buffer.cpp">
-      <Filter>src\Doge\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Doge\Renderer\Context.cpp">
       <Filter>src\Doge\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Doge\Renderer\Framebuffer.cpp">
@@ -1698,6 +1702,14 @@
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
     <ClCompile Include="src\Doge\Core\LayerStack.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLFramebuffer.cpp" />
     <ClCompile Include="src\Doge\Renderer\RendererCommands.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLRendererCommands.cpp" />
+    <ClCompile Include="src\Doge\Renderer\ShaderDataType.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLShader.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLTexture.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLVertexArray.cpp" />
   </ItemGroup>
 </Project>

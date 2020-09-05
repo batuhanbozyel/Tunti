@@ -5,7 +5,7 @@ namespace Sandbox
 	GameLayer::GameLayer()
 		: m_Camera(60.0f, Doge::Application::GetActiveWindow()->GetWindowProps().Width, Doge::Application::GetActiveWindow()->GetWindowProps().Height)
 	{
-		const Doge::Shader* shader = Doge::ShaderLibrary::CreateShader("assets/shaders/PhongLighting.glsl");
+		std::shared_ptr<Doge::Shader> shader = Doge::ShaderLibrary::CreateShader("assets/shaders/PhongLighting.glsl");
 
 		std::shared_ptr<Doge::Material> material = std::make_shared<Doge::Material>(*shader);
 		material->SetBaseColor(glm::vec3(1.0f));
@@ -32,17 +32,17 @@ namespace Sandbox
 
 		if(!m_IsMouseVisible) m_Camera.Rotate(Doge::Input::GetMousePos());
 
-		if (Doge::Input::IsKeyPressed(KEY_W)) m_Camera.Move(KEY_W, dt);
-		if (Doge::Input::IsKeyPressed(KEY_A)) m_Camera.Move(KEY_A, dt);
-		if (Doge::Input::IsKeyPressed(KEY_S)) m_Camera.Move(KEY_S, dt);
-		if (Doge::Input::IsKeyPressed(KEY_D)) m_Camera.Move(KEY_D, dt);
+		if (Doge::Input::IsKeyPressed(Doge::Key::W)) m_Camera.Move(Doge::Key::W, dt);
+		if (Doge::Input::IsKeyPressed(Doge::Key::A)) m_Camera.Move(Doge::Key::A, dt);
+		if (Doge::Input::IsKeyPressed(Doge::Key::S)) m_Camera.Move(Doge::Key::S, dt);
+		if (Doge::Input::IsKeyPressed(Doge::Key::D)) m_Camera.Move(Doge::Key::D, dt);
 
 		for (const auto& renderData : m_RenderDatas)
 		{
 			Doge::Renderer::Submit(renderData);
 		}
 
-		Doge::Renderer::DrawIndexed(m_Camera);
+		Doge::Renderer::RenderIndexed(m_Camera);
 	}
 
 	void GameLayer::OnEvent(Doge::Event& e)
@@ -56,7 +56,7 @@ namespace Sandbox
 	{
 		switch (e.GetKeyCode())
 		{
-		case KEY_ESCAPE:
+		case Doge::Key::Escape:
 		{
 			Doge::Application::GetInstance()->Shutdown();
 			return true;
@@ -69,7 +69,7 @@ namespace Sandbox
 	{
 		switch (e.GetMouseButton())
 		{
-		case MOUSE_BUTTON_2:
+		case Doge::Mouse::Button2:
 		{
 			m_IsMouseVisible ? Doge::Application::DisableCursor() : Doge::Application::EnableCursor();
 			m_IsMouseVisible = !m_IsMouseVisible;
