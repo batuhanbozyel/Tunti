@@ -9,23 +9,23 @@ namespace Doge
 {
 	// Shader Program initialization methods
 
-	std::shared_ptr<Shader> Shader::Create(const char* filePath)
+	std::unique_ptr<Shader> Shader::Create(const char* filePath)
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
-		case RendererAPI::OpenGL: return std::make_shared<OpenGLShader>(filePath);
+		case RendererAPI::OpenGL: return std::make_unique<OpenGLShader>(filePath);
 		}
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
 		return nullptr;
 	}
 
-	std::shared_ptr<Doge::Shader> Shader::Create(const char* name, const std::string& vertexSrc, const std::string& fragmentSrc)
+	std::unique_ptr<Doge::Shader> Shader::Create(const char* name, const std::string& vertexSrc, const std::string& fragmentSrc)
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
-		case RendererAPI::OpenGL: return std::make_shared<OpenGLShader>(name, vertexSrc, fragmentSrc);
+		case RendererAPI::OpenGL: return std::make_unique<OpenGLShader>(name, vertexSrc, fragmentSrc);
 		}
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
 		return nullptr;

@@ -5,12 +5,12 @@
 
 namespace Doge
 {
-	std::shared_ptr<Doge::VertexArray> VertexArray::Create()
+	std::unique_ptr<VertexArray> VertexArray::Create()
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
-		case RendererAPI::OpenGL: return std::make_shared<OpenGLVertexArray>();
+		case RendererAPI::OpenGL: return std::make_unique<OpenGLVertexArray>();
 		}
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
 		return nullptr;

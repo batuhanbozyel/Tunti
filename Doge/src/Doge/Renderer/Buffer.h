@@ -54,8 +54,8 @@ namespace Doge
 	class VertexBuffer
 	{
 	public:
-		static std::shared_ptr<VertexBuffer> Create(uint32_t size);
-		static std::shared_ptr<VertexBuffer> Create(const float* vertices, uint32_t size);
+		static std::unique_ptr<VertexBuffer> Create(uint32_t size);
+		static std::unique_ptr<VertexBuffer> Create(const float* vertices, uint32_t size);
 
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
@@ -73,8 +73,8 @@ namespace Doge
 	class IndexBuffer
 	{
 	public:
-		static std::shared_ptr<IndexBuffer> Create(uint32_t count);
-		static std::shared_ptr<IndexBuffer> Create(const uint32_t* indices, uint32_t count);
+		static std::unique_ptr<IndexBuffer> Create(uint32_t count);
+		static std::unique_ptr<IndexBuffer> Create(const uint32_t* indices, uint32_t count);
 
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
@@ -91,7 +91,7 @@ namespace Doge
 	class ShaderStorageBuffer
 	{
 	public:
-		static std::shared_ptr<ShaderStorageBuffer> Create(uint32_t size, uint32_t location);
+		static std::unique_ptr<ShaderStorageBuffer> Create(uint32_t size, uint32_t location);
 
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
@@ -105,7 +105,7 @@ namespace Doge
 	class UniformBuffer
 	{
 	public:
-		static std::shared_ptr<UniformBuffer> Create(uint32_t size, uint32_t location);
+		static std::unique_ptr<UniformBuffer> Create(uint32_t size, uint32_t location);
 
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;

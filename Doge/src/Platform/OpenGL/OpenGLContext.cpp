@@ -24,9 +24,8 @@ namespace Doge
 	}
 
 	OpenGLContext::OpenGLContext(GLFWwindow* window)
+		: m_Window(window)
 	{
-		m_Window = window;
-		GLFWInit();
 		LOG_ASSERT(window, "Window could not found!");
 
 		glfwMakeContextCurrent(m_Window);
@@ -58,8 +57,9 @@ namespace Doge
 		LOG_TRACE("Context creation succeed!");
 	}
 
-	OpenGLContext::~OpenGLContext()
+	void OpenGLContext::SwapBuffers() const
 	{
-		m_Window = nullptr;
+		glfwSwapBuffers(m_Window);
 	}
+
 }

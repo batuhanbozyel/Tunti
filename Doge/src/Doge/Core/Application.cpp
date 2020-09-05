@@ -18,7 +18,7 @@ namespace Doge
 		Log::Init();
 
 		Renderer::SetAPI(Doge::RendererAPI::OpenGL);
-		Window* window = new Window(WindowProps(), flag);
+		Window* window = new Window(WindowProps(appName), flag);
 		window->SetEventCallbackFn(BIND_EVENT_FN(OnEvent));
 		s_ActiveWindow = window;
 
@@ -31,7 +31,6 @@ namespace Doge
 	{
 		LOG_TRACE("Application terminating!");
 		delete s_ActiveWindow;
-		Context::GLFWTerminate();
 	}
 
 	void Application::Run()

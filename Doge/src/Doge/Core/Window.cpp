@@ -1,16 +1,40 @@
 #include "pch.h"
 #include "Window.h"
 
+#include "Doge/Renderer/Renderer.h"
 #include "Doge/Events/KeyEvent.h"
 #include "Doge/Events/MouseEvent.h"
 
 namespace Doge
 {
+	uint8_t Window::s_WindowCount = 0;
+
+	static void GLFWErrorCallback(int error, const char* description)
+	{
+		LOG_ERROR("Error: {0}", description);
+	}
+
 	Window::Window(const WindowProps& props, const WindowFlag& flag)
 		: m_Props(props)
 	{
-		Context::GLFWInit();
+		if (s_WindowCount == 0)
+		{
+			int glfw = glfwInit();
+			LOG_ASSERT(glfw, "GLFW initialization failed!");
 
+			if (Renderer::GetAPI() == RendererAPI::OpenGL)
+			{
+				glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+				glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+				glfwWindowHint(GLFW_SAMPLES, 4);
+
+#ifdef DEBUG_ENABLED
+				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+#endif
+			}
+			glfwSetErrorCallback(GLFWErrorCallback);
+		}
+		
 		GLFWwindow* windowContext = CreateNativeWindow(flag);
 		LOG_ASSERT(windowContext, "Window creation failed");
 		m_Context = Context::Create(windowContext);
@@ -121,17 +145,20 @@ namespace Doge
 
 				props.EventCallback(WindowMovedEvent(xPos, yPos));
 			});
-		Context::MakeCurrent(windowContext);
 	}
 
 	Window::~Window()
 	{
-		glfwDestroyWindow(m_Context->GetNativeWindow());
+		glfwDestroyWindow(static_cast<GLFWwindow*>(m_Context->GetNativeWindow()));
+		s_WindowCount--;
+
+		if (s_WindowCount == 0)
+			glfwTerminate();
 	}
 
 	void Window::OnUpdate()
 	{
-		m_Context->PollEvents();
+		glfwPollEvents();
 		m_Context->SwapBuffers();
 	}
 
@@ -156,6 +183,7 @@ namespace Doge
 		{
 		case WindowFlag::BorderlessFullscreen:
 		{
+			s_WindowCount++;
 			GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 			const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
@@ -172,6 +200,7 @@ namespace Doge
 		}
 		case WindowFlag::ExclusiveFullscreen:
 		{
+			s_WindowCount++;
 			GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 			const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
@@ -183,6 +212,7 @@ namespace Doge
 		}
 		case WindowFlag::MaximizedWindow:
 		{
+			s_WindowCount++;
 			glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 			GLFWwindow* window = glfwCreateWindow(m_Props.Width, m_Props.Height, m_Props.Title.c_str(), nullptr, nullptr);
 
@@ -195,6 +225,7 @@ namespace Doge
 		}
 		case WindowFlag::CustomWindow:
 		{
+			s_WindowCount++;
 			return glfwCreateWindow(m_Props.Width, m_Props.Height, m_Props.Title.c_str(), nullptr, nullptr);
 		}
 		}
@@ -202,5 +233,4 @@ namespace Doge
 		LOG_ASSERT(nullptr, "Native Window initialization failed!");
 		return nullptr;
 	}
-
 }

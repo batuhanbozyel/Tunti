@@ -9,12 +9,12 @@ namespace Doge
 {
 	constexpr uint32_t MaxFramebufferSize = 8192;
 
-	std::shared_ptr<Doge::Framebuffer> Framebuffer::Create(const FramebufferSpecification& specification)
+	std::unique_ptr<Framebuffer> Framebuffer::Create(const FramebufferSpecification& specification)
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
-		case RendererAPI::OpenGL: return std::make_shared<OpenGLFramebuffer>(specification);
+		case RendererAPI::OpenGL: return std::make_unique<OpenGLFramebuffer>(specification);
 		}
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
 		return nullptr;

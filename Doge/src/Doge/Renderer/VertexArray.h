@@ -6,7 +6,7 @@ namespace Doge
 	class VertexArray
 	{
 	public:
-		static std::shared_ptr<VertexArray> Create();
+		static std::unique_ptr<VertexArray> Create();
 
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;

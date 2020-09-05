@@ -21,7 +21,7 @@ namespace Doge
 	protected:
 		virtual uint64_t GetTextureHandle() = 0;
 	private:
-		static std::shared_ptr<Texture> Create(const std::string& texturePath);
+		static std::unique_ptr<Texture> Create(const std::string& texturePath);
 		friend class TextureManager;
 	};
 
@@ -33,7 +33,7 @@ namespace Doge
 		static uint32_t LoadTexture(const std::string& path);
 		static uint32_t LoadTextureMaps(const std::vector<std::pair<std::string, TextureType>>& texturePaths);
 	private:
-		static std::vector<std::shared_ptr<Texture>> s_Textures;
+		static std::vector<std::unique_ptr<Texture>> s_Textures;
 		static std::shared_ptr<ShaderStorageBuffer> m_SSBO;
 
 		static uint32_t m_Count;

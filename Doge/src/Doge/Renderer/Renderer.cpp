@@ -17,10 +17,10 @@
 namespace Doge
 {
 	RendererAPI Renderer::s_API = RendererAPI::None;
-	std::shared_ptr<Doge::Framebuffer> Renderer::s_Framebuffer = nullptr;
-	std::shared_ptr<VertexArray> Renderer::s_VertexArray = nullptr;
-	std::shared_ptr<UniformBuffer> Renderer::s_ViewProjectionUniformBuffer = nullptr;
-	std::shared_ptr<UniformBuffer> Renderer::s_LightingUniformBuffer = nullptr;
+	std::unique_ptr<Framebuffer> Renderer::s_Framebuffer = nullptr;
+	std::unique_ptr<VertexArray> Renderer::s_VertexArray = nullptr;
+	std::unique_ptr<UniformBuffer> Renderer::s_ViewProjectionUniformBuffer = nullptr;
+	std::unique_ptr<UniformBuffer> Renderer::s_LightingUniformBuffer = nullptr;
 	std::unordered_map<std::shared_ptr<Material>, std::queue<RenderData>> Renderer::s_RenderQueue;
 
 	const Shader* Renderer::s_LastShaderState = nullptr;
@@ -40,7 +40,7 @@ namespace Doge
 			{ ShaderDataType::Float3, "a_Normal" },
 			{ ShaderDataType::Float2, "a_TexCoord" },
 			{ ShaderDataType::UInt , "a_TexIndex" }
-			}, 0);
+		}, 0);
 
 		// ViewProjection Uniform Buffer: binding = 1
 		s_ViewProjectionUniformBuffer = UniformBuffer::Create(sizeof(glm::mat4) * 2, 1);

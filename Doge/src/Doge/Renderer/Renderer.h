@@ -38,10 +38,10 @@ namespace Doge
 		static void PrepareBufferObjects(const Camera& camera);
 		static void RenderObjectIndexed(const RenderData& renderData);
 	private:
-		static std::shared_ptr<Framebuffer> s_Framebuffer;
-		static std::shared_ptr<VertexArray> s_VertexArray;
-		static std::shared_ptr<UniformBuffer> s_ViewProjectionUniformBuffer;
-		static std::shared_ptr<UniformBuffer> s_LightingUniformBuffer;
+		static std::unique_ptr<Framebuffer> s_Framebuffer;
+		static std::unique_ptr<VertexArray> s_VertexArray;
+		static std::unique_ptr<UniformBuffer> s_ViewProjectionUniformBuffer;
+		static std::unique_ptr<UniformBuffer> s_LightingUniformBuffer;
 		static std::unordered_map<std::shared_ptr<Material>, std::queue<RenderData>> s_RenderQueue;
 
 		static const Shader* s_LastShaderState;

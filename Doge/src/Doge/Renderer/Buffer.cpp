@@ -33,24 +33,24 @@ namespace Doge
 
 	/////////// VertexBuffer ///////////
 
-	std::shared_ptr<VertexBuffer> VertexBuffer::Create(uint32_t size)
+	std::unique_ptr<VertexBuffer> VertexBuffer::Create(uint32_t size)
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!");  return nullptr;
-		case RendererAPI::OpenGL: return std::make_shared<OpenGLVertexBuffer>(size);
+		case RendererAPI::OpenGL: return std::make_unique<OpenGLVertexBuffer>(size);
 		}
 
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
 		return nullptr;
 	}
 
-	std::shared_ptr<VertexBuffer> VertexBuffer::Create(const float* vertices, uint32_t size)
+	std::unique_ptr<VertexBuffer> VertexBuffer::Create(const float* vertices, uint32_t size)
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!");  return nullptr;
-		case RendererAPI::OpenGL: return std::make_shared<OpenGLVertexBuffer>(vertices, size);
+		case RendererAPI::OpenGL: return std::make_unique<OpenGLVertexBuffer>(vertices, size);
 		}
 
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
@@ -59,24 +59,24 @@ namespace Doge
 
 	/////////// IndexBuffer ///////////
 
-	std::shared_ptr<IndexBuffer> IndexBuffer::Create(uint32_t count)
+	std::unique_ptr<IndexBuffer> IndexBuffer::Create(uint32_t count)
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!");  return nullptr;
-		case RendererAPI::OpenGL: return std::make_shared<OpenGLIndexBuffer>(count);
+		case RendererAPI::OpenGL: return std::make_unique<OpenGLIndexBuffer>(count);
 		}
 
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
 		return nullptr;
 	}
 
-	std::shared_ptr<IndexBuffer> IndexBuffer::Create(const uint32_t* indices, uint32_t count)
+	std::unique_ptr<IndexBuffer> IndexBuffer::Create(const uint32_t* indices, uint32_t count)
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!");  return nullptr;
-		case RendererAPI::OpenGL: return std::make_shared<OpenGLIndexBuffer>(indices, count);
+		case RendererAPI::OpenGL: return std::make_unique<OpenGLIndexBuffer>(indices, count);
 		}
 
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
@@ -85,12 +85,12 @@ namespace Doge
 
 	/////////// ShaderStorageBuffer ///////////
 
-	std::shared_ptr<ShaderStorageBuffer> ShaderStorageBuffer::Create(uint32_t size, uint32_t location)
+	std::unique_ptr<ShaderStorageBuffer> ShaderStorageBuffer::Create(uint32_t size, uint32_t location)
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!");  return nullptr;
-		case RendererAPI::OpenGL: return std::make_shared<OpenGLShaderStorageBuffer>(size, location);
+		case RendererAPI::OpenGL: return std::make_unique<OpenGLShaderStorageBuffer>(size, location);
 		}
 
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
@@ -99,12 +99,12 @@ namespace Doge
 	
 	/////////// UniformBuffer ///////////
 
-	std::shared_ptr<UniformBuffer> UniformBuffer::Create(uint32_t size, uint32_t location)
+	std::unique_ptr<UniformBuffer> UniformBuffer::Create(uint32_t size, uint32_t location)
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!");  return nullptr;
-		case RendererAPI::OpenGL: return std::make_shared<OpenGLUniformBuffer>(size, location);
+		case RendererAPI::OpenGL: return std::make_unique<OpenGLUniformBuffer>(size, location);
 		}
 
 		LOG_ASSERT(false, "RendererAPI initialization failed!");

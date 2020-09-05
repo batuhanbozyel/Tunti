@@ -10,16 +10,16 @@ namespace Doge
 	constexpr uint32_t max_textures = 1024;
 
 	uint32_t TextureManager::m_Count = 0;
-	std::vector<std::shared_ptr<Texture>> TextureManager::s_Textures;
+	std::vector<std::unique_ptr<Texture>> TextureManager::s_Textures;
 	std::shared_ptr<ShaderStorageBuffer> TextureManager::m_SSBO = nullptr;
 	std::unordered_map<std::string, uint32_t> TextureManager::s_TextureMap;
 
-	std::shared_ptr<Doge::Texture> Texture::Create(const std::string& texturePath)
+	std::unique_ptr<Texture> Texture::Create(const std::string& texturePath)
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!");  return nullptr;
-		case RendererAPI::OpenGL: return std::make_shared<OpenGLTexture>(texturePath);
+		case RendererAPI::OpenGL: return std::make_unique<OpenGLTexture>(texturePath);
 		}
 
 		LOG_ASSERT(false, "RendererAPI initialization failed!");

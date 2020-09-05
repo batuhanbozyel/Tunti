@@ -40,8 +40,8 @@ namespace Doge
 
 		virtual void Compile(const std::string& vertexSrc, const std::string& fragmentSrc) = 0;
 	private:
-		static std::shared_ptr<Shader> Create(const char* filePath);
-		static std::shared_ptr<Shader> Create(const char* name, const std::string& vertexSrc, const std::string& fragmentSrc);
+		static std::unique_ptr<Shader> Create(const char* filePath);
+		static std::unique_ptr<Shader> Create(const char* name, const std::string& vertexSrc, const std::string& fragmentSrc);
 	protected:
 		uint32_t m_RendererID;
 		std::unordered_map<std::string, uint32_t> m_UniformCache;

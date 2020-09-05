@@ -16,7 +16,7 @@ namespace Doge
 
 	struct WindowProps
 	{
-		WindowProps(const std::string& title = "SandboxApp",
+		WindowProps(const std::string& title = "Doge",
 			uint32_t width = 1280, uint32_t height = 720,
 			GLFWmonitor* monitor = nullptr,
 			GLFWwindow* share = nullptr,
@@ -48,12 +48,14 @@ namespace Doge
 		inline void SetEventCallbackFn(std::function<void(Event&)> callback) { m_Props.EventCallback = callback; }
 		inline bool VSync() const { return m_Props.VSync; }
 
-		inline GLFWwindow* GetNativeWindow() const { return m_Context->GetNativeWindow(); }
+		inline GLFWwindow* GetNativeWindow() const { return static_cast<GLFWwindow*>(m_Context->GetNativeWindow()); }
 		inline const WindowProps& GetWindowProps() const { return m_Props; }
 	private:
 		GLFWwindow* CreateNativeWindow(const WindowFlag& flag);
 	private:
-		std::shared_ptr<Context> m_Context;
+		std::unique_ptr<Context> m_Context;
 		WindowProps m_Props;
+
+		static uint8_t s_WindowCount;
 	};
 }
