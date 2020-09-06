@@ -43,6 +43,7 @@ namespace Doge
 		static Window* s_ActiveWindow;
 		LayerStack m_LayerStack;
 		Timestep m_FrameTime = 0.0f;
+		static bool s_Running;
 	private:
 		static Application* s_Instance;
 		friend int ::main(int argc, char** argv);

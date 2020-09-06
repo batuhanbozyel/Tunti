@@ -1,12 +1,15 @@
 #include "pch.h"
-#include "Window.h"
+#include "Doge/Core/Window.h"
 
 #include "Doge/Renderer/Renderer.h"
 #include "Doge/Events/KeyEvent.h"
 #include "Doge/Events/MouseEvent.h"
 
+#include <GLFW/glfw3.h>
+
 namespace Doge
 {
+#ifdef PLATFORM_WINDOWS
 	uint8_t Window::s_WindowCount = 0;
 
 	static void GLFWErrorCallback(int error, const char* description)
@@ -34,8 +37,8 @@ namespace Doge
 			}
 			glfwSetErrorCallback(GLFWErrorCallback);
 		}
-		
-		GLFWwindow* windowContext = CreateNativeWindow(flag);
+
+		GLFWwindow* windowContext = static_cast<GLFWwindow*>(CreateNativeWindow(flag));
 		LOG_ASSERT(windowContext, "Window creation failed");
 		m_Context = Context::Create(windowContext);
 
@@ -164,6 +167,7 @@ namespace Doge
 
 	void Window::OnWindowResize(WindowResizeEvent& e)
 	{
+		glfwSetWindowSize(static_cast<GLFWwindow*>(m_Context->GetNativeWindow()), e.GetWidth(), e.GetHeight());
 		m_Props.Width = e.GetWidth();
 		m_Props.Height = e.GetHeight();
 	}
@@ -177,7 +181,23 @@ namespace Doge
 		}
 	}
 
-	GLFWwindow* Window::CreateNativeWindow(const WindowFlag& flag)
+	void Window::HideCursor()
+	{
+		glfwSetInputMode(static_cast<GLFWwindow*>(m_Context->GetNativeWindow()), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+		if (glfwRawMouseMotionSupported())
+			glfwSetInputMode(static_cast<GLFWwindow*>(m_Context->GetNativeWindow()), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+	}
+
+	void Window::ShowCursor()
+	{
+		glfwSetInputMode(static_cast<GLFWwindow*>(m_Context->GetNativeWindow()), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
+		if (glfwRawMouseMotionSupported())
+			glfwSetInputMode(static_cast<GLFWwindow*>(m_Context->GetNativeWindow()), GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
+	}
+
+	void* Window::CreateNativeWindow(const WindowFlag& flag)
 	{
 		switch (flag)
 		{
@@ -233,4 +253,7 @@ namespace Doge
 		LOG_ASSERT(nullptr, "Native Window initialization failed!");
 		return nullptr;
 	}
+#else
+#error Tunti Engine currently supports Windows only!
+#endif
 }

@@ -92,9 +92,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\ImGuiBuild.cpp" />
+    <ClInclude Include="src\Editor\EditorLayer.h" />
+    <ClInclude Include="src\Editor\SceneFrame.h" />
+    <ClInclude Include="src\TuntiEditor.h" />
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="src\Editor\EditorLayer.cpp" />
     <ClCompile Include="src\Editor\SceneFrame.cpp" />
+    <ClCompile Include="src\ImGuiBuild.cpp" />
     <ClCompile Include="src\TuntiEditor.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -104,11 +109,6 @@
     <ProjectReference Include="vendor\imgui\ImGui.vcxproj">
       <Project>{C0FF640D-2C14-8DBE-F595-301E616989EF}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\Editor\SceneFrame.h" />
-    <ClInclude Include="src\TuntiEditor.h" />
-    <ClInclude Include="src\Editor\EditorLayer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

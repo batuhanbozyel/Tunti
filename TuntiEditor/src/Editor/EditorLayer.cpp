@@ -31,8 +31,8 @@ namespace TEditor
 		}
 
 		// Setup Platform/Renderer bindings
-		GLFWwindow* window = Doge::Application::GetInstance()->GetActiveWindow()->GetNativeWindow();
-		ImGui_ImplGlfw_InitForOpenGL(window, true);
+		void* window = Doge::Application::GetInstance()->GetActiveWindow()->GetNativeWindow();
+		ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow*>(window), true);
 		ImGui_ImplOpenGL3_Init("#version 450");
 	}
 

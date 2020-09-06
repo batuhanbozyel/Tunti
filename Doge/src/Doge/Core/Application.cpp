@@ -7,14 +7,15 @@
 
 namespace Doge
 {
-	// Application Initialization and Shutdown Methods
 	Application* Application::s_Instance = nullptr;
 	Window* Application::s_ActiveWindow = nullptr;
+	bool Application::s_Running = false;
 
 	Application::Application(const std::string& appName, const WindowFlag& flag)
 	{
 		LOG_ASSERT(s_Instance == nullptr, "Application already exists!");
 		s_Instance = this;
+		s_Running = true;
 		Log::Init();
 
 		Renderer::SetAPI(Doge::RendererAPI::OpenGL);
@@ -35,7 +36,7 @@ namespace Doge
 
 	void Application::Run()
 	{
-		while (!glfwWindowShouldClose(s_ActiveWindow->GetNativeWindow()))
+		while (s_Running)
 		{
 			float dt = m_FrameTime.DeltaTime();
 
@@ -49,7 +50,7 @@ namespace Doge
 
 	void Application::Shutdown() const
 	{
-		glfwSetWindowShouldClose(s_ActiveWindow->GetNativeWindow(), GLFW_TRUE);
+		s_Running = false;
 	}
 
 	void Application::PushLayer(Layer* layer)
@@ -97,13 +98,12 @@ namespace Doge
 
 	bool Application::OnWindowClose(WindowCloseEvent& e)
 	{
-		glfwSetWindowShouldClose(s_ActiveWindow->GetNativeWindow(), GLFW_TRUE);
+		s_Running = false;
 		return true;
 	}
 
 	bool Application::OnWindowResize(WindowResizeEvent& e)
 	{
-		glfwSetWindowSize(s_ActiveWindow->GetNativeWindow(), e.GetWidth(), e.GetHeight());
 		s_ActiveWindow->OnWindowResize(e);
 
 		RendererCommands::SetViewport(0, 0, e.GetWidth(), e.GetHeight());
@@ -114,18 +114,11 @@ namespace Doge
 
 	void Application::DisableCursor()
 	{
-		glfwSetInputMode(s_ActiveWindow->GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-		if (glfwRawMouseMotionSupported())
-			glfwSetInputMode(s_ActiveWindow->GetNativeWindow(), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+		s_ActiveWindow->HideCursor();
 	}
 
 	void Application::EnableCursor()
 	{
-		glfwSetInputMode(s_ActiveWindow->GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-
-		if (glfwRawMouseMotionSupported())
-			glfwSetInputMode(s_ActiveWindow->GetNativeWindow(), GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
+		s_ActiveWindow->ShowCursor();
 	}
-
 }

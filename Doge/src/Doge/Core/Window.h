@@ -1,5 +1,4 @@
 #pragma once
-#include <GLFW/glfw3.h>
 
 #include "Doge/Renderer/Context.h"
 #include "Doge/Events/WindowEvent.h"
@@ -18,8 +17,8 @@ namespace Doge
 	{
 		WindowProps(const std::string& title = "Doge",
 			uint32_t width = 1280, uint32_t height = 720,
-			GLFWmonitor* monitor = nullptr,
-			GLFWwindow* share = nullptr,
+			void* monitor = nullptr,
+			void* share = nullptr,
 			bool vsync = false)
 			: Title(title), Width(width), Height(height), Monitor(monitor), Share(share), VSync(vsync)
 		{
@@ -28,8 +27,8 @@ namespace Doge
 
 		std::string Title;
 		uint32_t Width, Height;
-		GLFWmonitor* Monitor;
-		GLFWwindow* Share;
+		void* Monitor;
+		void* Share;
 		bool VSync;
 
 		std::function<void(Event&)> EventCallback;
@@ -45,13 +44,17 @@ namespace Doge
 		void OnWindowResize(WindowResizeEvent& e);
 
 		void SetVSync(bool enabled);
+
+		void HideCursor();
+		void ShowCursor();
+
 		inline void SetEventCallbackFn(std::function<void(Event&)> callback) { m_Props.EventCallback = callback; }
 		inline bool VSync() const { return m_Props.VSync; }
 
-		inline GLFWwindow* GetNativeWindow() const { return static_cast<GLFWwindow*>(m_Context->GetNativeWindow()); }
+		inline void* GetNativeWindow() const { return m_Context->GetNativeWindow(); }
 		inline const WindowProps& GetWindowProps() const { return m_Props; }
 	private:
-		GLFWwindow* CreateNativeWindow(const WindowFlag& flag);
+		void* CreateNativeWindow(const WindowFlag& flag);
 	private:
 		std::unique_ptr<Context> m_Context;
 		WindowProps m_Props;
