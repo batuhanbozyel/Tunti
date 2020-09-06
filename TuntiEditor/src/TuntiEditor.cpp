@@ -4,7 +4,7 @@
 namespace TEditor
 {
 	TuntiEditor::TuntiEditor()
-		: Application("Tunti Editor", Doge::WindowFlag::MaximizedWindow), m_EditorLayer(new EditorLayer)
+		: Application("Tunti Editor", Doge::WindowFlag::MaximizedWindow), m_EditorLayer(EditorLayer::Create())
 	{
 		PushOverlay(m_EditorLayer);
 	}

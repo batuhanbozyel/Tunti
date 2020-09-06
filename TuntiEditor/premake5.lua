@@ -15,6 +15,7 @@ project "TuntiEditor"
 
 	includedirs
 	{
+		"src",
 		"%{wks.location}/Doge/src",
 		"%{wks.location}/Doge/vendor",
 		"%{IncludeDir.GLFW}",

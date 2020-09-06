@@ -4,6 +4,12 @@
     <Filter Include="Editor">
       <UniqueIdentifier>{8C1A20B0-78BC-4A86-6177-5EDA4DB8D1D6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{2AC788B4-1694-E3BF-3FAD-D1672BD9184E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform\OpenGL">
+      <UniqueIdentifier>{1E7D2C1D-8A08-9AE1-9319-1DD6FF23F6E1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Editor\EditorLayer.h">
@@ -13,6 +19,9 @@
       <Filter>Editor</Filter>
     </ClInclude>
     <ClInclude Include="src\TuntiEditor.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLEditorLayer.h">
+      <Filter>Platform\OpenGL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Editor\EditorLayer.cpp">
@@ -21,7 +30,12 @@
     <ClCompile Include="src\Editor\SceneFrame.cpp">
       <Filter>Editor</Filter>
     </ClCompile>
-    <ClCompile Include="src\ImGuiBuild.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\ImGuiOpenGLBuild.cpp">
+      <Filter>Platform\OpenGL</Filter>
+    </ClCompile>
     <ClCompile Include="src\TuntiEditor.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLEditorLayer.cpp">
+      <Filter>Platform\OpenGL</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
