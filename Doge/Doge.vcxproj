@@ -130,6 +130,7 @@
     <ClInclude Include="src\Doge\Renderer\Texture.h" />
     <ClInclude Include="src\Doge\Renderer\VertexArray.h" />
     <ClInclude Include="src\Doge\Utility\Camera.h" />
+    <ClInclude Include="src\Doge\Utility\CameraController.h" />
     <ClInclude Include="src\Doge\Utility\Material.h" />
     <ClInclude Include="src\Doge\Utility\Mesh.h" />
     <ClInclude Include="src\Doge\Utility\Model.h" />
@@ -654,6 +655,7 @@
     <ClCompile Include="src\Doge\Renderer\Texture.cpp" />
     <ClCompile Include="src\Doge\Renderer\VertexArray.cpp" />
     <ClCompile Include="src\Doge\Utility\Camera.cpp" />
+    <ClCompile Include="src\Doge\Utility\CameraController.cpp" />
     <ClCompile Include="src\Doge\Utility\Material.cpp" />
     <ClCompile Include="src\Doge\Utility\Model.cpp" />
     <ClCompile Include="src\Doge\Utility\SceneObject3D.cpp" />

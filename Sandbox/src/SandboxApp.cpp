@@ -9,7 +9,7 @@ namespace Sandbox
 	{
 	public:
 		SandboxApp()
-			: Application("SandboxApp", Doge::WindowFlag::CustomWindow), m_GameLayer(new GameLayer)
+			: Application("SandboxApp", Doge::WindowFlag::MaximizedWindow), m_GameLayer(new GameLayer)
 		{
 			PushLayer(m_GameLayer);
 		}

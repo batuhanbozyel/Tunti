@@ -72,7 +72,7 @@ namespace Doge
 		s_LightingUniformBuffer->Bind();
 		s_LightingUniformBuffer->SetData(&camera.GetPosition()[0], sizeof(glm::vec3), 0);
 		// Temporary: Light direction is set same as Camera direction
-		s_LightingUniformBuffer->SetData(&camera.GetViewDirection()[0], sizeof(glm::vec3), sizeof(glm::vec4));
+		s_LightingUniformBuffer->SetData(&camera.CalculateViewDirection()[0], sizeof(glm::vec3), sizeof(glm::vec4));
 	}
 
 	void Renderer::RenderObjectIndexed(const RenderData& renderData)

@@ -13,7 +13,7 @@
 #include "Doge/Renderer/Shader.h"
 
 // Utility
-#include "Doge/Utility/Camera.h"
+#include "Doge/Utility/CameraController.h"
 #include "Doge/Utility/Mesh.h"
 #include "Doge/Utility/Model.h"
 #include "Doge/Utility/SceneObject3D.h"

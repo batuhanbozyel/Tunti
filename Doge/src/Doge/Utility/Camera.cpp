@@ -17,12 +17,7 @@ namespace Doge
 
 	}
 
-	void OrthographicCamera::Update()
-	{
-
-	}
-
-	void OrthographicCamera::Move(int keyCode, float dt)
+	void OrthographicCamera::RecalculateViewMatrix()
 	{
 
 	}
@@ -34,74 +29,38 @@ namespace Doge
 
 	// Perspective Camera
 
-	PerspectiveCamera::PerspectiveCamera(float fov, float width, float height,
-		const glm::vec3& position,
-		const glm::vec3& front,
-		const glm::vec3& up)
+	PerspectiveCamera::PerspectiveCamera(float fov, float width, float height, const glm::vec3& position)
 		:
-		Camera(glm::perspective(glm::radians(fov), width / height, 0.01f, 100.0f), glm::lookAt(position, position + front, up), position),
-		m_Fov(fov), m_AspectRatio(width / height),
-		m_Up(up), m_Front(front),
-		m_Yaw(-90.0f), m_Pitch(0.0f),
-		m_LastMousePos(width / 2.0f, height / 2.0f)
+		Camera(glm::perspective(glm::radians(fov), width / height, 0.01f, 100.0f), glm::lookAt(position, position + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f)), position),
+		m_Fov(fov),	m_Up(glm::vec3(0.0f, 1.0f, 0.0f)), m_Front(glm::vec3(0.0f, 0.0f, 1.0f)), m_AspectRatio(width / height)
 	{
 
 	}
 
-	void PerspectiveCamera::Update()
+	void PerspectiveCamera::RecalculateViewMatrix()
 	{
-
-	}
-
-	void PerspectiveCamera::Move(int keyCode, float dt)
-	{
-		constexpr float speed = 0.004f;
-		switch (keyCode)
-		{
-		case Key::W:
-			m_Position += speed * m_Front * dt;
-			break;
-		case Key::S:
-			m_Position -= speed * m_Front * dt;
-			break;
-		case Key::A:
-			m_Position -= speed * glm::normalize(glm::cross(m_Front, m_Up)) * dt;
-			break;
-		case Key::D:
-			m_Position += speed * glm::normalize(glm::cross(m_Front, m_Up)) * dt;
-			break;
-		}
-		m_ViewMatrix = glm::lookAt(m_Position, m_Position + m_Front, m_Up);
-	}
-
-	void PerspectiveCamera::Rotate(const std::pair<float, float>& mousePos)
-	{
-		constexpr float sensitivity = 0.05f;
-
-		m_Yaw += (mousePos.first - m_LastMousePos.first) * sensitivity;
-		m_Pitch += (m_LastMousePos.second - mousePos.second) * sensitivity;
-
-		m_LastMousePos = mousePos;
-
-		if (m_Pitch > 89.0f) m_Pitch = 89.0f;
-		if (m_Pitch < -89.0f) m_Pitch = -89.0f;
-
-		m_Front = glm::normalize(glm::vec3(
-			glm::cos(glm::radians(m_Yaw)) * glm::cos(glm::radians(m_Pitch)),
-			glm::sin(glm::radians(m_Pitch)),
-			glm::sin(glm::radians(m_Yaw)) * glm::cos(glm::radians(m_Pitch))
-		));
 		m_ViewMatrix = glm::lookAt(m_Position, m_Position + m_Front, m_Up);
 	}
 
 	void PerspectiveCamera::SetProjection(float width, float height)
 	{
 		if (height == 0.0f) height = 0.0001f;
-		m_ProjectionMatrix = glm::perspective(glm::radians(m_Fov), width / height, 0.01f, 100.0f);
+		m_AspectRatio = width / height;
+		m_ProjectionMatrix = glm::perspective(glm::radians(m_Fov), m_AspectRatio, 0.01f, 100.0f);
 	}
 
-	const glm::vec3 PerspectiveCamera::GetViewDirection() const
+	void PerspectiveCamera::SetFrontVector(float yaw, float pitch)
 	{
-		return glm::vec3(-m_Front.x, -m_Front.y, m_Front.z);
+		m_Front = glm::normalize(glm::vec3(
+			glm::cos(glm::radians(yaw)) * glm::cos(glm::radians(pitch)),
+			glm::sin(glm::radians(pitch)),
+			glm::sin(glm::radians(yaw)) * glm::cos(glm::radians(pitch))
+		));
+	}
+
+	void PerspectiveCamera::SetFieldOfView(float fov)
+	{
+		m_Fov = fov;
+		m_ProjectionMatrix = glm::perspective(glm::radians(m_Fov), m_AspectRatio, 0.01f, 100.0f);
 	}
 }
