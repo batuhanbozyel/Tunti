@@ -28,6 +28,11 @@ namespace Doge
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
+	void OpenGLFramebuffer::BindColorAttachment(uint32_t slot) const
+	{
+		glBindTextureUnit(slot, m_ColorAttachment);
+	}
+
 	void OpenGLFramebuffer::Construct()
 	{
 		if (m_RendererID)

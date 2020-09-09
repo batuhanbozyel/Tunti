@@ -11,6 +11,8 @@ namespace Doge
 
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
+
+		virtual void BindColorAttachment(uint32_t slot) const override;
 	private:
 		virtual void Construct() override;
 	private:

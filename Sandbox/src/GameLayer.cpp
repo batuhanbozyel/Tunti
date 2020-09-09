@@ -14,20 +14,6 @@ namespace Sandbox
 		Doge::Model backpack("assets/models/backpack/backpack.obj");
 		Doge::Model handgun("assets/models/gun/M1911_01.obj");
 
-#if 1
-		std::vector<Doge::Mesh> modelMeshes;
-		for (uint32_t i = 0; i < 10; i++)
-			for (uint32_t j = 0; j < 10; j++)
-			{
-				Doge::Model backpackCpy = backpack;
-				backpackCpy.Translate(glm::vec3(i * 4.0f, j * 4.0f, 0.0f));
-				std::vector<Doge::Mesh> modelMesh = backpackCpy.GetMeshes();
-				modelMeshes.insert(modelMeshes.end(), modelMesh.begin(), modelMesh.end());
-			}
-
-		Doge::RenderData batchedBackpacks = Doge::RenderDataManager::ConstructBatched(modelMeshes, material);
-		m_RenderDatas.push_back(batchedBackpacks);
-#else
 		Doge::RenderData backpackData = Doge::RenderDataManager::ConstructBatched(backpack.GetMeshes(), material, glm::translate(glm::mat4(1.0f), glm::vec3(-2.0f, 0.0f, 0.0f)));
 		for (uint32_t i = 0; i < 10; i++)
 			for (uint32_t j = 0; j < 10; j++)
@@ -35,7 +21,6 @@ namespace Sandbox
 				backpackData.modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(i * 4.0f, j * 4.0f, 0.0f));
 				m_RenderDatas.push_back(backpackData);
 			}
-#endif
 
 		Doge::Application::DisableCursor();
 	}
