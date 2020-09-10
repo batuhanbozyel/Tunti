@@ -34,7 +34,6 @@ namespace TEditor
 		{
 			Doge::Renderer::Submit(renderData);
 		}
-
 		Doge::Renderer::RenderIndexed(m_CameraController.GetCamera());
 	}
 

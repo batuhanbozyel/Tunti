@@ -99,6 +99,9 @@
     <ClInclude Include="src\Doge\Core\MouseButtonCodes.h">
       <Filter>src\Doge\Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\Doge\Core\Platform.h">
+      <Filter>src\Doge\Core</Filter>
+    </ClInclude>
     <ClInclude Include="src\Doge\Core\Timestep.h">
       <Filter>src\Doge\Core</Filter>
     </ClInclude>
@@ -154,6 +157,9 @@
       <Filter>src\Doge\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Doge\Utility\Camera.h">
+      <Filter>src\Doge\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Doge\Utility\CameraController.h">
       <Filter>src\Doge\Utility</Filter>
     </ClInclude>
     <ClInclude Include="src\Doge\Utility\Material.h">
@@ -1677,7 +1683,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Doge\Utility\CameraController.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Doge\Core\Application.cpp">
@@ -1725,6 +1730,9 @@
     <ClCompile Include="src\Doge\Utility\Camera.cpp">
       <Filter>src\Doge\Utility</Filter>
     </ClCompile>
+    <ClCompile Include="src\Doge\Utility\CameraController.cpp">
+      <Filter>src\Doge\Utility</Filter>
+    </ClCompile>
     <ClCompile Include="src\Doge\Utility\Material.cpp">
       <Filter>src\Doge\Utility</Filter>
     </ClCompile>
@@ -1767,6 +1775,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Doge\Utility\CameraController.cpp" />
   </ItemGroup>
 </Project>

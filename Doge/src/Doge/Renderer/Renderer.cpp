@@ -12,7 +12,6 @@
 
 #include "Doge/Utility/Camera.h"
 #include "Doge/Utility/Material.h"
-#include "Doge/Utility/SceneObject3D.h"
 
 static const char* TexturedQuadVertexShader = R"(
 #version 450 core

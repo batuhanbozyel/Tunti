@@ -1,5 +1,7 @@
 #pragma once
+#include "Platform.h"
 
+#ifdef PLATFORM_WINDOWS
 extern Doge::Application* CreateApplication();
 
 int main(int argc, char** argv)
@@ -10,3 +12,6 @@ int main(int argc, char** argv)
 
 	delete app;
 }
+#else
+#error Tunti Engine currently supports Windows only!
+#endif

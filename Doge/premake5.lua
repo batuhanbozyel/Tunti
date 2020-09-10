@@ -58,7 +58,6 @@ project "Doge"
 
 	filter "system:windows"
 		systemversion "latest"
-		defines "PLATFORM_WINDOWS"
 
 	filter "configurations:Debug"
 		defines "DEBUG_ENABLED"

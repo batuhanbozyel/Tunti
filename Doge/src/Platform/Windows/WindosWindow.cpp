@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "Doge/Core/Platform.h"
 #include "Doge/Core/Window.h"
 
 #include "Doge/Renderer/Renderer.h"

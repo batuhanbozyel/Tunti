@@ -2,6 +2,7 @@
 #include "Application.h"
 
 #include "Doge/Renderer/Renderer.h"
+#include "Doge/Renderer/Framebuffer.h"
 #include "Doge/Renderer/RendererCommands.h"
 #include "Doge/Utility/Camera.h"
 
@@ -105,10 +106,7 @@ namespace Doge
 	bool Application::OnWindowResize(WindowResizeEvent& e)
 	{
 		s_ActiveWindow->OnWindowResize(e);
-
-		RendererCommands::SetViewport(0, 0, e.GetWidth(), e.GetHeight());
-
-		LOG_TRACE(e.ToString());
+		Renderer::GetFramebuffer()->Resize(e.GetWidth(), e.GetHeight());
 		return true;
 	}
 

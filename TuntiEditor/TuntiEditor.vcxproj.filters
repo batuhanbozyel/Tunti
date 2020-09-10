@@ -18,10 +18,10 @@
     <ClInclude Include="src\Editor\SceneFrame.h">
       <Filter>Editor</Filter>
     </ClInclude>
-    <ClInclude Include="src\TuntiEditor.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLEditorLayer.h">
       <Filter>Platform\OpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="src\TuntiEditor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Editor\EditorLayer.cpp">
@@ -33,9 +33,9 @@
     <ClCompile Include="src\Platform\OpenGL\ImGuiOpenGLBuild.cpp">
       <Filter>Platform\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="src\TuntiEditor.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLEditorLayer.cpp">
       <Filter>Platform\OpenGL</Filter>
     </ClCompile>
+    <ClCompile Include="src\TuntiEditor.cpp" />
   </ItemGroup>
 </Project>

@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "Doge/Core/Platform.h"
 #include "Doge/Core/Input.h"
 #include "Doge/Core/Application.h"
 
