@@ -72,7 +72,7 @@ namespace Doge
 			{ ShaderDataType::Float3, "a_Normal" },
 			{ ShaderDataType::Float2, "a_TexCoord" },
 			{ ShaderDataType::UInt , "a_TexIndex" }
-			}, 0);
+		}, 0);
 
 		// Create Framebuffer for Post-Processing Effects
 		s_QuadFramebuffer = Framebuffer::Create(FramebufferSpecification(props.Width, props.Height));

@@ -14,11 +14,10 @@ namespace TEditor
 
 		void Resize(uint32_t viewportWidth, uint32_t viewportHeight);
 
-		uint32_t GetSceneTexture() const { return m_SceneFramebuffer->GetColorAttachment(); }
-		uint32_t GetWidth() const { return m_SceneFramebuffer->GetViewportWidth(); }
-		uint32_t GetHeight() const { return m_SceneFramebuffer->GetViewportHeight(); }
+		uint32_t GetSceneTexture() const { return Doge::Renderer::GetFramebuffer()->GetColorAttachment(); }
+		uint32_t GetWidth() const { return Doge::Renderer::GetFramebuffer()->GetViewportWidth(); }
+		uint32_t GetHeight() const { return Doge::Renderer::GetFramebuffer()->GetViewportHeight(); }
 	private:
-		std::unique_ptr<Doge::Framebuffer> m_SceneFramebuffer;
 		std::vector<Doge::RenderData> m_RenderDatas;
 		Doge::PerspectiveCameraController m_CameraController;
 	};

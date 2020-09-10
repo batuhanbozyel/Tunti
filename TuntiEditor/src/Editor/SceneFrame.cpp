@@ -3,8 +3,7 @@
 namespace TEditor
 {
 	SceneFrame::SceneFrame(uint32_t viewportWidth, uint32_t viewportHeight)
-		: m_SceneFramebuffer(Doge::Framebuffer::Create(Doge::FramebufferSpecification(viewportWidth, viewportHeight))),
-		m_CameraController(60.0f, viewportWidth, viewportHeight)
+		: m_CameraController(60.0f, viewportWidth, viewportHeight)
 	{
 		std::shared_ptr<Doge::Shader> shader = Doge::ShaderLibrary::CreateShader("assets/shaders/PhongLighting.glsl");
 
@@ -36,16 +35,11 @@ namespace TEditor
 			Doge::Renderer::Submit(renderData);
 		}
 
-		m_SceneFramebuffer->Bind();
-		Doge::RendererCommands::ClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
-		Doge::RendererCommands::Clear();
 		Doge::Renderer::RenderIndexed(m_CameraController.GetCamera());
-		m_SceneFramebuffer->Unbind();
 	}
 
 	void SceneFrame::Resize(uint32_t viewportWidth, uint32_t viewportHeight)
 	{
-		m_SceneFramebuffer->Resize(viewportWidth, viewportHeight);
+		Doge::Renderer::GetFramebuffer()->Resize(viewportWidth, viewportHeight);
 	}
-
 }

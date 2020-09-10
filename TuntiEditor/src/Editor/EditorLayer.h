@@ -24,10 +24,9 @@ namespace TEditor
 		virtual void ImGuiBeginRender();
 		virtual void ImGuiEndRender();
 	private:
-
 		void MenuBarView();
 		void StatsView();
-		void SceneView(float dt);
+		void SceneView();
 
 		bool OnKeyPress(Doge::KeyPressedEvent& e);
 	private:

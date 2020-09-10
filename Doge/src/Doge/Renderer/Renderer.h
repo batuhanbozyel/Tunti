@@ -34,6 +34,8 @@ namespace Doge
 
 		static void SetAPI(const RendererAPI& api) { s_API = api; }
 		static const RendererAPI& GetAPI() { return s_API; }
+
+		static const std::unique_ptr<Framebuffer>& GetFramebuffer() { return s_QuadFramebuffer; }
 	private:
 		static void PrepareBufferObjects(const Camera& camera);
 		static void RenderObjectIndexed(const RenderData& renderData);
@@ -43,7 +45,6 @@ namespace Doge
 		static std::shared_ptr<VertexBuffer> s_QuadVertexBuffer;
 		static std::shared_ptr<IndexBuffer> s_QuadIndexBuffer;
 		static std::shared_ptr<Shader> s_QuadTexturedShader;
-
 
 		static std::unique_ptr<VertexArray> s_VertexArray;
 		static std::unique_ptr<UniformBuffer> s_ViewProjectionUniformBuffer;

@@ -54,7 +54,7 @@ namespace TEditor
 		s_EditorAPI->ImGuiBeginRender();
 
 		MenuBarView();
-		SceneView(dt);
+		SceneView();
 		StatsView();
 
 		s_EditorAPI->ImGuiEndRender();
@@ -92,7 +92,7 @@ namespace TEditor
 		}
 	}
 
-	void EditorLayer::SceneView(float dt)
+	void EditorLayer::SceneView()
 	{
 		static bool dockspaceOpen = true;
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
