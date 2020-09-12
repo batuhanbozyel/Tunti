@@ -125,6 +125,7 @@
     <ClInclude Include="src\Doge\Renderer\Pipeline.h" />
     <ClInclude Include="src\Doge\Renderer\RenderDataManager.h" />
     <ClInclude Include="src\Doge\Renderer\Renderer.h" />
+    <ClInclude Include="src\Doge\Renderer\RendererBaseShaders.h" />
     <ClInclude Include="src\Doge\Renderer\RendererCommands.h" />
     <ClInclude Include="src\Doge\Renderer\Shader.h" />
     <ClInclude Include="src\Doge\Renderer\ShaderDataType.h" />
