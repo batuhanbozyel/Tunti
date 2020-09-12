@@ -22,6 +22,8 @@ namespace Doge
 		virtual uint64_t GetTextureHandle() = 0;
 	private:
 		static std::unique_ptr<Texture> Create(const std::string& texturePath);
+		static std::unique_ptr<Texture> CreateWhiteTexture();
+
 		friend class TextureManager;
 	};
 

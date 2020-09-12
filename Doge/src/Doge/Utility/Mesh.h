@@ -6,7 +6,7 @@ namespace Doge
 #pragma pack(push, 1)
 	struct Vertex
 	{
-		Vertex() {}
+		Vertex() = default;
 
 		Vertex(const glm::vec3& pos, const glm::vec3& normal, const glm::vec2& tex, uint32_t index = 0)
 			: Position(pos, 1.0f), Normal(normal), TexCoord(tex), TexIndex(index) {}
@@ -24,6 +24,8 @@ namespace Doge
 	class Mesh
 	{
 	public:
+		Mesh() = default;
+
 		Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices)
 			: m_Vertices(vertices), m_Indices(indices) {}
 
@@ -46,6 +48,8 @@ namespace Doge
 			}
 		}
 
+		inline void SetVertices(const std::vector<Vertex>& vertices) { m_Vertices = vertices; }
+		inline void SetIndices(const std::vector<uint32_t>& indices) { m_Indices = indices; }
 		inline const std::vector<Vertex>& GetVertices() const { return m_Vertices; }
 		inline const std::vector<uint32_t>& GetIndices() const { return m_Indices; }
 	private:

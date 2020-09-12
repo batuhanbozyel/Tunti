@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Renderer.h"
 #include "RendererCommands.h"
+#include "RendererBaseShaders.h"
 
 #include "Shader.h"
 #include "Texture.h"
@@ -13,47 +14,23 @@
 #include "Doge/Utility/Camera.h"
 #include "Doge/Utility/Material.h"
 
-static const char* TexturedQuadVertexShader = R"(
-#version 450 core
-
-layout(location = 0) in vec2  a_Position;
-layout(location = 1) in vec2  a_TexCoord;
-
-out vec2 v_TexCoord;
-
-void main()
-{
-	v_TexCoord = a_TexCoord;
-	gl_Position = vec4(a_Position, 0.0, 1.0);
-})";
-
-static const char* TexturedQuadFragmentShader = R"(
-#version 450 core
-
-layout(location = 0) out vec4 color;
-
-in vec2 v_TexCoord;
-
-uniform sampler2D u_Texture;
-
-void main()
-{
-	color = texture(u_Texture, v_TexCoord);
-})";
-
 namespace Doge
 {
 	RendererAPI Renderer::s_API = RendererAPI::None;
 
 	std::unique_ptr<Framebuffer> Renderer::s_QuadFramebuffer = nullptr;
-	std::unique_ptr<Doge::VertexArray> Renderer::s_QuadVertexArray = nullptr;
-	std::shared_ptr<Doge::VertexBuffer> Renderer::s_QuadVertexBuffer = nullptr;
-	std::shared_ptr<Doge::IndexBuffer> Renderer::s_QuadIndexBuffer = nullptr;
-	std::shared_ptr<Doge::Shader> Renderer::s_QuadTexturedShader = nullptr;
+	std::unique_ptr<VertexArray> Renderer::s_QuadVertexArray = nullptr;
+	std::shared_ptr<VertexBuffer> Renderer::s_QuadVertexBuffer = nullptr;
+	std::shared_ptr<IndexBuffer> Renderer::s_QuadIndexBuffer = nullptr;
+	std::shared_ptr<Shader> Renderer::s_QuadTexturedShader = nullptr;
 
 	std::unique_ptr<VertexArray> Renderer::s_VertexArray = nullptr;
 	std::unique_ptr<UniformBuffer> Renderer::s_ViewProjectionUniformBuffer = nullptr;
 	std::unique_ptr<UniformBuffer> Renderer::s_LightingUniformBuffer = nullptr;
+
+	std::shared_ptr<Shader> Renderer::s_ObjectOutliningShader = nullptr;
+
+	std::queue<Doge::RenderData> Renderer::s_OutlineRenderQueue;
 	std::unordered_map<std::shared_ptr<Material>, std::queue<RenderData>> Renderer::s_RenderQueue;
 
 	const Shader* Renderer::s_LastShaderState = nullptr;
@@ -74,7 +51,7 @@ namespace Doge
 		}, 0);
 
 		// Create Framebuffer for Post-Processing Effects
-		s_QuadFramebuffer = Framebuffer::Create(FramebufferSpecification(props.Width, props.Height));
+		s_QuadFramebuffer = Framebuffer::Create(FramebufferSpecification(props.Width, props.Height, 4, true));
 		// Create Vertex Array, Vertex Buffer and Index Buffer for rendering Framebuffer
 		s_QuadVertexArray = VertexArray::Create();
 		s_QuadVertexArray->Bind();
@@ -130,11 +107,17 @@ namespace Doge
 			s_LightingUniformBuffer->SetData(&diffuse.x, sizeof(glm::vec3), sizeof(glm::vec4) * 3);
 			s_LightingUniformBuffer->SetData(&specular.x, sizeof(glm::vec3), sizeof(glm::vec4) * 4);
 		}
+
+		// Create ObjectOutlining Shader program for outlining selected objects
+		s_ObjectOutliningShader = ShaderLibrary::CreateShader("ObjectOutlining", ObjectOutliningVertexShader, ObjectOutliningFragmentShader);
 	}
 
 	void Renderer::Submit(const RenderData& data)
 	{
 		s_RenderQueue[data.material].emplace(data);
+
+		if(data.Selected)
+			s_OutlineRenderQueue.emplace(data);
 	}
 
 	void Renderer::PrepareBufferObjects(const Camera& camera)
@@ -167,13 +150,16 @@ namespace Doge
 	void Renderer::RenderIndexed(const Camera& camera)
 	{
 		// Render Objects into Framebuffer
-		s_VertexArray->Bind();
 		s_QuadFramebuffer->Bind();
+		s_VertexArray->Bind();
 
 		RendererCommands::ClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		RendererCommands::Clear();
 
 		PrepareBufferObjects(camera);
+
+		// Render objects normally
+		RendererCommands::EnableFaceCulling(CullFace::Back);
 		for (auto& materialLayer : s_RenderQueue)
 		{
 			// Set Common Material properties
@@ -196,10 +182,24 @@ namespace Doge
 				renderQueue.pop();
 			}
 		}
-		s_QuadFramebuffer->Unbind();
+
+		// Render objects in single color with vertices expanded along their normal
+		RendererCommands::EnableFaceCulling(CullFace::Front);
+		s_ObjectOutliningShader->Bind();
+		while (!s_OutlineRenderQueue.empty())
+		{
+			auto& renderData = s_OutlineRenderQueue.front();
+			renderData.modelMatrix = glm::scale(renderData.modelMatrix, glm::vec3(1.03f));
+			s_ObjectOutliningShader->SetUniformMat4("u_Model", renderData.modelMatrix);
+			RenderObjectIndexed(renderData);
+			s_OutlineRenderQueue.pop();
+		}
+
+		s_QuadFramebuffer->BlitMultisampled();
 		s_LastShaderState = nullptr;
 
-		// Render the Framebuffer
+		// Render Framebuffer to the screen
+		RendererCommands::EnableFaceCulling(CullFace::Back);
 		s_QuadFramebuffer->BindColorAttachment(0);
 		s_QuadTexturedShader->Bind();
 		s_QuadVertexArray->Bind();

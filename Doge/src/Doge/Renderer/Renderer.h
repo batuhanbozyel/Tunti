@@ -49,6 +49,8 @@ namespace Doge
 		static std::unique_ptr<VertexArray> s_VertexArray;
 		static std::unique_ptr<UniformBuffer> s_ViewProjectionUniformBuffer;
 		static std::unique_ptr<UniformBuffer> s_LightingUniformBuffer;
+		static std::shared_ptr<Shader> s_ObjectOutliningShader;
+		static std::queue<RenderData> s_OutlineRenderQueue;
 		static std::unordered_map<std::shared_ptr<Material>, std::queue<RenderData>> s_RenderQueue;
 
 		static const Shader* s_LastShaderState;

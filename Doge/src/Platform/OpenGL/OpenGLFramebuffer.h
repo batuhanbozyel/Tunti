@@ -9,6 +9,8 @@ namespace Doge
 		OpenGLFramebuffer(const FramebufferSpecification& specification);
 		~OpenGLFramebuffer();
 
+		virtual void BlitMultisampled() const override;
+
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
 

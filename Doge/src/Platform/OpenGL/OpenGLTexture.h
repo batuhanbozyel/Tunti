@@ -6,6 +6,7 @@ namespace Doge
 	class OpenGLTexture : public Texture
 	{
 	public:
+		explicit OpenGLTexture();
 		explicit OpenGLTexture(const std::string& texturePath);
 		~OpenGLTexture();
 	private:

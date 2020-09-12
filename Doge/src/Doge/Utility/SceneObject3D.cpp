@@ -9,53 +9,48 @@ namespace Doge
 
 	Cuboid::Cuboid(glm::vec3 length, uint32_t texIndex)
 	{
-		m_Vertices.resize(24);
+		std::vector<Vertex> vertices(24);
 		length = length / 2.0f;
 
 		// Front
-		m_Vertices[0] = { glm::vec3(-length.x, -length.y,  length.z), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f), texIndex };
-		m_Vertices[1] = { glm::vec3(length.x, -length.y,  length.z), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f), texIndex };
-		m_Vertices[2] = { glm::vec3(length.x,  length.y,  length.z), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f), texIndex };
-		m_Vertices[3] = { glm::vec3(-length.x,  length.y,  length.z), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f), texIndex };
+		vertices[0] = { glm::vec3(-length.x, -length.y,  length.z), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f), texIndex };
+		vertices[1] = { glm::vec3( length.x, -length.y,  length.z), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f), texIndex };
+		vertices[2] = { glm::vec3( length.x,  length.y,  length.z), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f), texIndex };
+		vertices[3] = { glm::vec3(-length.x,  length.y,  length.z), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f), texIndex };
 		// Back
-		m_Vertices[4] = { glm::vec3(-length.x, -length.y, -length.z), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(0.0f, 0.0f), texIndex };
-		m_Vertices[5] = { glm::vec3(length.x, -length.y, -length.z), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(1.0f, 0.0f), texIndex };
-		m_Vertices[6] = { glm::vec3(length.x,  length.y, -length.z), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(1.0f, 1.0f), texIndex };
-		m_Vertices[7] = { glm::vec3(-length.x,  length.y, -length.z), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(0.0f, 1.0f), texIndex };
+		vertices[4] = { glm::vec3( length.x, -length.y, -length.z), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(0.0f, 0.0f), texIndex };
+		vertices[5] = { glm::vec3(-length.x, -length.y, -length.z), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(1.0f, 0.0f), texIndex };
+		vertices[6] = { glm::vec3(-length.x,  length.y, -length.z), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(1.0f, 1.0f), texIndex };
+		vertices[7] = { glm::vec3( length.x,  length.y, -length.z), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(0.0f, 1.0f), texIndex };
 		// Left
-		m_Vertices[8] = { glm::vec3(-length.x, -length.y, -length.z), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f), texIndex };
-		m_Vertices[9] = { glm::vec3(-length.x, -length.y,  length.z), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f), texIndex };
-		m_Vertices[10] = { glm::vec3(-length.x,  length.y,  length.z), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f), texIndex };
-		m_Vertices[11] = { glm::vec3(-length.x,  length.y, -length.z), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 1.0f), texIndex };
+		vertices[8] =  { glm::vec3(-length.x, -length.y, -length.z), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f), texIndex };
+		vertices[9] =  { glm::vec3(-length.x, -length.y,  length.z), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f), texIndex };
+		vertices[10] = { glm::vec3(-length.x,  length.y,  length.z), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f), texIndex };
+		vertices[11] = { glm::vec3(-length.x,  length.y, -length.z), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 1.0f), texIndex };
 		// Right	
-		m_Vertices[12] = { glm::vec3(length.x, -length.y, -length.z), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f), texIndex };
-		m_Vertices[13] = { glm::vec3(length.x, -length.y,  length.z), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f), texIndex };
-		m_Vertices[14] = { glm::vec3(length.x,  length.y,  length.z), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f), texIndex };
-		m_Vertices[15] = { glm::vec3(length.x,  length.y, -length.z), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 1.0f), texIndex };
+		vertices[12] = { glm::vec3(length.x, -length.y,  length.z), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f), texIndex };
+		vertices[13] = { glm::vec3(length.x, -length.y, -length.z), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f), texIndex };
+		vertices[14] = { glm::vec3(length.x,  length.y, -length.z), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f), texIndex };
+		vertices[15] = { glm::vec3(length.x,  length.y,  length.z), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 1.0f), texIndex };
 		// Top
-		m_Vertices[16] = { glm::vec3(-length.x,  length.y, -length.z), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 0.0f), texIndex };
-		m_Vertices[17] = { glm::vec3(length.x,  length.y, -length.z), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 0.0f), texIndex };
-		m_Vertices[18] = { glm::vec3(length.x,  length.y,  length.z), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 1.0f), texIndex };
-		m_Vertices[19] = { glm::vec3(-length.x,  length.y,  length.z), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 1.0f), texIndex };
+		vertices[16] = { glm::vec3(-length.x,  length.y,  length.z), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 0.0f), texIndex };
+		vertices[17] = { glm::vec3( length.x,  length.y,  length.z), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 0.0f), texIndex };
+		vertices[18] = { glm::vec3( length.x,  length.y, -length.z), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 1.0f), texIndex };
+		vertices[19] = { glm::vec3(-length.x,  length.y, -length.z), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 1.0f), texIndex };
 		// Bottom
-		m_Vertices[20] = { glm::vec3(-length.x, -length.y, -length.z), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(0.0f, 0.0f), texIndex };
-		m_Vertices[21] = { glm::vec3(length.x, -length.y, -length.z), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(1.0f, 0.0f), texIndex };
-		m_Vertices[22] = { glm::vec3(length.x, -length.y,  length.z), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(1.0f, 1.0f), texIndex };
-		m_Vertices[23] = { glm::vec3(-length.x, -length.y,  length.z), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(0.0f, 1.0f), texIndex };
+		vertices[20] = { glm::vec3(-length.x, -length.y, -length.z), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(0.0f, 0.0f), texIndex };
+		vertices[21] = { glm::vec3( length.x, -length.y, -length.z), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(1.0f, 0.0f), texIndex };
+		vertices[22] = { glm::vec3( length.x, -length.y,  length.z), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(1.0f, 1.0f), texIndex };
+		vertices[23] = { glm::vec3(-length.x, -length.y,  length.z), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(0.0f, 1.0f), texIndex };
+
+		m_Mesh.SetVertices(vertices);
+		m_Mesh.SetIndices(CalculateIndices());
 	}
 
-	void Cuboid::Transform(const glm::mat4& transform)
-	{
-		for (auto& vertex : m_Vertices)
-		{
-			vertex.Position = transform * vertex.Position;
-			vertex.Normal = transform * glm::vec4(vertex.Normal, 0.0f);
-		}
-	}
-
-	const std::vector<uint32_t> Cuboid::CalculateIndices(uint32_t& offset)
+	const std::vector<uint32_t> Cuboid::CalculateIndices()
 	{
 		std::vector<uint32_t> indices(36);
+		uint32_t offset = 0;
 		for (uint32_t i = 0; i < 36; i += 6)
 		{
 			indices[i + 0] = offset + 0;
@@ -75,6 +70,7 @@ namespace Doge
 	Sphere::Sphere(float radius, uint32_t sectorCount, uint32_t stackCount, uint32_t texIndex)
 		: m_SectorCount(sectorCount), m_StackCount(stackCount)
 	{
+		std::vector<Vertex> vertices;
 		radius = radius / 2.0f;
 		float x, y, z, xy;                              // vertex position
 		float nx, ny, nz, lengthInv = 1.0f / radius;		// vertex normal
@@ -107,30 +103,24 @@ namespace Doge
 				t = (float)i / stackCount;
 				glm::vec2 texCoord(s, t);
 
-				m_Vertices.push_back(Vertex(pos, normal, texCoord, texIndex));
+				vertices.push_back(Vertex(pos, normal, texCoord, texIndex));
 			}
 		}
 		glm::mat4 transform(glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(-1.0f, 0.0f, 0.0f)));
-		for (auto& vertex : m_Vertices)
+		for (auto& vertex : vertices)
 		{
 			vertex.Position = transform * vertex.Position;
 			vertex.Normal = transform * glm::vec4(vertex.Normal, 0.0f);
 		}
+		m_Mesh.SetVertices(vertices);
+		m_Mesh.SetIndices(CalculateIndices());
 	}
 
-	void Sphere::Transform(const glm::mat4& transform)
-	{
-		for (auto& vertex : m_Vertices)
-		{
-			vertex.Position = transform * vertex.Position;
-			vertex.Normal = transform * glm::vec4(vertex.Normal, 0.0f);
-		}
-	}
-
-	const std::vector<uint32_t> Sphere::CalculateIndices(uint32_t& offset)
+	const std::vector<uint32_t> Sphere::CalculateIndices()
 	{
 		std::vector<uint32_t> indices;
 		int k1, k2;
+		uint32_t offset = 0;
 		for (uint32_t i = 0; i < m_StackCount; ++i)
 		{
 			k1 = i * (m_SectorCount + 1);     // beginning of current stack
@@ -156,7 +146,7 @@ namespace Doge
 				}
 			}
 		}
-		offset += static_cast<uint32_t>(m_Vertices.size());
+		offset += static_cast<uint32_t>(m_Mesh.GetVertices().size());
 		m_IndexCount = static_cast<uint32_t>(indices.size());
 		return indices;
 	}

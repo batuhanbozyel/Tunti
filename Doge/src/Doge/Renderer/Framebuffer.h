@@ -6,8 +6,8 @@ namespace Doge
 	{
 		FramebufferSpecification() = default;
 
-		FramebufferSpecification(uint32_t width, uint32_t height)
-			: Width(width), Height(height) {}
+		FramebufferSpecification(uint32_t width, uint32_t height, uint32_t samples = 1, bool swapChain = false)
+			: Width(width), Height(height), Samples(samples), SwapChainTarget(swapChain) {}
 
 		uint32_t Width = 0, Height = 0;
 		uint32_t Samples = 1;
@@ -21,6 +21,8 @@ namespace Doge
 		static std::unique_ptr<Framebuffer> Create(const FramebufferSpecification& specification);
 
 		void Resize(uint32_t width, uint32_t height);
+
+		virtual void BlitMultisampled() const = 0;
 
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;

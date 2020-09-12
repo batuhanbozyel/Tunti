@@ -8,12 +8,12 @@
 
 namespace Doge
 {
-	RenderData RenderDataManager::ConstructBatched(const std::vector<Mesh>& meshes, const std::shared_ptr<Material>& material, const glm::mat4& model)
+	RenderData RenderDataManager::ConstructBatched(const std::vector<Mesh>& meshes, const std::shared_ptr<Material>& material, const glm::mat4& model, bool selected)
 	{
-		return Construct(BatchMeshes(meshes), material, model);
+		return Construct(BatchMeshes(meshes), material, model, selected);
 	}
 
-	RenderData RenderDataManager::Construct(const Mesh& mesh, const std::shared_ptr<Material>& material, const glm::mat4& model)
+	RenderData RenderDataManager::Construct(const Mesh& mesh, const std::shared_ptr<Material>& material, const glm::mat4& model, bool selected)
 	{
 		std::vector<std::shared_ptr<VertexBuffer>> vertexBuffers;
 		std::shared_ptr<VertexBuffer> vertexBuffer = VertexBuffer::Create(&mesh.GetVertices().data()->Position.x,
@@ -29,7 +29,7 @@ namespace Doge
 		std::shared_ptr<IndexBuffer> indexBuffer = IndexBuffer::Create(mesh.GetIndices().data(),
 			static_cast<uint32_t>(mesh.GetIndices().size()));
 
-		return RenderData(vertexBuffers, indexBuffer, material, model);
+		return RenderData(vertexBuffers, indexBuffer, material, model, selected);
 	}
 
 	Mesh RenderDataManager::BatchMeshes(const std::vector<Mesh>& meshes)

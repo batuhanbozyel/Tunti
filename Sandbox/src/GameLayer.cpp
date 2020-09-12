@@ -11,7 +11,7 @@ namespace Sandbox
 		material->SetBaseColor(glm::vec3(1.0f));
 		material->SetBaseShininess(32.0f);
 
-		Doge::Model backpack("assets/models/backpack/backpack.obj");
+ 		Doge::Model backpack("assets/models/backpack/backpack.obj");
 		Doge::Model handgun("assets/models/gun/M1911_01.obj");
 
 		Doge::RenderData backpackData = Doge::RenderDataManager::ConstructBatched(backpack.GetMeshes(), material, glm::translate(glm::mat4(1.0f), glm::vec3(-2.0f, 0.0f, 0.0f)));
@@ -19,6 +19,8 @@ namespace Sandbox
 			for (uint32_t j = 0; j < 10; j++)
 			{
 				backpackData.modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(i * 4.0f, j * 4.0f, 0.0f));
+				if (i % 2 == 0 && j % 2 == 0) backpackData.Selected = true;
+				else backpackData.Selected = false;
 				m_RenderDatas.push_back(backpackData);
 			}
 

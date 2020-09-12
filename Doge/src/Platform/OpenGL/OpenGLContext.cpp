@@ -61,5 +61,4 @@ namespace Doge
 	{
 		glfwSwapBuffers(m_Window);
 	}
-
 }

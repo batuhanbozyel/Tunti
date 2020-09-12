@@ -26,12 +26,33 @@ namespace Doge
 		return nullptr;
 	}
 
+	std::unique_ptr<Doge::Texture> Texture::CreateWhiteTexture()
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!");  return nullptr;
+		case RendererAPI::OpenGL: return std::make_unique<OpenGLTexture>();
+		}
+
+		LOG_ASSERT(false, "RendererAPI initialization failed!");
+		return nullptr;
+	}
+
 	// TextureManager
 
 	void TextureManager::Init()
 	{
 		s_Textures.reserve(max_textures);
 		m_SSBO = ShaderStorageBuffer::Create(sizeof(TextureMaps) * max_textures, 0);
+
+		s_Textures.emplace_back(Texture::CreateWhiteTexture());
+		// Get Handle with Texture index and store in SSBO
+		m_SSBO->Bind();
+		uint64_t handle = s_Textures[0]->GetTextureHandle();
+		m_SSBO->SetData(&handle, sizeof(TextureMaps) * m_Count + static_cast<size_t>(TextureType::Diffuse), sizeof(uint64_t));
+		m_SSBO->SetData(&handle, sizeof(TextureMaps) * m_Count + static_cast<size_t>(TextureType::Specular), sizeof(uint64_t));
+
+		m_Count++;
 	}
 
 	uint32_t TextureManager::LoadTexture(const std::string& path)
