@@ -12,10 +12,8 @@ namespace Doge
 	{
 		RenderData(const std::vector<std::shared_ptr<VertexBuffer>>& vertexBuffers,
 			const std::shared_ptr<IndexBuffer>& indexBuffer,
-			const std::shared_ptr<Material>& mat,
-			const glm::mat4& model = glm::mat4(1.0f),
-			bool selected = false)
-			: VBOs(vertexBuffers), IBO(indexBuffer), material(mat), modelMatrix(model), Selected(selected)
+			const std::shared_ptr<Material>& mat)
+			: VBOs(vertexBuffers), IBO(indexBuffer), material(mat)
 		{
 
 		}
@@ -23,15 +21,15 @@ namespace Doge
 		std::vector<std::shared_ptr<VertexBuffer>> VBOs;
 		std::shared_ptr<IndexBuffer> IBO;
 		std::shared_ptr<Material> material;
-		glm::mat4 modelMatrix;
-		bool Selected;
+		glm::mat4 modelMatrix = glm::mat4(1.0f);
+		bool Selected = false;
 	};
 
 	class RenderDataManager
 	{
 	public:
-		static RenderData ConstructBatched(const std::vector<Mesh>& meshes, const std::shared_ptr<Material>& material, const glm::mat4& model = glm::mat4(1.0f), bool selected = false);
-		static RenderData Construct(const Mesh& mesh, const std::shared_ptr<Material>& material, const glm::mat4& model = glm::mat4(1.0f), bool selected = false);
+		static RenderData ConstructBatched(const std::vector<Mesh>& meshes, const std::shared_ptr<Material>& material);
+		static RenderData Construct(const Mesh& mesh, const std::shared_ptr<Material>& material);
 	private:
 		static Mesh BatchMeshes(const std::vector<Mesh>& meshes);
 	};

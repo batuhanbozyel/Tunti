@@ -26,14 +26,39 @@ namespace Doge
 		s_RendererAPI->DrawIndexedImpl(count);
 	}
 
+	void RendererCommands::DisableMSAA()
+	{
+		s_RendererAPI->DisableMSAAImpl();
+	}
+
+	void RendererCommands::EnableMSAA()
+	{
+		s_RendererAPI->EnableMSAAImpl();
+	}
+
+	void RendererCommands::DisableDepthTest()
+	{
+		s_RendererAPI->DisableDepthTestImpl();
+	}
+
+	void RendererCommands::EnableDepthTest()
+	{
+		s_RendererAPI->EnableDepthTestImpl();
+	}
+
 	void RendererCommands::DisableFaceCulling()
 	{
 		s_RendererAPI->DisableFaceCullingImpl();
 	}
 
-	void RendererCommands::EnableFaceCulling(const CullFace& face)
+	void RendererCommands::EnableFaceCulling()
 	{
-		s_RendererAPI->EnableFaceCullingImpl(face);
+		s_RendererAPI->EnableFaceCullingImpl();
+	}
+
+	void RendererCommands::SetFaceCulling(const CullFace& face)
+	{
+		s_RendererAPI->SetFaceCullingImpl(face);
 	}
 
 	void RendererCommands::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)

@@ -30,7 +30,6 @@ namespace Doge
 			{
 				glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 				glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
-				glfwWindowHint(GLFW_SAMPLES, 4);
 
 #ifdef DEBUG_ENABLED
 				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);

@@ -10,14 +10,38 @@ namespace Doge
 		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 	}
 
+	void OpenGLRendererCommands::DisableMSAAImpl() const
+	{
+		glDisable(GL_MULTISAMPLE);
+	}
+
+	void OpenGLRendererCommands::EnableMSAAImpl() const
+	{
+		glEnable(GL_MULTISAMPLE);
+	}
+
+	void OpenGLRendererCommands::DisableDepthTestImpl() const
+	{
+		glDisable(GL_DEPTH_TEST);
+	}
+
+	void OpenGLRendererCommands::EnableDepthTestImpl() const
+	{
+		glEnable(GL_DEPTH_TEST);
+	}
+
 	void OpenGLRendererCommands::DisableFaceCullingImpl() const
 	{
 		glDisable(GL_CULL_FACE);
 	}
 
-	void OpenGLRendererCommands::EnableFaceCullingImpl(const CullFace& face) const
+	void OpenGLRendererCommands::EnableFaceCullingImpl() const
 	{
 		glEnable(GL_CULL_FACE);
+	}
+
+	void OpenGLRendererCommands::SetFaceCullingImpl(const CullFace& face) const
+	{
 		glCullFace(GL_FRONT + static_cast<int>(face));
 	}
 

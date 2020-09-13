@@ -55,7 +55,7 @@ struct Material
 
 struct Light
 {
-	vec3  Direction;
+	vec3  Position;
 	vec3  Ambient;
 	vec3  Diffuse;
 	vec3  Specular;
@@ -82,7 +82,7 @@ void main()
 
 	// Diffuse Lighting
 	vec3 norm = normalize(v_Normal);
-	vec3 lightDir = normalize(-u_Light.Direction);
+	vec3 lightDir = normalize(u_Light.Position - v_FragPos);
 	float diff = max(dot(norm, lightDir), 0.0);
 	vec3 diffuse = u_Light.Diffuse * diff * vec3(texture(sampler2D(textureBuffer.textures[v_TexIndex].Diffuse), v_TexCoord));
 

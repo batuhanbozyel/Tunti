@@ -13,13 +13,18 @@ namespace Doge
 	OpenGLFramebuffer::~OpenGLFramebuffer()
 	{
 		glDeleteFramebuffers(1, &m_RendererID);
-		glDeleteTextures(1, &m_ColorAttachment);
+
+		if (m_Specification.SwapChainTarget)
+			glDeleteRenderbuffers(1, &m_ColorAttachment);
+		else
+			glDeleteTextures(1, &m_ColorAttachment);
+
 		glDeleteRenderbuffers(1, &m_DepthAttachment);
 	}
 
-	void OpenGLFramebuffer::BlitMultisampled() const
+	void OpenGLFramebuffer::BlitMultisampled(uint32_t fboID) const
 	{
-		glBlitNamedFramebuffer(m_RendererID, 0, 0, 0, m_Specification.Width, m_Specification.Height, 0, 0, m_Specification.Width, m_Specification.Height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+		glBlitNamedFramebuffer(m_RendererID, fboID, 0, 0, m_Specification.Width, m_Specification.Height, 0, 0, m_Specification.Width, m_Specification.Height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 	}
 
 	void OpenGLFramebuffer::Bind() const
@@ -43,7 +48,12 @@ namespace Doge
 		if (m_RendererID)
 		{
 			glDeleteFramebuffers(1, &m_RendererID);
-			glDeleteTextures(1, &m_ColorAttachment);
+
+			if (m_Specification.SwapChainTarget)
+				glDeleteRenderbuffers(1, &m_ColorAttachment);
+			else
+				glDeleteTextures(1, &m_ColorAttachment);
+
 			glDeleteRenderbuffers(1, &m_DepthAttachment);
 		}
 
@@ -52,8 +62,10 @@ namespace Doge
 		// Construct Color Buffer Texture
 		if (m_Specification.SwapChainTarget)
 		{
-			glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &m_ColorAttachment);
-			glTextureStorage2DMultisample(m_ColorAttachment, m_Specification.Samples, GL_RGBA8, m_Specification.Width, m_Specification.Height, GL_TRUE);
+			glCreateRenderbuffers(1, &m_ColorAttachment);
+			glNamedRenderbufferStorageMultisample(m_ColorAttachment, m_Specification.Samples, GL_RGBA8, m_Specification.Width, m_Specification.Height);
+			// Set Framebuffer's Color Attachment
+			glNamedFramebufferRenderbuffer(m_RendererID, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, m_ColorAttachment);
 		}
 		else
 		{
@@ -61,19 +73,16 @@ namespace Doge
 			glTextureParameteri(m_ColorAttachment, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTextureParameteri(m_ColorAttachment, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTextureStorage2D(m_ColorAttachment, 1, GL_RGBA8, m_Specification.Width, m_Specification.Height);
+			// Set Framebuffer's Color Attachment
+			glNamedFramebufferTexture(m_RendererID, GL_COLOR_ATTACHMENT0, m_ColorAttachment, 0);
 		}
-		
-		// Set Framebuffer's Color Attachment
-		glNamedFramebufferTexture(m_RendererID, GL_COLOR_ATTACHMENT0, m_ColorAttachment, 0);
 
 		// Construct Depth Render Buffer
 		glCreateRenderbuffers(1, &m_DepthAttachment);
-
 		if (m_Specification.SwapChainTarget)
 			glNamedRenderbufferStorageMultisample(m_DepthAttachment, m_Specification.Samples, GL_DEPTH24_STENCIL8, m_Specification.Width, m_Specification.Height);
 		else
 			glNamedRenderbufferStorage(m_DepthAttachment, GL_DEPTH24_STENCIL8, m_Specification.Width, m_Specification.Height);
-		
 		// Set Framebuffer's Depth Attachment
 		glNamedFramebufferRenderbuffer(m_RendererID, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_DepthAttachment);
 

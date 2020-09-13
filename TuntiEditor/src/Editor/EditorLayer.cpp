@@ -37,7 +37,7 @@ namespace TEditor
 
 	void EditorLayer::OnEvent(Doge::Event& e)
 	{
-		if (m_BlockEvents)
+		if (!m_ScenePlay)
 		{
 			ImGuiIO& io = ImGui::GetIO();
 			e.Handled |= e.IsInCategory(Doge::EventCategoryMouse) & io.WantCaptureMouse;
@@ -67,14 +67,12 @@ namespace TEditor
 
 	void EditorLayer::StopScenePlay()
 	{
-		m_BlockEvents = true;
 		m_ScenePlay = false;
 		Doge::Application::EnableCursor();
 	}
 
 	void EditorLayer::StartScenePlay()
 	{
-		m_BlockEvents = false;
 		m_ScenePlay = true;
 		Doge::Application::DisableCursor();
 	}

@@ -53,7 +53,7 @@ namespace Doge
 		void SetFrontVector(float yaw, float pitch);
 		void SetFieldOfView(float fov);
 
-		virtual inline glm::vec3 CalculateViewDirection() const override { return glm::vec3(-m_Front.x, -m_Front.y, m_Front.z); };
+		virtual inline glm::vec3 CalculateViewDirection() const override { return glm::vec3(-m_Front.x,-m_Front.y, m_Front.z); };
 
 		inline const glm::vec3& GetFrontVector() const { return m_Front; }
 		inline const glm::vec3& GetUpVector() const { return m_Up; }

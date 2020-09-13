@@ -30,7 +30,6 @@ namespace TEditor
 
 		bool OnKeyPress(Doge::KeyPressedEvent& e);
 	private:
-		bool m_BlockEvents = true;
 		bool m_ScenePlay = false;
 		SceneFrame m_Scene;
 		static EditorLayer* s_EditorAPI;

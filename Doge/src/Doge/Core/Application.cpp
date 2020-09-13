@@ -106,7 +106,7 @@ namespace Doge
 	bool Application::OnWindowResize(WindowResizeEvent& e)
 	{
 		s_ActiveWindow->OnWindowResize(e);
-		Renderer::GetFramebuffer()->Resize(e.GetWidth(), e.GetHeight());
+		Renderer::OnWindowResize(e);
 		return true;
 	}
 

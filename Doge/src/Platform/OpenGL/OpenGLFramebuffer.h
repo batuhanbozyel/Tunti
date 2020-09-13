@@ -9,7 +9,7 @@ namespace Doge
 		OpenGLFramebuffer(const FramebufferSpecification& specification);
 		~OpenGLFramebuffer();
 
-		virtual void BlitMultisampled() const override;
+		virtual void BlitMultisampled(uint32_t fboID) const override;
 
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
@@ -17,7 +17,5 @@ namespace Doge
 		virtual void BindColorAttachment(uint32_t slot) const override;
 	private:
 		virtual void Construct() override;
-	private:
-		uint32_t m_RendererID;
 	};
 }

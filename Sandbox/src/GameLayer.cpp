@@ -11,27 +11,16 @@ namespace Sandbox
 		material->SetBaseColor(glm::vec3(1.0f));
 		material->SetBaseShininess(32.0f);
 
- 		Doge::Model backpack("assets/models/backpack/backpack.obj");
-		Doge::Model handgun("assets/models/gun/M1911_01.obj");
-
-		Doge::RenderData backpackData = Doge::RenderDataManager::ConstructBatched(backpack.GetMeshes(), material, glm::translate(glm::mat4(1.0f), glm::vec3(-2.0f, 0.0f, 0.0f)));
-		for (uint32_t i = 0; i < 10; i++)
-			for (uint32_t j = 0; j < 10; j++)
-			{
-				backpackData.modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(i * 4.0f, j * 4.0f, 0.0f));
-				if (i % 2 == 0 && j % 2 == 0) backpackData.Selected = true;
-				else backpackData.Selected = false;
-				m_RenderDatas.push_back(backpackData);
-			}
+		Doge::Cuboid cube(glm::vec3(1.0f));
+		Doge::RenderData cubeData = Doge::RenderDataManager::Construct(cube.GetMesh(), material);
+		cubeData.Selected = true;
+		m_RenderDatas.push_back(cubeData);
 
 		Doge::Application::DisableCursor();
 	}
 
 	void GameLayer::OnUpdate(float dt)
 	{
-		Doge::RendererCommands::ClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
-		Doge::RendererCommands::Clear();
-
 		m_CameraController.OnUpdate(dt);
 
 		for (const auto& renderData : m_RenderDatas)

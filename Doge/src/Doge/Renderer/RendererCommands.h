@@ -14,8 +14,15 @@ namespace Doge
 		// Renderer Commands
 		static void DrawIndexed(uint32_t count);
 
+		static void DisableMSAA();
+		static void EnableMSAA();
+
+		static void DisableDepthTest();
+		static void EnableDepthTest();
+
 		static void DisableFaceCulling();
-		static void EnableFaceCulling(const CullFace& face);
+		static void EnableFaceCulling();
+		static void SetFaceCulling(const CullFace& face);
 
 		static void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height);
 		static void ClearColor(const glm::vec4& color);
@@ -23,8 +30,15 @@ namespace Doge
 	protected:
 		virtual void DrawIndexedImpl(uint32_t count) const = 0;
 
+		virtual void DisableMSAAImpl() const = 0;
+		virtual void EnableMSAAImpl() const = 0;
+
+		virtual void DisableDepthTestImpl() const = 0;
+		virtual void EnableDepthTestImpl() const = 0;
+
 		virtual void DisableFaceCullingImpl() const = 0;
-		virtual void EnableFaceCullingImpl(const CullFace& face) const = 0;
+		virtual void EnableFaceCullingImpl() const = 0;
+		virtual void SetFaceCullingImpl(const CullFace& face) const = 0;
 
 		virtual void SetViewportImpl(uint32_t x, uint32_t y, uint32_t width, uint32_t height) const = 0;
 		virtual void ClearColorImpl(const glm::vec4& color) const = 0;
