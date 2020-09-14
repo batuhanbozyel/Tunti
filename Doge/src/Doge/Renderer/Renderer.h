@@ -50,6 +50,7 @@ namespace Doge
 
 		void RenderObjectsIndexed();
 		void RenderOutlinedObjectsIndexed();
+		void RenderLightObjectsIndexed();
 		void RenderFramebuffer();
 
 		void DrawIndexed(const RenderData& renderData);
@@ -68,7 +69,8 @@ namespace Doge
 		std::queue<RenderData> s_OutlineRenderQueue;
 		std::unordered_map<std::shared_ptr<Material>, std::queue<RenderData>> s_RenderQueue;
 
-		const Shader* s_LastShaderState;
+		std::unique_ptr<RenderData> s_PointLight;
+		const Shader* s_LastShaderState = nullptr;
 
 		static Renderer* s_Renderer;
 		static RendererAPI s_API;

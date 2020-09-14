@@ -13,6 +13,7 @@
 
 #include "Doge/Utility/Camera.h"
 #include "Doge/Utility/Material.h"
+#include "Doge/Utility/SceneObject3D.h"
 
 namespace Doge
 {
@@ -91,17 +92,26 @@ namespace Doge
 		// Lighting Uniform buffer: binding = 2
 		s_LightingUniformBuffer = UniformBuffer::Create(sizeof(glm::vec4) * 5, 2);
 
+		// Create ObjectOutlining Shader program for outlining selected objects
+		s_ObjectOutliningShader = ShaderLibrary::CreateShader("ObjectOutlining", ObjectOutliningVertexShader, ObjectOutliningFragmentShader);
+
 		// Set Lighting properties
 		s_LightingUniformBuffer->Bind();
-		glm::vec3 ambient(0.5f);
-		glm::vec3 diffuse(0.5f);
-		glm::vec3 specular(0.5f);
+		glm::vec3 position(6.0f, 4.0f, 5.0f);
+		glm::vec3 ambient(0.6f);
+		glm::vec3 diffuse(0.6f);
+		glm::vec3 specular(0.2f);
+		s_LightingUniformBuffer->SetData(&position.x, sizeof(glm::vec3), sizeof(glm::vec4));
 		s_LightingUniformBuffer->SetData(&ambient.x, sizeof(glm::vec3), sizeof(glm::vec4) * 2);
 		s_LightingUniformBuffer->SetData(&diffuse.x, sizeof(glm::vec3), sizeof(glm::vec4) * 3);
 		s_LightingUniformBuffer->SetData(&specular.x, sizeof(glm::vec3), sizeof(glm::vec4) * 4);
 
-		// Create ObjectOutlining Shader program for outlining selected objects
-		s_ObjectOutliningShader = ShaderLibrary::CreateShader("ObjectOutlining", ObjectOutliningVertexShader, ObjectOutliningFragmentShader);
+		// Set Point Light properties for rendering
+		Sphere pointLight(1.0f);
+		std::shared_ptr<Material> lightMaterial = std::make_shared<Material>(*s_ObjectOutliningShader.get());
+		RenderData pointLightData = RenderDataManager::Construct(pointLight.GetMesh(), lightMaterial);
+		pointLightData.modelMatrix = glm::translate(glm::mat4(1.0f), position);
+		s_PointLight.reset(new RenderData(pointLightData));
 	}
 
 	Renderer::~Renderer()
@@ -120,9 +130,6 @@ namespace Doge
 		s_LightingUniformBuffer->Bind();
 		// Set vec3 u_CameraPos
 		s_LightingUniformBuffer->SetData(&camera.GetPosition()[0], sizeof(glm::vec3), 0);
-		// Set Light u_Light.Position
-		// Temporary: Light position is set same as Camera direction
-		s_LightingUniformBuffer->SetData(&camera.GetPosition()[0], sizeof(glm::vec3), sizeof(glm::vec4));
 	}
 
 	void Renderer::BeginRender(const Camera& camera)
@@ -183,6 +190,7 @@ namespace Doge
 		RendererCommands::SetFaceCulling(CullFace::Front);
 
 		s_ObjectOutliningShader->Bind();
+		s_ObjectOutliningShader->SetUniformFloat3("u_OutlineColor", { 0.8f, 0.5f, 0.2f });
 		while (!s_OutlineRenderQueue.empty())
 		{
 			auto& renderData = s_OutlineRenderQueue.front();
@@ -191,6 +199,13 @@ namespace Doge
 			DrawIndexed(renderData);
 			s_OutlineRenderQueue.pop();
 		}
+	}
+
+	void Renderer::RenderLightObjectsIndexed()
+	{
+		s_ObjectOutliningShader->SetUniformFloat3("u_OutlineColor", { 1.0f, 1.0f, 1.0f });
+		s_ObjectOutliningShader->SetUniformMat4("u_Model", s_PointLight->modelMatrix);
+		DrawIndexed(*s_PointLight.get());
 	}
 
 	void Renderer::RenderFramebuffer()
@@ -241,6 +256,11 @@ namespace Doge
 
 			// Render objects in single color with vertices expanded along their normal
 			s_Renderer->RenderOutlinedObjectsIndexed();
+
+			// Render Light objects in white color
+			// Make sure Lights are rendered right after Object Outlining
+			// So, We don't have to bind the same shader again
+			s_Renderer->RenderLightObjectsIndexed();
 		}
 		s_Renderer->EndRender();
 

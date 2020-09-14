@@ -60,8 +60,10 @@ namespace Doge
 	
 	layout(location = 0) out vec4 color;
 
+	uniform vec3 u_OutlineColor;
+
 	void main()
 	{
-		color = vec4(0.8, 0.5, 0.2, 1.0);
+		color = vec4(u_OutlineColor, 1.0);
 	})";
 }
