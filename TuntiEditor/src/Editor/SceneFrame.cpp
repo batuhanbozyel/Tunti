@@ -11,16 +11,10 @@ namespace TEditor
 		material->SetBaseColor(glm::vec3(1.0f));
 		material->SetBaseShininess(32.0f);
 
-		Doge::Model backpack("assets/models/backpack/backpack.obj");
-		Doge::Model handgun("assets/models/gun/M1911_01.obj");
-
-		Doge::RenderData backpackData = Doge::RenderDataManager::ConstructBatched(backpack.GetMeshes(), material);
-		for (uint32_t i = 0; i < 10; i++)
-			for (uint32_t j = 0; j < 10; j++)
-			{
-				backpackData.modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(i * 4.0f, j * 4.0f, 0.0f));
-				m_RenderDatas.push_back(backpackData);
-			}
+		Doge::Cuboid cube(glm::vec3(1.0f));
+		Doge::RenderData cubeData = Doge::RenderDataManager::Construct(cube.GetMesh(), material);
+		cubeData.Selected = true;
+		m_RenderDatas.push_back(cubeData);
 	}
 
 	void SceneFrame::OnUpdate(float dt)

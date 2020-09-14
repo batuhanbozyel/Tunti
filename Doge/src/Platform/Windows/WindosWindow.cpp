@@ -197,6 +197,11 @@ namespace Doge
 			glfwSetInputMode(static_cast<GLFWwindow*>(m_Context->GetNativeWindow()), GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
 	}
 
+	void Window::SetCursorPos(float x, float y)
+	{
+		glfwSetCursorPos(static_cast<GLFWwindow*>(m_Context->GetNativeWindow()), x, y);
+	}
+
 	void* Window::CreateNativeWindow(const WindowFlag& flag)
 	{
 		switch (flag)

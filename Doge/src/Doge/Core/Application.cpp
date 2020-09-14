@@ -25,6 +25,7 @@ namespace Doge
 		s_ActiveWindow = window;
 
 		Renderer::Init(s_ActiveWindow->GetWindowProps());
+		SetCursorPos(s_ActiveWindow->GetWindowProps().Width / 2.0f, s_ActiveWindow->GetWindowProps().Height / 2.0f);
 
 		LOG_TRACE("Application started running!");
 	}
@@ -118,5 +119,10 @@ namespace Doge
 	void Application::EnableCursor()
 	{
 		s_ActiveWindow->ShowCursor();
+	}
+
+	void Application::SetCursorPos(float x, float y)
+	{
+		s_ActiveWindow->SetCursorPos(x, y);
 	}
 }

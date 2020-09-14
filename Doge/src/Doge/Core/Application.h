@@ -30,6 +30,7 @@ namespace Doge
 		// Application Utility Methods
 		static void DisableCursor();
 		static void EnableCursor();
+		static void SetCursorPos(float x, float y);
 
 		inline static const Window* GetActiveWindow() { return s_ActiveWindow; }
 		inline static const Application* GetInstance() { return s_Instance; }

@@ -47,6 +47,7 @@ namespace Doge
 
 		void HideCursor();
 		void ShowCursor();
+		void SetCursorPos(float x, float y);
 
 		inline void SetEventCallbackFn(std::function<void(Event&)> callback) { m_Props.EventCallback = callback; }
 		inline bool VSync() const { return m_Props.VSync; }

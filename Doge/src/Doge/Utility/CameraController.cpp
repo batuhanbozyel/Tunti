@@ -32,7 +32,8 @@ namespace Doge
 		: m_Camera(fov, width, height, position),
 		m_LastMousePos(width / 2.0f, height / 2.0f)
 	{
-
+		m_Camera.SetFrontVector(m_Yaw, m_Pitch);
+		m_Camera.RecalculateViewMatrix();
 	}
 
 	void PerspectiveCameraController::OnEvent(Event& e)
@@ -76,5 +77,4 @@ namespace Doge
 		m_Camera.SetProjection(static_cast<float>(e.GetWidth()), static_cast<float>(e.GetHeight()));
 		return false;
 	}
-
 }

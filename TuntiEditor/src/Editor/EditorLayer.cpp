@@ -19,7 +19,7 @@ namespace TEditor
 		switch (Doge::Renderer::GetAPI())
 		{
 		case Doge::RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
-		case Doge::RendererAPI::OpenGL: return s_EditorAPI = new OpenGLEditorLayer; return s_EditorAPI;
+		case Doge::RendererAPI::OpenGL: return s_EditorAPI = new OpenGLEditorLayer;
 		}
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
 		return nullptr;
@@ -67,14 +67,24 @@ namespace TEditor
 
 	void EditorLayer::StopScenePlay()
 	{
-		m_ScenePlay = false;
-		Doge::Application::EnableCursor();
+		if (m_ScenePlay == true)
+		{
+			m_ScenePlay = false;
+			m_Scene = SceneFrame(Doge::Application::GetActiveWindow()->GetWindowProps().Width,
+								 Doge::Application::GetActiveWindow()->GetWindowProps().Height);
+			Doge::Application::EnableCursor();
+		}
 	}
 
 	void EditorLayer::StartScenePlay()
 	{
-		m_ScenePlay = true;
-		Doge::Application::DisableCursor();
+		if (m_ScenePlay == false)
+		{
+			m_ScenePlay = true;
+			Doge::Application::SetCursorPos(Doge::Application::GetActiveWindow()->GetWindowProps().Width / 2.0f,
+											Doge::Application::GetActiveWindow()->GetWindowProps().Height / 2.0f);
+			Doge::Application::DisableCursor();
+		}
 	}
 
 	void EditorLayer::MenuBarView()
