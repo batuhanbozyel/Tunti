@@ -31,14 +31,22 @@ namespace Doge
 	{
 	public:
 		static void Init();
+		~TextureManager() = default;
 
 		static uint32_t LoadTexture(const std::string& path);
 		static uint32_t LoadTextureMaps(const std::vector<std::pair<std::string, TextureType>>& texturePaths);
 	private:
-		static std::vector<std::unique_ptr<Texture>> s_Textures;
-		static std::shared_ptr<ShaderStorageBuffer> m_SSBO;
+		TextureManager();
 
-		static uint32_t m_Count;
-		static std::unordered_map<std::string, uint32_t> s_TextureMap;
+		uint32_t LoadTextureImpl(const std::string& path);
+		uint32_t LoadTextureMapsImpl(const std::vector<std::pair<std::string, TextureType>>& texturePaths);
+	private:
+		std::vector<std::unique_ptr<Texture>> s_Textures;
+		std::shared_ptr<ShaderStorageBuffer> m_SSBO;
+
+		uint32_t m_Count = 0;
+		std::unordered_map<std::string, uint32_t> s_TextureMap;
+
+		static std::unique_ptr<TextureManager> s_TextureManager;
 	};
 }

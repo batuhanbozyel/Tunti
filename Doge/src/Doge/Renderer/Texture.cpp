@@ -8,11 +8,7 @@
 namespace Doge
 {
 	constexpr uint32_t max_textures = 1024;
-
-	uint32_t TextureManager::m_Count = 0;
-	std::vector<std::unique_ptr<Texture>> TextureManager::s_Textures;
-	std::shared_ptr<ShaderStorageBuffer> TextureManager::m_SSBO = nullptr;
-	std::unordered_map<std::string, uint32_t> TextureManager::s_TextureMap;
+	std::unique_ptr<TextureManager> TextureManager::s_TextureManager = nullptr;
 
 	std::unique_ptr<Texture> Texture::Create(const std::string& texturePath)
 	{
@@ -40,7 +36,7 @@ namespace Doge
 
 	// TextureManager
 
-	void TextureManager::Init()
+	TextureManager::TextureManager()
 	{
 		s_Textures.reserve(max_textures);
 		m_SSBO = ShaderStorageBuffer::Create(sizeof(TextureMaps) * max_textures, 0);
@@ -55,7 +51,7 @@ namespace Doge
 		m_Count++;
 	}
 
-	uint32_t TextureManager::LoadTexture(const std::string& path)
+	uint32_t TextureManager::LoadTextureImpl(const std::string& path)
 	{
 		auto& textureIt = s_TextureMap.find(path);
 		uint32_t index = 0;
@@ -81,7 +77,7 @@ namespace Doge
 		return m_Count++;
 	}
 
-	uint32_t TextureManager::LoadTextureMaps(const std::vector<std::pair<std::string, TextureType>>& texturePaths)
+	uint32_t TextureManager::LoadTextureMapsImpl(const std::vector<std::pair<std::string, TextureType>>& texturePaths)
 	{
 		m_SSBO->Bind();
 		for (const auto& texture : texturePaths)
@@ -107,5 +103,20 @@ namespace Doge
 
 		// Return SSBO storage index
 		return m_Count++;
+	}
+
+	void TextureManager::Init()
+	{
+		s_TextureManager.reset(new TextureManager);
+	}
+
+	uint32_t TextureManager::LoadTexture(const std::string& path)
+	{
+		return s_TextureManager->LoadTextureImpl(path);
+	}
+
+	uint32_t TextureManager::LoadTextureMaps(const std::vector<std::pair<std::string, TextureType>>& texturePaths)
+	{
+		return s_TextureManager->LoadTextureMapsImpl(texturePaths);
 	}
 }
