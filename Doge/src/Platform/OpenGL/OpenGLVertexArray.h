@@ -15,6 +15,6 @@ namespace Doge
 		virtual void BindVertexBuffer(const std::shared_ptr<VertexBuffer>& vertexBuffer, uint32_t binding) override;
 		virtual void BindIndexBuffer(const std::shared_ptr<IndexBuffer>& indexBuffer) override;
 
-		virtual void SetBufferLayout(const BufferLayout& layout, uint32_t binding) override;
+		virtual void SetBufferLayout(const BufferLayout& layout, uint32_t binding, uint32_t divisor = 0) override;
 	};
 }

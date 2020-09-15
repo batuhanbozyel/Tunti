@@ -36,7 +36,7 @@ namespace Doge
 		glVertexArrayElementBuffer(m_RendererID, indexBuffer->GetID());
 	}
 
-	void OpenGLVertexArray::SetBufferLayout(const BufferLayout& layout, uint32_t binding)
+	void OpenGLVertexArray::SetBufferLayout(const BufferLayout& layout, uint32_t binding, uint32_t divisor)
 	{
 		LOG_ASSERT(binding < 16, "VertexArrayBinding must be in range 0 to 16");
 
@@ -69,6 +69,7 @@ namespace Doge
 				break;
 			}
 			glVertexArrayAttribBinding(m_RendererID, m_VertexAttribIndex, binding);
+			glVertexArrayBindingDivisor(m_RendererID, binding, divisor);
 			m_VertexAttribIndex++;
 		}
 	}

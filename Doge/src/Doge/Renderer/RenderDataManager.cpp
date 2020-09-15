@@ -17,17 +17,18 @@ namespace Doge
 	{
 		std::vector<std::shared_ptr<VertexBuffer>> vertexBuffers;
 		std::shared_ptr<VertexBuffer> vertexBuffer = VertexBuffer::Create(&mesh.GetVertices().data()->Position.x,
-			static_cast<uint32_t>(mesh.GetVertices().size() * sizeof(Vertex)));
+																		  static_cast<uint32_t>(mesh.GetVertices().size() * sizeof(Vertex)));
+
 		vertexBuffer->SetLayout({
 			{ ShaderDataType::Float4, "a_Position" },
 			{ ShaderDataType::Float3, "a_Normal" },
 			{ ShaderDataType::Float2, "a_TexCoord" },
 			{ ShaderDataType::UInt , "a_TexIndex" }
-			});
+		});
 		vertexBuffers.push_back(vertexBuffer);
 
 		std::shared_ptr<IndexBuffer> indexBuffer = IndexBuffer::Create(mesh.GetIndices().data(),
-			static_cast<uint32_t>(mesh.GetIndices().size()));
+																	   static_cast<uint32_t>(mesh.GetIndices().size()));
 
 		return RenderData(vertexBuffers, indexBuffer, material);
 	}
@@ -43,10 +44,10 @@ namespace Doge
 			vertices.insert(std::end(vertices), std::begin(meshVertices), std::end(meshVertices));
 
 			auto meshIndices = mesh.GetIndices();
-			std::for_each(meshIndices.begin(), meshIndices.end(), [&](uint32_t& indice)
-				{
-					indice += offset;
-				});
+			std::for_each(meshIndices.begin(), meshIndices.end(), [&offset = std::as_const(offset)](uint32_t& indice)
+			{
+				indice += offset;
+			});
 
 			indices.insert(std::end(indices), std::begin(meshIndices), std::end(meshIndices));
 

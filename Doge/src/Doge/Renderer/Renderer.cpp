@@ -108,9 +108,9 @@ namespace Doge
 
 		// Set Point Light properties for rendering
 		Sphere pointLight(1.0f);
-		std::shared_ptr<Material> lightMaterial = std::make_shared<Material>(*s_ObjectOutliningShader.get());
+		std::shared_ptr<Material> lightMaterial = std::make_shared<Material>(*s_ObjectOutliningShader);
 		RenderData pointLightData = RenderDataManager::Construct(pointLight.GetMesh(), lightMaterial);
-		pointLightData.modelMatrix = glm::translate(glm::mat4(1.0f), position);
+		pointLightData.ModelMatrix = glm::translate(glm::mat4(1.0f), position);
 		s_PointLight.reset(new RenderData(pointLightData));
 	}
 
@@ -177,8 +177,8 @@ namespace Doge
 			{
 				const auto& renderData = renderQueue.front();
 				// Set Unique Material properties and the Model matrix
-				renderData.material->SetModifiedUniforms();
-				renderData.material->GetShaderRef().SetUniformMat4("u_Model", renderData.modelMatrix);
+				renderData.MaterialRef->SetModifiedUniforms();
+				renderData.MaterialRef->GetShaderRef().SetUniformMat4("u_Model", renderData.ModelMatrix);
 				DrawIndexed(renderData);
 				renderQueue.pop();
 			}
@@ -194,8 +194,8 @@ namespace Doge
 		while (!s_OutlineRenderQueue.empty())
 		{
 			auto& renderData = s_OutlineRenderQueue.front();
-			renderData.modelMatrix = glm::scale(renderData.modelMatrix, glm::vec3(1.03f));
-			s_ObjectOutliningShader->SetUniformMat4("u_Model", renderData.modelMatrix);
+			renderData.ModelMatrix = glm::scale(renderData.ModelMatrix, glm::vec3(1.03f));
+			s_ObjectOutliningShader->SetUniformMat4("u_Model", renderData.ModelMatrix);
 			DrawIndexed(renderData);
 			s_OutlineRenderQueue.pop();
 		}
@@ -204,7 +204,7 @@ namespace Doge
 	void Renderer::RenderLightObjectsIndexed()
 	{
 		s_ObjectOutliningShader->SetUniformFloat3("u_OutlineColor", { 1.0f, 1.0f, 1.0f });
-		s_ObjectOutliningShader->SetUniformMat4("u_Model", s_PointLight->modelMatrix);
+		s_ObjectOutliningShader->SetUniformMat4("u_Model", s_PointLight->ModelMatrix);
 		DrawIndexed(*s_PointLight.get());
 	}
 
@@ -225,7 +225,7 @@ namespace Doge
 	void Renderer::Submit(const RenderData& data)
 	{
 		// Emplace the Object to the appropriate Material bucket in the Map
-		s_Renderer->s_RenderQueue[data.material].emplace(data);
+		s_Renderer->s_RenderQueue[data.MaterialRef].emplace(data);
 
 		// Emplace the Object to the Outline RenderQueue if marked as Selected
 		if (data.Selected)

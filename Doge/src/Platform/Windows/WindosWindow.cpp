@@ -43,7 +43,7 @@ namespace Doge
 		m_Context = Context::Create(windowContext);
 
 		glfwSetWindowUserPointer(windowContext, &m_Props);
-		glfwSwapInterval(props.VSync);
+		glfwSwapInterval(static_cast<int>(props.VSync));
 
 		// KeyPressed, KeyReleased Events
 		glfwSetKeyCallback(windowContext, [](GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -177,7 +177,7 @@ namespace Doge
 		if (m_Props.VSync ^ enabled)
 		{
 			m_Props.VSync = enabled;
-			glfwSwapInterval(enabled);
+			glfwSwapInterval(static_cast<int>(enabled));
 		}
 	}
 
