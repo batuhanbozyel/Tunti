@@ -25,7 +25,7 @@ namespace Doge
 
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 		{
-			LOG_ERROR("ASSIMP: {0}", importer.GetErrorString());
+			Log::Error("ASSIMP: {0}", importer.GetErrorString());
 			return;
 		}
 		m_Directory = filePath.substr(0, filePath.find_last_of('/') + 1);

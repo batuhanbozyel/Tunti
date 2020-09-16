@@ -15,10 +15,10 @@ namespace Doge
 	{
 		switch (severity)
 		{
-		case GL_DEBUG_SEVERITY_HIGH:         LOG_CRITICAL(message); return;
-		case GL_DEBUG_SEVERITY_MEDIUM:       LOG_ERROR(message); return;
-		case GL_DEBUG_SEVERITY_LOW:          LOG_WARN(message); return;
-		case GL_DEBUG_SEVERITY_NOTIFICATION: LOG_TRACE(message); return;
+		case GL_DEBUG_SEVERITY_HIGH:         Log::Critical(message); return;
+		case GL_DEBUG_SEVERITY_MEDIUM:       Log::Error(message); return;
+		case GL_DEBUG_SEVERITY_LOW:          Log::Warn(message); return;
+		case GL_DEBUG_SEVERITY_NOTIFICATION: Log::Trace(message); return;
 		}
 
 	}
@@ -51,10 +51,10 @@ namespace Doge
 		glCullFace(GL_BACK);
 		glFrontFace(GL_CCW);
 
-		LOG_INFO(glGetString(GL_RENDERER));
-		LOG_INFO(glGetString(GL_VERSION));
+		Log::Info(glGetString(GL_RENDERER));
+		Log::Info(glGetString(GL_VERSION));
 
-		LOG_TRACE("Context creation succeed!");
+		Log::Trace("Context creation succeed!");
 	}
 
 	void OpenGLContext::SwapBuffers() const

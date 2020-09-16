@@ -6,6 +6,8 @@
 
 namespace Doge
 {
+	// OpenGLTexture
+
 	OpenGLTexture::OpenGLTexture(const std::string& texturePath)
 	{
 		stbi_set_flip_vertically_on_load(1);

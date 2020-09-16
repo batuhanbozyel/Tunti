@@ -5,9 +5,9 @@ namespace Sandbox
 	GameLayer::GameLayer()
 		: m_CameraController(60.0f, Doge::Application::GetActiveWindow()->GetWindowProps().Width, Doge::Application::GetActiveWindow()->GetWindowProps().Height)
 	{
-		std::shared_ptr<Doge::Shader> shader = Doge::ShaderLibrary::CreateShader("assets/shaders/PhongLighting.glsl");
+		Doge::Ref<Doge::Shader> shader = Doge::ShaderLibrary::CreateShader("assets/shaders/PhongLighting.glsl");
 
-		std::shared_ptr<Doge::Material> material = std::make_shared<Doge::Material>(*shader);
+		Doge::Ref<Doge::Material> material = Doge::CreateRef<Doge::Material>(*shader);
 		material->SetBaseColor(glm::vec3(1.0f));
 		material->SetBaseShininess(32.0f);
 
@@ -44,7 +44,7 @@ namespace Sandbox
 		{
 		case Doge::Key::Escape:
 		{
-			Doge::Application::GetInstance()->Shutdown();
+			Doge::Application::Shutdown();
 			return true;
 		}
 		}
@@ -55,7 +55,7 @@ namespace Sandbox
 	{
 		switch (e.GetMouseButton())
 		{
-		case Doge::Mouse::Button2:
+		case Doge::Mouse::ButtonRight:
 		{
 			m_IsMouseVisible ? Doge::Application::DisableCursor() : Doge::Application::EnableCursor();
 			m_IsMouseVisible = !m_IsMouseVisible;

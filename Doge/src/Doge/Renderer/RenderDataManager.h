@@ -1,4 +1,5 @@
 #pragma once
+#include "Doge/Core/Base.h"
 
 namespace Doge
 {
@@ -10,17 +11,17 @@ namespace Doge
 
 	struct RenderData
 	{
-		RenderData(const std::vector<std::shared_ptr<VertexBuffer>>& vertexBuffers,
-			const std::shared_ptr<IndexBuffer>& indexBuffer,
-			const std::shared_ptr<Material>& mat)
+		RenderData(const std::vector<Ref<VertexBuffer>>& vertexBuffers,
+			const Ref<IndexBuffer>& indexBuffer,
+			const Ref<Material>& mat)
 			: VBOs(vertexBuffers), IBO(indexBuffer), MaterialRef(mat)
 		{
 
 		}
 
-		std::vector<std::shared_ptr<VertexBuffer>> VBOs;
-		std::shared_ptr<IndexBuffer> IBO;
-		std::shared_ptr<Material> MaterialRef;
+		std::vector<Ref<VertexBuffer>> VBOs;
+		Ref<IndexBuffer> IBO;
+		Ref<Material> MaterialRef;
 		glm::mat4 ModelMatrix = glm::mat4(1.0f);
 		bool Selected = false;
 	};
@@ -28,11 +29,8 @@ namespace Doge
 	class RenderDataManager
 	{
 	public:
-		static RenderData Construct(const Mesh& mesh, const std::shared_ptr<Material>& material);
-		static RenderData ConstructBatched(const std::vector<Mesh>& meshes, const std::shared_ptr<Material>& material);
-
-// 		static RenderData ConstructInstanced(const Mesh& mesh, const std::shared_ptr<Material>& material);
-// 		static RenderData ConstructBatchedInstanced(const std::vector<Mesh>& meshes, const std::shared_ptr<Material>& material);
+		static RenderData Construct(const Mesh& mesh, const Ref<Material>& material);
+		static RenderData ConstructBatched(const std::vector<Mesh>& meshes, const Ref<Material>& material);
 	private:
 		static Mesh BatchMeshes(const std::vector<Mesh>& meshes);
 	};

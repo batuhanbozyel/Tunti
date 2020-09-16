@@ -10,10 +10,10 @@ namespace Doge
 	{
 		switch (Renderer::GetAPI())
 		{
-		case RendererAPI::None: LOG_ASSERT(false, ""); return 0;
+		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return 0;
 		case RendererAPI::OpenGL: return ConvertToOpenGLBaseType(type);
 		}
-		LOG_ASSERT(false, "");
+		LOG_ASSERT(false, "RendererAPI initialization failed!");
 		return 0;
 	}
 

@@ -39,7 +39,7 @@ namespace Doge
 
 		static void OnWindowResize(WindowResizeEvent& e);
 
-		static const std::unique_ptr<Framebuffer>& GetFramebuffer() { return s_Renderer->s_QuadFramebuffer; }
+		static const Scope<Framebuffer>& GetFramebuffer() { return s_Renderer->s_QuadFramebuffer; }
 	private:
 		Renderer(const WindowProps& props);
 		~Renderer();
@@ -55,21 +55,21 @@ namespace Doge
 
 		void DrawIndexed(const RenderData& renderData);
 	private:
-		std::unique_ptr<Framebuffer> s_QuadFramebuffer;
-		std::unique_ptr<VertexArray> s_QuadVertexArray;
-		std::shared_ptr<VertexBuffer> s_QuadVertexBuffer;
-		std::shared_ptr<IndexBuffer> s_QuadIndexBuffer;
-		std::shared_ptr<Shader> s_QuadTexturedShader;
+		Scope<Framebuffer> s_QuadFramebuffer;
+		Scope<VertexArray> s_QuadVertexArray;
+		Scope<VertexBuffer> s_QuadVertexBuffer;
+		Scope<IndexBuffer> s_QuadIndexBuffer;
+		Ref<Shader> s_QuadTexturedShader;
 
-		std::unique_ptr<Framebuffer> s_MainFramebuffer;
-		std::unique_ptr<VertexArray> s_VertexArray;
-		std::unique_ptr<UniformBuffer> s_ViewProjectionUniformBuffer;
-		std::unique_ptr<UniformBuffer> s_LightingUniformBuffer;
-		std::shared_ptr<Shader> s_ObjectOutliningShader;
+		Scope<Framebuffer> s_MainFramebuffer;
+		Scope<VertexArray> s_VertexArray;
+		Scope<UniformBuffer> s_ViewProjectionUniformBuffer;
+		Scope<UniformBuffer> s_LightingUniformBuffer;
+		Ref<Shader> s_ObjectOutliningShader;
 		std::queue<RenderData> s_OutlineRenderQueue;
-		std::unordered_map<std::shared_ptr<Material>, std::queue<RenderData>> s_RenderQueue;
+		std::unordered_map<Ref<Material>, std::queue<RenderData>> s_RenderQueue;
 
-		std::unique_ptr<RenderData> s_PointLight;
+		Scope<RenderData> s_PointLight;
 		const Shader* s_LastShaderState = nullptr;
 
 		static Renderer* s_Renderer;

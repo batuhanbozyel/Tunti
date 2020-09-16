@@ -18,7 +18,7 @@ namespace Doge
 	class Framebuffer
 	{
 	public:
-		static std::unique_ptr<Framebuffer> Create(const FramebufferSpecification& specification);
+		static Scope<Framebuffer> Create(const FramebufferSpecification& specification);
 
 		void Resize(uint32_t width, uint32_t height);
 

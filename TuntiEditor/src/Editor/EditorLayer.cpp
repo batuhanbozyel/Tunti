@@ -33,6 +33,7 @@ namespace TEditor
 	void EditorLayer::OnDetach()
 	{
 		s_EditorAPI->OnDetach();
+		delete s_EditorAPI;
 	}
 
 	void EditorLayer::OnEvent(Doge::Event& e)
@@ -73,6 +74,18 @@ namespace TEditor
 			m_Scene = SceneFrame(Doge::Application::GetActiveWindow()->GetWindowProps().Width,
 								 Doge::Application::GetActiveWindow()->GetWindowProps().Height);
 			Doge::Application::EnableCursor();
+
+			ImGuiIO& io = ImGui::GetIO(); (void)io;
+			ImGui::StyleColorsLight();
+
+			// When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+			ImGuiStyle& style = ImGui::GetStyle();
+			if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+			{
+				style.WindowRounding = 0.0f;
+				style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+			}
+
 		}
 	}
 
@@ -84,6 +97,18 @@ namespace TEditor
 			Doge::Application::SetCursorPos(Doge::Application::GetActiveWindow()->GetWindowProps().Width / 2.0f,
 											Doge::Application::GetActiveWindow()->GetWindowProps().Height / 2.0f);
 			Doge::Application::DisableCursor();
+
+			ImGuiIO& io = ImGui::GetIO(); (void)io;
+			ImGui::StyleColorsClassic();
+
+			// When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+			ImGuiStyle& style = ImGui::GetStyle();
+			if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+			{
+				style.WindowRounding = 0.0f;
+				style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+			}
+
 		}
 	}
 

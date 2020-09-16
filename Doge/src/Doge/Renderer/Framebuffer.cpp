@@ -9,12 +9,12 @@ namespace Doge
 {
 	constexpr uint32_t MaxFramebufferSize = 8192;
 
-	std::unique_ptr<Framebuffer> Framebuffer::Create(const FramebufferSpecification& specification)
+	Scope<Framebuffer> Framebuffer::Create(const FramebufferSpecification& specification)
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
-		case RendererAPI::OpenGL: return std::make_unique<OpenGLFramebuffer>(specification);
+		case RendererAPI::OpenGL: return CreateScope<OpenGLFramebuffer>(specification);
 		}
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
 		return nullptr;
@@ -24,7 +24,7 @@ namespace Doge
 	{
 		if (width == 0 || height == 0 || width > MaxFramebufferSize || height > MaxFramebufferSize)
 		{
-			LOG_WARN("Attempted to rezize framebuffer to {0}, {1}", width, height);
+			Log::Warn("Attempted to rezize framebuffer to {0}, {1}", width, height);
 			return;
 		}
 

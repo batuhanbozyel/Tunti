@@ -1,4 +1,5 @@
 #pragma once
+#include "Base.h"
 #include <spdlog/spdlog.h>
 
 namespace Doge
@@ -8,20 +9,21 @@ namespace Doge
 	public:
 		static void Init();
 
-		inline static std::shared_ptr<spdlog::logger>& GetLogger() { return s_Logger; }
+		template<typename ... Args>
+		inline static void Trace(Args&& ... args) { s_Logger->trace(std::forward<Args>(args)...); }
+
+		template<typename ... Args>
+		inline static void Info(Args&& ... args) { s_Logger->info(std::forward<Args>(args)...); }
+
+		template<typename ... Args>
+		inline static void Warn(Args&& ... args) { s_Logger->warn(std::forward<Args>(args)...); }
+
+		template<typename ... Args>
+		inline static void Error(Args&& ... args) { s_Logger->error(std::forward<Args>(args)...); }
+
+		template<typename ... Args>
+		inline static void Critical(Args&& ... args) { s_Logger->critical(std::forward<Args>(args)...); }
 	private:
-		static std::shared_ptr<spdlog::logger> s_Logger;
+		static Ref<spdlog::logger> s_Logger;
 	};
 }
-
-#define LOG_TRACE(...)		::Doge::Log::GetLogger()->trace(__VA_ARGS__);
-#define LOG_INFO(...)		::Doge::Log::GetLogger()->info(__VA_ARGS__);
-#define LOG_WARN(...)		::Doge::Log::GetLogger()->warn(__VA_ARGS__);
-#define LOG_ERROR(...)		::Doge::Log::GetLogger()->error(__VA_ARGS__);
-#define LOG_CRITICAL(...)	::Doge::Log::GetLogger()->critical(__VA_ARGS__);
-
-#ifdef DEBUG_ENABLED
-#define LOG_ASSERT(x, ...) { if(!(x)) { LOG_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
-#else
-#define LOG_ASSERT(x, ...)
-#endif

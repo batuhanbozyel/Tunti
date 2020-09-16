@@ -9,23 +9,23 @@ namespace Doge
 {
 	// Shader Program initialization methods
 
-	std::unique_ptr<Shader> Shader::Create(const char* filePath)
+	Scope<Shader> Shader::Create(const char* filePath)
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
-		case RendererAPI::OpenGL: return std::make_unique<OpenGLShader>(filePath);
+		case RendererAPI::OpenGL: return CreateScope<OpenGLShader>(filePath);
 		}
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
 		return nullptr;
 	}
 
-	std::unique_ptr<Doge::Shader> Shader::Create(const char* name, const std::string& vertexSrc, const std::string& fragmentSrc)
+	Scope<Doge::Shader> Shader::Create(const char* name, const std::string& vertexSrc, const std::string& fragmentSrc)
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
-		case RendererAPI::OpenGL: return std::make_unique<OpenGLShader>(name, vertexSrc, fragmentSrc);
+		case RendererAPI::OpenGL: return CreateScope<OpenGLShader>(name, vertexSrc, fragmentSrc);
 		}
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
 		return nullptr;
@@ -72,26 +72,26 @@ namespace Doge
 
 	// ShaderLibrary
 
-	std::unordered_map<std::string, std::shared_ptr<Shader>> ShaderLibrary::s_ShaderCache;
+	std::unordered_map<std::string, Ref<Shader>> ShaderLibrary::s_ShaderCache;
 
-	std::shared_ptr<Shader> ShaderLibrary::CreateShader(const char* filePath)
+	Ref<Shader> ShaderLibrary::CreateShader(const char* filePath)
 	{
 		auto& shaderIt = s_ShaderCache.find(filePath);
 		if (shaderIt == s_ShaderCache.end())
 		{
-			std::shared_ptr<Shader> shader = Shader::Create(filePath);
+			Ref<Shader> shader = Shader::Create(filePath);
 			s_ShaderCache.emplace(std::make_pair(filePath, shader));
 			return shader;
 		}
 		return shaderIt->second;
 	}
 
-	std::shared_ptr<Shader> ShaderLibrary::CreateShader(const char* name, const std::string& vertexSrc, const std::string& fragmentSrc)
+	Ref<Shader> ShaderLibrary::CreateShader(const char* name, const std::string& vertexSrc, const std::string& fragmentSrc)
 	{
 		auto& shaderIt = s_ShaderCache.find(name);
 		if (shaderIt == s_ShaderCache.end())
 		{
-			std::shared_ptr<Shader> shader = Shader::Create(name, vertexSrc, fragmentSrc);
+			Ref<Shader> shader = Shader::Create(name, vertexSrc, fragmentSrc);
 			s_ShaderCache.emplace(std::make_pair(name, shader));
 			return shader;
 		}

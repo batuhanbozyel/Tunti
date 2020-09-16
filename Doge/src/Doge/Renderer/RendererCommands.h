@@ -1,4 +1,5 @@
 #pragma once
+#include "Doge/Core/Base.h"
 
 namespace Doge
 {
@@ -44,6 +45,6 @@ namespace Doge
 		virtual void ClearColorImpl(const glm::vec4& color) const = 0;
 		virtual void ClearImpl() const = 0;
 	private:
-		static std::unique_ptr<RendererCommands> s_RendererAPI;
+		static Scope<RendererCommands> s_RendererAPI;
 	};
 }

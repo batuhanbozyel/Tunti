@@ -9,8 +9,6 @@
 namespace Doge
 {
 	Application* Application::s_Instance = nullptr;
-	Window* Application::s_ActiveWindow = nullptr;
-	bool Application::s_Running = false;
 
 	Application::Application(const std::string& appName, const WindowFlag& flag)
 	{
@@ -22,37 +20,37 @@ namespace Doge
 		Renderer::SetAPI(Doge::RendererAPI::OpenGL);
 		Window* window = new Window(WindowProps(appName), flag);
 		window->SetEventCallbackFn(BIND_EVENT_FN(OnEvent));
-		s_ActiveWindow = window;
+		s_ActiveWindow.reset(window);
 
 		Renderer::Init(s_ActiveWindow->GetWindowProps());
 		SetCursorPos(s_ActiveWindow->GetWindowProps().Width / 2.0f, s_ActiveWindow->GetWindowProps().Height / 2.0f);
 
-		LOG_TRACE("Application started running!");
+		Log::Trace("Application started running!");
 	}
 
 	Application::~Application()
 	{
-		LOG_TRACE("Application terminating!");
-		delete s_ActiveWindow;
+		Log::Trace("Application terminating!");
+		s_Instance = nullptr;
 	}
 
 	void Application::Run()
 	{
-		while (s_Running)
+		while (s_Instance->s_Running)
 		{
-			float dt = m_FrameTime.DeltaTime();
+			float dt = s_Instance->m_FrameTime.DeltaTime();
 
 			s_Instance->OnUpdate(dt);
 
-			m_LayerStack.OnUpdate(dt);
+			s_Instance->m_LayerStack.OnUpdate(dt);
 
-			s_ActiveWindow->OnUpdate();
+			s_Instance->s_ActiveWindow->OnUpdate();
 		}
 	}
 
-	void Application::Shutdown() const
+	void Application::Shutdown()
 	{
-		s_Running = false;
+		s_Instance->s_Running = false;
 	}
 
 	void Application::PushLayer(Layer* layer)
@@ -113,16 +111,16 @@ namespace Doge
 
 	void Application::DisableCursor()
 	{
-		s_ActiveWindow->HideCursor();
+		s_Instance->s_ActiveWindow->HideCursor();
 	}
 
 	void Application::EnableCursor()
 	{
-		s_ActiveWindow->ShowCursor();
+		s_Instance->s_ActiveWindow->ShowCursor();
 	}
 
 	void Application::SetCursorPos(float x, float y)
 	{
-		s_ActiveWindow->SetCursorPos(x, y);
+		s_Instance->s_ActiveWindow->SetCursorPos(x, y);
 	}
 }

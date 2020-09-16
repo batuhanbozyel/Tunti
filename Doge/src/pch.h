@@ -31,4 +31,5 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "Doge/Core/Log.h"
+#include "Doge/Core/Base.h"
 #include "Doge/Core/Input.h"

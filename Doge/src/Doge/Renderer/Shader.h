@@ -40,8 +40,8 @@ namespace Doge
 
 		virtual void Compile(const std::string& vertexSrc, const std::string& fragmentSrc) = 0;
 	private:
-		static std::unique_ptr<Shader> Create(const char* filePath);
-		static std::unique_ptr<Shader> Create(const char* name, const std::string& vertexSrc, const std::string& fragmentSrc);
+		static Scope<Shader> Create(const char* filePath);
+		static Scope<Shader> Create(const char* name, const std::string& vertexSrc, const std::string& fragmentSrc);
 	protected:
 		uint32_t m_RendererID;
 		std::unordered_map<std::string, uint32_t> m_UniformCache;
@@ -50,11 +50,11 @@ namespace Doge
 	class ShaderLibrary
 	{
 	public:
-		static std::shared_ptr<Shader> CreateShader(const char* filePath);
-		static std::shared_ptr<Shader> CreateShader(const char* name, const std::string& vertexSrc, const std::string& fragmentSrc);
+		static Ref<Shader> CreateShader(const char* filePath);
+		static Ref<Shader> CreateShader(const char* name, const std::string& vertexSrc, const std::string& fragmentSrc);
 
 		static Shader& GetShader(const std::string& shader);
 	private:
-		static std::unordered_map<std::string, std::shared_ptr<Shader>> s_ShaderCache;
+		static std::unordered_map<std::string, Ref<Shader>> s_ShaderCache;
 	};
 }

@@ -1,10 +1,13 @@
 #pragma once
+#include <string_view>
 
 namespace Doge
 {
+	using namespace std::literals;
+
 	// Textured Quad Shader
 
-	static const char* TexturedQuadVertexShader = R"(
+	static const auto TexturedQuadVertexShader = R"(
 	#version 450 core
 
 	layout(location = 0) in vec2  a_Position;
@@ -16,9 +19,9 @@ namespace Doge
 	{
 		v_TexCoord = a_TexCoord;
 		gl_Position = vec4(a_Position, 0.0, 1.0);
-	})";
+	})"sv;
 
-	static const char* TexturedQuadFragmentShader = R"(
+	static const auto TexturedQuadFragmentShader = R"(
 	#version 450 core
 
 	layout(location = 0) out vec4 color;
@@ -30,11 +33,11 @@ namespace Doge
 	void main()
 	{
 		color = texture(u_Texture, v_TexCoord);
-	})";
+	})"sv;
 
 	// Object Outlining Shader
 
-	static const char* ObjectOutliningVertexShader = R"(
+	static const auto ObjectOutliningVertexShader = R"(
 	#version 450 core
 
 	layout(location = 0) in vec4  a_Position;
@@ -53,9 +56,9 @@ namespace Doge
 	void main()
 	{
 		gl_Position = u_Projection * u_View * u_Model * a_Position;
-	})";
+	})"sv;
 
-	static const char* ObjectOutliningFragmentShader = R"(
+	static const auto ObjectOutliningFragmentShader = R"(
 	#version 450 core
 	
 	layout(location = 0) out vec4 color;
@@ -65,5 +68,5 @@ namespace Doge
 	void main()
 	{
 		color = vec4(u_OutlineColor, 1.0);
-	})";
+	})"sv;
 }

@@ -15,7 +15,7 @@ namespace Doge
 
 	static void GLFWErrorCallback(int error, const char* description)
 	{
-		LOG_ERROR("Error: {0}", description);
+		Log::Error("Error: {0}", description);
 	}
 
 	Window::Window(const WindowProps& props, const WindowFlag& flag)

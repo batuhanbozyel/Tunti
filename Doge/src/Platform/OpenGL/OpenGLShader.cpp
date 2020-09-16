@@ -165,7 +165,7 @@ namespace Doge
 			glDeleteShader(vertexShader);
 
 			// Vertex shader compilation failed
-			LOG_ERROR("Vertex Shader complation failed: {0}", infoLog.data());
+			Log::Error("Vertex Shader complation failed: {0}", infoLog.data());
 			LOG_ASSERT(false, "Vertex Shader compilation failed!");
 			return;
 		}
@@ -197,7 +197,7 @@ namespace Doge
 			glDeleteShader(vertexShader);
 
 			// Fragment shader compilation failed
-			LOG_ERROR("Fragment Shader compilation failed: {0}", infoLog.data());
+			Log::Error("Fragment Shader compilation failed: {0}", infoLog.data());
 			LOG_ASSERT(false, "Fragment Shader compilation failed!");
 			return;
 		}
@@ -233,7 +233,7 @@ namespace Doge
 			glDeleteShader(fragmentShader);
 
 			// Shader linking failed
-			LOG_ERROR("Shader Linking failed: {0}", infoLog.data());
+			Log::Error("Shader Linking failed: {0}", infoLog.data());
 			LOG_ASSERT(false, "Shader Linking failed!");
 			return;
 		}

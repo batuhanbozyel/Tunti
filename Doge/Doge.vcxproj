@@ -104,6 +104,7 @@
   <ItemGroup>
     <ClInclude Include="src\Doge.h" />
     <ClInclude Include="src\Doge\Core\Application.h" />
+    <ClInclude Include="src\Doge\Core\Base.h" />
     <ClInclude Include="src\Doge\Core\EntryPoint.h" />
     <ClInclude Include="src\Doge\Core\Input.h" />
     <ClInclude Include="src\Doge\Core\KeyCodes.h" />

@@ -76,14 +76,14 @@ namespace Doge
 				{ ShaderDataType::Float2, "a_Position" },
 				{ ShaderDataType::Float2, "a_TexCoord" }
 				});
-			s_QuadVertexArray->BindVertexBuffer(s_QuadVertexBuffer, 0);
+			s_QuadVertexArray->BindVertexBuffer(*s_QuadVertexBuffer, 0);
 
 			uint32_t indices[6] = { 0, 1, 2, 2, 3, 0 };
 			s_QuadIndexBuffer = IndexBuffer::Create(indices, 6);
-			s_QuadVertexArray->BindIndexBuffer(s_QuadIndexBuffer);
+			s_QuadVertexArray->BindIndexBuffer(*s_QuadIndexBuffer);
 		}
 		// Create TexturedQuad Shader program for rendering Framebuffer
-		s_QuadTexturedShader = ShaderLibrary::CreateShader("TexturedQuad", TexturedQuadVertexShader, TexturedQuadFragmentShader);
+		s_QuadTexturedShader = ShaderLibrary::CreateShader("TexturedQuad", TexturedQuadVertexShader.data(), TexturedQuadFragmentShader.data());
 		s_QuadTexturedShader->Bind();
 		s_QuadTexturedShader->SetUniformInt("u_Texture", 0);
 
@@ -93,7 +93,7 @@ namespace Doge
 		s_LightingUniformBuffer = UniformBuffer::Create(sizeof(glm::vec4) * 5, 2);
 
 		// Create ObjectOutlining Shader program for outlining selected objects
-		s_ObjectOutliningShader = ShaderLibrary::CreateShader("ObjectOutlining", ObjectOutliningVertexShader, ObjectOutliningFragmentShader);
+		s_ObjectOutliningShader = ShaderLibrary::CreateShader("ObjectOutlining", ObjectOutliningVertexShader.data(), ObjectOutliningFragmentShader.data());
 
 		// Set Lighting properties
 		s_LightingUniformBuffer->Bind();
@@ -108,7 +108,7 @@ namespace Doge
 
 		// Set Point Light properties for rendering
 		Sphere pointLight(1.0f);
-		std::shared_ptr<Material> lightMaterial = std::make_shared<Material>(*s_ObjectOutliningShader);
+		Ref<Material> lightMaterial = CreateRef<Material>(*s_ObjectOutliningShader);
 		RenderData pointLightData = RenderDataManager::Construct(pointLight.GetMesh(), lightMaterial);
 		pointLightData.ModelMatrix = glm::translate(glm::mat4(1.0f), position);
 		s_PointLight.reset(new RenderData(pointLightData));
@@ -205,7 +205,7 @@ namespace Doge
 	{
 		s_ObjectOutliningShader->SetUniformFloat3("u_OutlineColor", { 1.0f, 1.0f, 1.0f });
 		s_ObjectOutliningShader->SetUniformMat4("u_Model", s_PointLight->ModelMatrix);
-		DrawIndexed(*s_PointLight.get());
+		DrawIndexed(*s_PointLight);
 	}
 
 	void Renderer::RenderFramebuffer()
@@ -216,8 +216,8 @@ namespace Doge
 		// Bind screen sized Quad Framebuffer and appropriate Vertex Array and its buffers
 		s_QuadTexturedShader->Bind();
 		s_QuadVertexArray->Bind();
-		s_QuadVertexArray->BindVertexBuffer(s_QuadVertexBuffer, 0);
-		s_QuadVertexArray->BindIndexBuffer(s_QuadIndexBuffer);
+		s_QuadVertexArray->BindVertexBuffer(*s_QuadVertexBuffer, 0);
+		s_QuadVertexArray->BindIndexBuffer(*s_QuadIndexBuffer);
 
 		RendererCommands::DrawIndexed(s_QuadIndexBuffer->GetCount());
 	}
@@ -238,10 +238,10 @@ namespace Doge
 		uint32_t binding = 0;
 		for (const auto& vertexBuffer : renderData.VBOs)
 		{
-			s_VertexArray->BindVertexBuffer(vertexBuffer, binding);
+			s_VertexArray->BindVertexBuffer(*vertexBuffer, binding);
 			binding++;
 		}
-		s_VertexArray->BindIndexBuffer(renderData.IBO);
+		s_VertexArray->BindIndexBuffer(*renderData.IBO);
 
 		RendererCommands::DrawIndexed(renderData.IBO->GetCount());
 	}

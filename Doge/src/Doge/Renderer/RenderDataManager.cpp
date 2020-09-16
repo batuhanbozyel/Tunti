@@ -8,16 +8,16 @@
 
 namespace Doge
 {
-	RenderData RenderDataManager::ConstructBatched(const std::vector<Mesh>& meshes, const std::shared_ptr<Material>& material)
+	RenderData RenderDataManager::ConstructBatched(const std::vector<Mesh>& meshes, const Ref<Material>& material)
 	{
 		return Construct(BatchMeshes(meshes), material);
 	}
 
-	RenderData RenderDataManager::Construct(const Mesh& mesh, const std::shared_ptr<Material>& material)
+	RenderData RenderDataManager::Construct(const Mesh& mesh, const Ref<Material>& material)
 	{
-		std::vector<std::shared_ptr<VertexBuffer>> vertexBuffers;
-		std::shared_ptr<VertexBuffer> vertexBuffer = VertexBuffer::Create(&mesh.GetVertices().data()->Position.x,
-																		  static_cast<uint32_t>(mesh.GetVertices().size() * sizeof(Vertex)));
+		std::vector<Ref<VertexBuffer>> vertexBuffers;
+		Ref<VertexBuffer> vertexBuffer = VertexBuffer::Create(&mesh.GetVertices().data()->Position.x,
+															  static_cast<uint32_t>(mesh.GetVertices().size() * sizeof(Vertex)));
 
 		vertexBuffer->SetLayout({
 			{ ShaderDataType::Float4, "a_Position" },
@@ -27,8 +27,8 @@ namespace Doge
 		});
 		vertexBuffers.push_back(vertexBuffer);
 
-		std::shared_ptr<IndexBuffer> indexBuffer = IndexBuffer::Create(mesh.GetIndices().data(),
-																	   static_cast<uint32_t>(mesh.GetIndices().size()));
+		Ref<IndexBuffer> indexBuffer = IndexBuffer::Create(mesh.GetIndices().data(),
+														   static_cast<uint32_t>(mesh.GetIndices().size()));
 
 		return RenderData(vertexBuffers, indexBuffer, material);
 	}

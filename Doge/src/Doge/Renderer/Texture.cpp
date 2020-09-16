@@ -8,26 +8,28 @@
 namespace Doge
 {
 	constexpr uint32_t max_textures = 1024;
-	std::unique_ptr<TextureManager> TextureManager::s_TextureManager = nullptr;
+	Scope<TextureManager> TextureManager::s_TextureManager = nullptr;
 
-	std::unique_ptr<Texture> Texture::Create(const std::string& texturePath)
+	// Texture
+
+	Scope<Texture> Texture::Create(const std::string& texturePath)
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!");  return nullptr;
-		case RendererAPI::OpenGL: return std::make_unique<OpenGLTexture>(texturePath);
+		case RendererAPI::OpenGL: return CreateScope<OpenGLTexture>(texturePath);
 		}
 
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
 		return nullptr;
 	}
 
-	std::unique_ptr<Doge::Texture> Texture::CreateWhiteTexture()
+	Scope<Doge::Texture> Texture::CreateWhiteTexture()
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!");  return nullptr;
-		case RendererAPI::OpenGL: return std::make_unique<OpenGLTexture>();
+		case RendererAPI::OpenGL: return CreateScope<OpenGLTexture>();
 		}
 
 		LOG_ASSERT(false, "RendererAPI initialization failed!");

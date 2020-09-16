@@ -6,7 +6,7 @@
 
 namespace Doge
 {
-	std::unique_ptr<RendererCommands> RendererCommands::s_RendererAPI = nullptr;
+	Scope<RendererCommands> RendererCommands::s_RendererAPI = nullptr;
 
 	void RendererCommands::Init()
 	{
@@ -15,7 +15,7 @@ namespace Doge
 		case RendererAPI::None:		LOG_ASSERT(false, "RendererAPI is not specified!");
 									s_RendererAPI = nullptr;
 									return;
-		case RendererAPI::OpenGL:	s_RendererAPI = std::make_unique<Doge::OpenGLRendererCommands>();
+		case RendererAPI::OpenGL:	s_RendererAPI = CreateScope<OpenGLRendererCommands>();
 									return;
 		}
 		LOG_ASSERT(false, "RendererAPI initialization failed!");

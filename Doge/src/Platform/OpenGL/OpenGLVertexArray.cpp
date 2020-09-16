@@ -24,16 +24,16 @@ namespace Doge
 		glBindVertexArray(0);
 	}
 
-	void OpenGLVertexArray::BindVertexBuffer(const std::shared_ptr<VertexBuffer>& vertexBuffer, uint32_t binding)
+	void OpenGLVertexArray::BindVertexBuffer(const VertexBuffer& vertexBuffer, uint32_t binding)
 	{
 		LOG_ASSERT(binding < 16, "VertexArrayBinding must be in range 0 to 16");
 
-		glVertexArrayVertexBuffer(m_RendererID, binding, vertexBuffer->GetID(), 0, vertexBuffer->GetLayout().GetStride());
+		glVertexArrayVertexBuffer(m_RendererID, binding, vertexBuffer.GetID(), 0, vertexBuffer.GetLayout().GetStride());
 	}
 
-	void OpenGLVertexArray::BindIndexBuffer(const std::shared_ptr<IndexBuffer>& indexBuffer)
+	void OpenGLVertexArray::BindIndexBuffer(const IndexBuffer& indexBuffer)
 	{
-		glVertexArrayElementBuffer(m_RendererID, indexBuffer->GetID());
+		glVertexArrayElementBuffer(m_RendererID, indexBuffer.GetID());
 	}
 
 	void OpenGLVertexArray::SetBufferLayout(const BufferLayout& layout, uint32_t binding, uint32_t divisor)
@@ -73,5 +73,4 @@ namespace Doge
 			m_VertexAttribIndex++;
 		}
 	}
-
 }

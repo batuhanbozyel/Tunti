@@ -1684,6 +1684,7 @@
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
     <ClInclude Include="src\Doge\Renderer\RendererBaseShaders.h" />
+    <ClInclude Include="src\Doge\Core\Base.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Doge\Core\Application.cpp">

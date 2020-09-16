@@ -57,7 +57,7 @@ namespace Doge
 	private:
 		void* CreateNativeWindow(const WindowFlag& flag);
 	private:
-		std::unique_ptr<Context> m_Context;
+		Scope<Context> m_Context;
 		WindowProps m_Props;
 
 		static uint8_t s_WindowCount;

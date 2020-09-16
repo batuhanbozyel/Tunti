@@ -1,6 +1,8 @@
 #pragma once
 #include "ShaderDataType.h"
 
+#include "Doge/Core/Base.h"
+
 namespace Doge
 {
 	class VertexArray;
@@ -54,15 +56,15 @@ namespace Doge
 	class VertexBuffer
 	{
 	public:
-		static std::unique_ptr<VertexBuffer> Create(uint32_t size);
-		static std::unique_ptr<VertexBuffer> Create(const float* vertices, uint32_t size);
+		static Scope<VertexBuffer> Create(uint32_t size);
+		static Scope<VertexBuffer> Create(const float* vertices, uint32_t size);
 
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
 		virtual void SetData(const float* vertices, uint32_t offset, uint32_t size) = 0;
 
-		inline const uint32_t GetID() { return m_RendererID; }
+		inline const uint32_t GetID() const { return m_RendererID; }
 		inline const BufferLayout& GetLayout() const { return m_Layout; }
 		inline void SetLayout(const BufferLayout& layout) { m_Layout = layout; }
 	protected:
@@ -73,15 +75,15 @@ namespace Doge
 	class IndexBuffer
 	{
 	public:
-		static std::unique_ptr<IndexBuffer> Create(uint32_t count);
-		static std::unique_ptr<IndexBuffer> Create(const uint32_t* indices, uint32_t count);
+		static Scope<IndexBuffer> Create(uint32_t count);
+		static Scope<IndexBuffer> Create(const uint32_t* indices, uint32_t count);
 
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
 		virtual void SetData(const uint32_t* indices, uint32_t offset, uint32_t count) = 0;
 
-		inline const uint32_t GetID() { return m_RendererID; }
+		inline const uint32_t GetID() const { return m_RendererID; }
 		inline uint32_t GetCount() const { return m_Count; }
 	protected:
 		uint32_t m_Count;
@@ -91,7 +93,7 @@ namespace Doge
 	class ShaderStorageBuffer
 	{
 	public:
-		static std::unique_ptr<ShaderStorageBuffer> Create(uint32_t size, uint32_t location);
+		static Scope<ShaderStorageBuffer> Create(uint32_t size, uint32_t location);
 
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
@@ -105,7 +107,7 @@ namespace Doge
 	class UniformBuffer
 	{
 	public:
-		static std::unique_ptr<UniformBuffer> Create(uint32_t size, uint32_t location);
+		static Scope<UniformBuffer> Create(uint32_t size, uint32_t location);
 
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;

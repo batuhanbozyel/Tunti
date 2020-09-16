@@ -1,4 +1,5 @@
 #pragma once
+#include "Doge/Core/Base.h"
 
 namespace Doge
 {
@@ -21,8 +22,8 @@ namespace Doge
 	protected:
 		virtual uint64_t GetTextureHandle() = 0;
 	private:
-		static std::unique_ptr<Texture> Create(const std::string& texturePath);
-		static std::unique_ptr<Texture> CreateWhiteTexture();
+		static Scope<Texture> Create(const std::string& texturePath);
+		static Scope<Texture> CreateWhiteTexture();
 
 		friend class TextureManager;
 	};
@@ -41,12 +42,13 @@ namespace Doge
 		uint32_t LoadTextureImpl(const std::string& path);
 		uint32_t LoadTextureMapsImpl(const std::vector<std::pair<std::string, TextureType>>& texturePaths);
 	private:
-		std::vector<std::unique_ptr<Texture>> s_Textures;
-		std::shared_ptr<ShaderStorageBuffer> m_SSBO;
+		std::vector<Scope<Texture>> s_Textures;
+		Scope<ShaderStorageBuffer> m_SSBO;
 
 		uint32_t m_Count = 0;
 		std::unordered_map<std::string, uint32_t> s_TextureMap;
+		std::unordered_map<std::string, uint32_t> s_CubemapMap;
 
-		static std::unique_ptr<TextureManager> s_TextureManager;
+		static Scope<TextureManager> s_TextureManager;
 	};
 }
