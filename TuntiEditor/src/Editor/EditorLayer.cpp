@@ -118,7 +118,7 @@ namespace TEditor
 		{
 			if (ImGui::BeginMenu("File"))
 			{
-				if (ImGui::MenuItem("Exit")) Doge::Application::GetInstance()->Shutdown();
+				if (ImGui::MenuItem("Exit")) Doge::Application::Shutdown();
 				ImGui::EndMenu();
 			}
 			ImGui::EndMenuBar();

@@ -24,7 +24,7 @@ namespace TEditor
 		}
 
 		// Setup Platform/Renderer bindings
-		void* window = Doge::Application::GetInstance()->GetActiveWindow()->GetNativeWindow();
+		void* window = Doge::Application::GetActiveWindow()->GetNativeWindow();
 		ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow*>(window), true);
 		ImGui_ImplOpenGL3_Init("#version 450");
 	}
@@ -93,9 +93,8 @@ namespace TEditor
 	{
 		ImGui::End();
 
-		const Doge::Application* app = Doge::Application::GetInstance();
 		ImGuiIO& io = ImGui::GetIO();
-		io.DisplaySize = ImVec2((float)app->GetActiveWindow()->GetWindowProps().Width, (float)app->GetActiveWindow()->GetWindowProps().Height);
+		io.DisplaySize = ImVec2((float)Doge::Application::GetActiveWindow()->GetWindowProps().Width, (float)Doge::Application::GetActiveWindow()->GetWindowProps().Height);
 
 		// Rendering
 		ImGui::Render();
