@@ -13,7 +13,7 @@ namespace Doge
 
 	}
 
-	void Material::SetSharedUniforms() const
+	void Material::AssignCommonUniforms() const
 	{
 		if (!m_Color.second && m_Color.first != nullptr)
 			m_Shader->SetUniformFloat3("u_Material.Color", *m_Color.first);
@@ -53,7 +53,7 @@ namespace Doge
 
 	}
 
-	void MaterialInstance::SetModifiedUniforms() const
+	void MaterialInstance::AssignUniqueUniforms() const
 	{
 		const Ref<Shader>& shader = m_BaseMaterialRef->GetShaderRef();
 		if (m_Color.second)

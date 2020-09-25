@@ -15,7 +15,7 @@ namespace Doge
 	public:
 		explicit Material(const Ref<Shader>& shader);
 
-		void SetSharedUniforms() const;
+		void AssignCommonUniforms() const;
 
 		void SetModifiable(const MaterialProperty& prop);
 
@@ -23,8 +23,6 @@ namespace Doge
 		void SetBaseShininess(const float shininess);
 
 		const Ref<Shader>& GetShaderRef() const { return m_Shader; }
-
-		virtual void SetModifiedUniforms() const {};
 	protected:
 		template <class T>
 		using MaterialData = std::pair<Ref<T>, bool>;
@@ -43,7 +41,7 @@ namespace Doge
 		void SetColor(const glm::vec3& color);
 		void SetShininess(const float shininess);
 
-		void SetModifiedUniforms() const override;
+		void AssignUniqueUniforms() const;
 
 		const Ref<Material>& GetBaseMaterialRef() const { return m_BaseMaterialRef; }
 	private:

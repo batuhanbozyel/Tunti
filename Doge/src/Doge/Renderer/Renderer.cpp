@@ -175,7 +175,7 @@ namespace Doge
 				materialShader->Bind();
 				s_LastShaderState = materialShader.get();
 			}
-			materialLayer.first->SetSharedUniforms();
+			materialLayer.first->AssignCommonUniforms();
 
 			// For each object in the current Material's RenderQueue, Draw the Object
 			auto& renderQueue = materialLayer.second;
@@ -183,7 +183,7 @@ namespace Doge
 			{
 				const auto& renderData = renderQueue.front();
 				// Set Unique Material properties and the Model matrix
-				renderData.MaterialInstanceRef->SetModifiedUniforms();
+				renderData.MaterialInstanceRef->AssignUniqueUniforms();
 				renderData.MaterialInstanceRef->GetShaderRef()->SetUniformMat4("u_Model", renderData.ModelMatrix);
 				DrawIndexed(renderData);
 				renderQueue.pop();
