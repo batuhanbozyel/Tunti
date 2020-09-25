@@ -207,7 +207,10 @@ SPDLOG_INLINE size_t filesize(FILE *f)
         throw_spdlog_ex("Failed getting file size. fd is null");
     }
 #if defined(_WIN32) && !defined(__CYGWIN__)
+#pragma warning(push)
+#pragma warning(disable : 6387)
     int fd = ::_fileno(f);
+#pragma warning(pop)
 #if _WIN64 // 64 bits
     __int64 ret = ::_filelengthi64(fd);
     if (ret >= 0)
