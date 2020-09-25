@@ -1,5 +1,7 @@
 # Tunti Engine
-Tunti Engine is a 3D Game Engine. 
+Tunti Engine is a 3D Game Engine.
+
+![Tunti](/Resources/Screenshots/editor_scene_play_mode.png?raw=true "Tunti Editor")
 
 ## Getting Started
 Visual Studio 2017 or 2019 is recommended.<br/>
