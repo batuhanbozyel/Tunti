@@ -5,14 +5,15 @@ namespace TEditor
 	SceneFrame::SceneFrame(uint32_t viewportWidth, uint32_t viewportHeight)
 		: m_CameraController(60.0f, viewportWidth, viewportHeight)
 	{
-		std::shared_ptr<Doge::Shader> shader = Doge::ShaderLibrary::CreateShader("assets/shaders/PhongLighting.glsl");
+		Doge::Ref<Doge::Shader> shader = Doge::ShaderLibrary::CreateShader("assets/shaders/PhongLighting.glsl");
 
-		std::shared_ptr<Doge::Material> material = std::make_shared<Doge::Material>(*shader);
+		Doge::Ref<Doge::Material> material = Doge::CreateRef<Doge::Material>(shader);
 		material->SetBaseColor(glm::vec3(1.0f));
 		material->SetBaseShininess(32.0f);
+		Doge::Ref<Doge::MaterialInstance> materialInstance = Doge::CreateRef<Doge::MaterialInstance>(material);
 
-		Doge::Cuboid cube(glm::vec3(1.0f));
-		Doge::RenderData cubeData = Doge::RenderDataManager::Construct(cube.GetMesh(), material);
+		Doge::Cube cube(glm::vec3(1.0f));
+		Doge::RenderData cubeData = Doge::RenderDataManager::Construct(cube.GetMesh(), materialInstance);
 		cubeData.Selected = true;
 		m_RenderDatas.push_back(cubeData);
 	}

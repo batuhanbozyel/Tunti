@@ -13,7 +13,7 @@ namespace Doge
 	class Material
 	{
 	public:
-		explicit Material(const Shader& shader);
+		explicit Material(const Ref<Shader>& shader);
 
 		void SetSharedUniforms() const;
 
@@ -22,31 +22,31 @@ namespace Doge
 		void SetBaseColor(const glm::vec3& color);
 		void SetBaseShininess(const float shininess);
 
-		const Shader& GetShaderRef() const { return m_Shader; }
+		const Ref<Shader>& GetShaderRef() const { return m_Shader; }
 
 		virtual void SetModifiedUniforms() const {};
 	protected:
 		template <class T>
-		using MaterialData = std::pair<std::shared_ptr<T>, bool>;
+		using MaterialData = std::pair<Ref<T>, bool>;
 
 		MaterialData<glm::vec3> m_Color = MaterialData<glm::vec3>(nullptr, false);
 		MaterialData<float> m_Shininess = MaterialData<float>(nullptr, false);
 	private:
-		const Shader& m_Shader;
+		const Ref<Shader> m_Shader;
 	};
 
 	class MaterialInstance : public Material
 	{
 	public:
-		explicit MaterialInstance(const Material& material);
+		explicit MaterialInstance(const Ref<Material>& material);
 
 		void SetColor(const glm::vec3& color);
 		void SetShininess(const float shininess);
 
 		void SetModifiedUniforms() const override;
 
-		const Material& GetBaseMaterialRef() const { return m_BaseMaterialRef; }
+		const Ref<Material>& GetBaseMaterialRef() const { return m_BaseMaterialRef; }
 	private:
-		const Material& m_BaseMaterialRef;
+		const Ref<Material> m_BaseMaterialRef;
 	};
 }

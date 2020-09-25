@@ -18,105 +18,111 @@
 namespace Doge
 {
 	RendererAPI Renderer::s_API = RendererAPI::None;
-	Renderer* Renderer::s_Renderer = nullptr;
+	Scope<Renderer> Renderer::s_Renderer = nullptr;
 
 	void Renderer::Init(const WindowProps& props)
 	{
 		TextureManager::Init();
 		RendererCommands::Init();
 
-		s_Renderer = new Renderer(props);
+		s_Renderer = CreateScope<Renderer>(props);
 
 		RendererCommands::ClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 	}
 
 	Renderer::Renderer(const WindowProps& props)
 	{
-		s_MainFramebuffer = Framebuffer::Create(FramebufferSpecification(props.Width, props.Height, 4, true));
-		// Create main Vertex Array for rendering objects
-		s_VertexArray = VertexArray::Create();
-		s_VertexArray->Bind();
-		s_VertexArray->SetBufferLayout({
-			{ ShaderDataType::Float4, "a_Position" },
-			{ ShaderDataType::Float3, "a_Normal" },
-			{ ShaderDataType::Float2, "a_TexCoord" },
-			{ ShaderDataType::UInt , "a_TexIndex" }
-			}, 0);
-
-		// Create Framebuffer for Post-Processing Effects
-		s_QuadFramebuffer = Framebuffer::Create(FramebufferSpecification(props.Width, props.Height, 1, false));
-		s_QuadFramebuffer->Bind();
-		s_QuadFramebuffer->BindColorAttachment(0);
-		// Create Vertex Array, Vertex Buffer and Index Buffer for rendering Framebuffer
-		s_QuadVertexArray = VertexArray::Create();
-		s_QuadVertexArray->Bind();
-		s_QuadVertexArray->SetBufferLayout({
-			{ ShaderDataType::Float2, "a_Position" },
-			{ ShaderDataType::Float2, "a_TexCoord" }
-			}, 0);
+		if (s_Renderer == nullptr)
 		{
-#pragma pack(push, 1)
-			struct QuadVertex
-			{
-				QuadVertex(const glm::vec2& position, const glm::vec2& texCoord)
-					: a_Position(position), a_TexCoord(texCoord) {}
+			s_MainFramebuffer = Framebuffer::Create(FramebufferSpecification(props.Width, props.Height, 4, true));
+			// Create main Vertex Array for rendering objects
+			s_VertexArray = VertexArray::Create();
+			s_VertexArray->Bind();
+			s_VertexArray->SetBufferLayout({
+				{ ShaderDataType::Float4, "a_Position" },
+				{ ShaderDataType::Float3, "a_Normal" },
+				{ ShaderDataType::Float2, "a_TexCoord" },
+				{ ShaderDataType::UInt , "a_TexIndex" }
+				}, 0);
 
-				glm::vec2 a_Position;
-				glm::vec2 a_TexCoord;
-			};
-#pragma pack(pop)
-			QuadVertex vertices[4] = {
-				QuadVertex({-1.0f, -1.0f}, {0.0f, 0.0f}),
-				QuadVertex({ 1.0f, -1.0f}, {1.0f, 0.0f}),
-				QuadVertex({ 1.0f,  1.0f}, {1.0f, 1.0f}),
-				QuadVertex({-1.0f,  1.0f}, {0.0f, 1.0f})
-			};
-			s_QuadVertexBuffer = VertexBuffer::Create(&vertices->a_Position.x, sizeof(QuadVertex) * 4);
-			s_QuadVertexBuffer->SetLayout({
+			// Create Framebuffer for Post-Processing Effects
+			s_QuadFramebuffer = Framebuffer::Create(FramebufferSpecification(props.Width, props.Height, 1, false));
+			s_QuadFramebuffer->Bind();
+			s_QuadFramebuffer->BindColorAttachment(0);
+			// Create Vertex Array, Vertex Buffer and Index Buffer for rendering Framebuffer
+			s_QuadVertexArray = VertexArray::Create();
+			s_QuadVertexArray->Bind();
+			s_QuadVertexArray->SetBufferLayout({
 				{ ShaderDataType::Float2, "a_Position" },
 				{ ShaderDataType::Float2, "a_TexCoord" }
-				});
-			s_QuadVertexArray->BindVertexBuffer(*s_QuadVertexBuffer, 0);
+				}, 0);
+			{
+#pragma pack(push, 1)
+				struct QuadVertex
+				{
+					QuadVertex(const glm::vec2& position, const glm::vec2& texCoord)
+						: a_Position(position), a_TexCoord(texCoord) {}
 
-			uint32_t indices[6] = { 0, 1, 2, 2, 3, 0 };
-			s_QuadIndexBuffer = IndexBuffer::Create(indices, 6);
-			s_QuadVertexArray->BindIndexBuffer(*s_QuadIndexBuffer);
+					glm::vec2 a_Position;
+					glm::vec2 a_TexCoord;
+				};
+#pragma pack(pop)
+				QuadVertex vertices[4] = {
+					QuadVertex({-1.0f, -1.0f}, {0.0f, 0.0f}),
+					QuadVertex({ 1.0f, -1.0f}, {1.0f, 0.0f}),
+					QuadVertex({ 1.0f,  1.0f}, {1.0f, 1.0f}),
+					QuadVertex({-1.0f,  1.0f}, {0.0f, 1.0f})
+				};
+				s_QuadVertexBuffer = VertexBuffer::Create(&vertices->a_Position.x, sizeof(QuadVertex) * 4);
+				s_QuadVertexBuffer->SetLayout({
+					{ ShaderDataType::Float2, "a_Position" },
+					{ ShaderDataType::Float2, "a_TexCoord" }
+					});
+				s_QuadVertexArray->BindVertexBuffer(*s_QuadVertexBuffer, 0);
+
+				uint32_t indices[6] = { 0, 1, 2, 2, 3, 0 };
+				s_QuadIndexBuffer = IndexBuffer::Create(indices, 6);
+				s_QuadVertexArray->BindIndexBuffer(*s_QuadIndexBuffer);
+			}
+			// Create TexturedQuad Shader program for rendering Framebuffer
+			s_QuadTexturedShader = ShaderLibrary::CreateShader("TexturedQuad", TexturedQuadVertexShader.data(), TexturedQuadFragmentShader.data());
+			s_QuadTexturedShader->Bind();
+			s_QuadTexturedShader->SetUniformInt("u_Texture", 0);
+
+			// ViewProjection Uniform Buffer: binding = 1
+			s_ViewProjectionUniformBuffer = UniformBuffer::Create(sizeof(glm::mat4) * 2, 1);
+			// Lighting Uniform buffer: binding = 2
+			s_LightingUniformBuffer = UniformBuffer::Create(sizeof(glm::vec4) * 5, 2);
+
+			// Create ObjectOutlining Shader program for outlining selected objects
+			s_ObjectOutliningShader = ShaderLibrary::CreateShader("ObjectOutlining", ObjectOutliningVertexShader.data(), ObjectOutliningFragmentShader.data());
+
+			// Set Lighting properties
+			s_LightingUniformBuffer->Bind();
+			glm::vec3 position(6.0f, 4.0f, 5.0f);
+			glm::vec3 ambient(0.6f);
+			glm::vec3 diffuse(0.6f);
+			glm::vec3 specular(0.2f);
+			s_LightingUniformBuffer->SetData(&position.x, sizeof(glm::vec3), sizeof(glm::vec4));
+			s_LightingUniformBuffer->SetData(&ambient.x, sizeof(glm::vec3), sizeof(glm::vec4) * 2);
+			s_LightingUniformBuffer->SetData(&diffuse.x, sizeof(glm::vec3), sizeof(glm::vec4) * 3);
+			s_LightingUniformBuffer->SetData(&specular.x, sizeof(glm::vec3), sizeof(glm::vec4) * 4);
+
+			// Set Point Light properties for rendering
+			Sphere pointLight(1.0f);
+			Ref<Material> whiteColorMaterial = CreateRef<Material>(s_ObjectOutliningShader);
+			whiteColorMaterial->SetBaseColor({ 1.0f, 1.0f, 1.0f });
+			Ref<MaterialInstance>  lightMaterialInstance = CreateRef<MaterialInstance>(whiteColorMaterial);
+			RenderData pointLightData = RenderDataManager::Construct(pointLight.GetMesh(), lightMaterialInstance);
+			pointLightData.ModelMatrix = glm::translate(glm::mat4(1.0f), position);
+			s_PointLight.reset(new RenderData(pointLightData));
+
+			Log::Trace("Renderer initialized successfully!");
 		}
-		// Create TexturedQuad Shader program for rendering Framebuffer
-		s_QuadTexturedShader = ShaderLibrary::CreateShader("TexturedQuad", TexturedQuadVertexShader.data(), TexturedQuadFragmentShader.data());
-		s_QuadTexturedShader->Bind();
-		s_QuadTexturedShader->SetUniformInt("u_Texture", 0);
-
-		// ViewProjection Uniform Buffer: binding = 1
-		s_ViewProjectionUniformBuffer = UniformBuffer::Create(sizeof(glm::mat4) * 2, 1);
-		// Lighting Uniform buffer: binding = 2
-		s_LightingUniformBuffer = UniformBuffer::Create(sizeof(glm::vec4) * 5, 2);
-
-		// Create ObjectOutlining Shader program for outlining selected objects
-		s_ObjectOutliningShader = ShaderLibrary::CreateShader("ObjectOutlining", ObjectOutliningVertexShader.data(), ObjectOutliningFragmentShader.data());
-
-		// Set Lighting properties
-		s_LightingUniformBuffer->Bind();
-		glm::vec3 position(6.0f, 4.0f, 5.0f);
-		glm::vec3 ambient(0.6f);
-		glm::vec3 diffuse(0.6f);
-		glm::vec3 specular(0.2f);
-		s_LightingUniformBuffer->SetData(&position.x, sizeof(glm::vec3), sizeof(glm::vec4));
-		s_LightingUniformBuffer->SetData(&ambient.x, sizeof(glm::vec3), sizeof(glm::vec4) * 2);
-		s_LightingUniformBuffer->SetData(&diffuse.x, sizeof(glm::vec3), sizeof(glm::vec4) * 3);
-		s_LightingUniformBuffer->SetData(&specular.x, sizeof(glm::vec3), sizeof(glm::vec4) * 4);
-
-		// Set Point Light properties for rendering
-		Sphere pointLight(1.0f);
-		Ref<Material> lightMaterial = CreateRef<Material>(*s_ObjectOutliningShader);
-		RenderData pointLightData = RenderDataManager::Construct(pointLight.GetMesh(), lightMaterial);
-		pointLightData.ModelMatrix = glm::translate(glm::mat4(1.0f), position);
-		s_PointLight.reset(new RenderData(pointLightData));
-	}
-
-	Renderer::~Renderer()
-	{
-		delete s_Renderer;
+		else
+		{
+			Log::Warn("Renderer already initialized!");
+		}
 	}
 
 	void Renderer::PrepareBufferObjects(const Camera& camera)
@@ -163,11 +169,11 @@ namespace Doge
 		for (auto& materialLayer : s_RenderQueue)
 		{
 			// Set common Material properties and Bind the Shader if already not bound
-			const Shader& materialShader = materialLayer.first->GetShaderRef();
-			if (s_LastShaderState == nullptr || *s_LastShaderState != materialShader)
+			const Ref<Shader>& materialShader = materialLayer.first->GetShaderRef();
+			if (s_LastShaderState == nullptr || *s_LastShaderState != *materialShader)
 			{
-				materialShader.Bind();
-				s_LastShaderState = &materialShader;
+				materialShader->Bind();
+				s_LastShaderState = materialShader.get();
 			}
 			materialLayer.first->SetSharedUniforms();
 
@@ -177,8 +183,8 @@ namespace Doge
 			{
 				const auto& renderData = renderQueue.front();
 				// Set Unique Material properties and the Model matrix
-				renderData.MaterialRef->SetModifiedUniforms();
-				renderData.MaterialRef->GetShaderRef().SetUniformMat4("u_Model", renderData.ModelMatrix);
+				renderData.MaterialInstanceRef->SetModifiedUniforms();
+				renderData.MaterialInstanceRef->GetShaderRef()->SetUniformMat4("u_Model", renderData.ModelMatrix);
 				DrawIndexed(renderData);
 				renderQueue.pop();
 			}
@@ -203,8 +209,8 @@ namespace Doge
 
 	void Renderer::RenderLightObjectsIndexed()
 	{
-		s_ObjectOutliningShader->SetUniformFloat3("u_OutlineColor", { 1.0f, 1.0f, 1.0f });
-		s_ObjectOutliningShader->SetUniformMat4("u_Model", s_PointLight->ModelMatrix);
+ 		s_ObjectOutliningShader->SetUniformFloat3("u_OutlineColor", { 1.0f, 1.0f, 1.0f });
+ 		s_ObjectOutliningShader->SetUniformMat4("u_Model", s_PointLight->ModelMatrix);
 		DrawIndexed(*s_PointLight);
 	}
 
@@ -225,7 +231,7 @@ namespace Doge
 	void Renderer::Submit(const RenderData& data)
 	{
 		// Emplace the Object to the appropriate Material bucket in the Map
-		s_Renderer->s_RenderQueue[data.MaterialRef].emplace(data);
+		s_Renderer->s_RenderQueue[data.MaterialInstanceRef->GetBaseMaterialRef()].emplace(data);
 
 		// Emplace the Object to the Outline RenderQueue if marked as Selected
 		if (data.Selected)

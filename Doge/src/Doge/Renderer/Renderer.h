@@ -31,6 +31,9 @@ namespace Doge
 	public:
 		static void Init(const WindowProps& props);
 
+		Renderer(const WindowProps& props);
+		~Renderer() = default;
+
 		static void Submit(const RenderData& data);
 		static void RenderIndexed(const Camera& camera);
 
@@ -41,9 +44,6 @@ namespace Doge
 
 		static const Scope<Framebuffer>& GetFramebuffer() { return s_Renderer->s_QuadFramebuffer; }
 	private:
-		Renderer(const WindowProps& props);
-		~Renderer();
-
 		void PrepareBufferObjects(const Camera& camera);
 		void BeginRender(const Camera& camera);
 		void EndRender();
@@ -72,7 +72,7 @@ namespace Doge
 		Scope<RenderData> s_PointLight;
 		const Shader* s_LastShaderState = nullptr;
 
-		static Renderer* s_Renderer;
+		static Scope<Renderer> s_Renderer;
 		static RendererAPI s_API;
 	};
 }

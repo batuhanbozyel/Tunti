@@ -7,14 +7,25 @@ namespace Sandbox
 	{
 		Doge::Ref<Doge::Shader> shader = Doge::ShaderLibrary::CreateShader("assets/shaders/PhongLighting.glsl");
 
-		Doge::Ref<Doge::Material> material = Doge::CreateRef<Doge::Material>(*shader);
-		material->SetBaseColor(glm::vec3(1.0f));
+		Doge::Ref<Doge::Material> material = Doge::CreateRef<Doge::Material>(shader);
+		material->SetBaseColor({ 1.0f, 1.0f, 1.0f });
 		material->SetBaseShininess(32.0f);
 
-		Doge::Cuboid cube(glm::vec3(1.0f));
-		Doge::RenderData cubeData = Doge::RenderDataManager::Construct(cube.GetMesh(), material);
-		cubeData.Selected = true;
-		m_RenderDatas.push_back(cubeData);
+		material->SetModifiable(Doge::MaterialProperty::Color);
+		Doge::Ref<Doge::MaterialInstance> blueMaterialInstance = Doge::CreateRef<Doge::MaterialInstance>(material);
+		blueMaterialInstance->SetColor({ 0.2f, 0.3f, 0.8f });
+
+		Doge::Ref<Doge::MaterialInstance> greenMaterialInstance = Doge::CreateRef<Doge::MaterialInstance>(material);
+		greenMaterialInstance->SetColor({ 0.3f, 0.8f, 0.2f });
+
+		Doge::Cube cube(glm::vec3(1.0f));
+		Doge::RenderData blueCubeData = Doge::RenderDataManager::Construct(cube.GetMesh(), blueMaterialInstance);
+		blueCubeData.Selected = true;
+		m_RenderDatas.push_back(blueCubeData);
+
+		Doge::RenderData greenCubeData = Doge::RenderDataManager::Construct(cube.GetMesh(), greenMaterialInstance);
+		greenCubeData.ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-2.0f, 0.0f, 0.0f));
+		m_RenderDatas.push_back(greenCubeData);
 
 		Doge::Application::DisableCursor();
 	}
