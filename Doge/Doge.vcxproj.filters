@@ -78,6 +78,9 @@
     <ClInclude Include="src\Doge\Core\Application.h">
       <Filter>src\Doge\Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\Doge\Core\Base.h">
+      <Filter>src\Doge\Core</Filter>
+    </ClInclude>
     <ClInclude Include="src\Doge\Core\EntryPoint.h">
       <Filter>src\Doge\Core</Filter>
     </ClInclude>
@@ -139,6 +142,9 @@
       <Filter>src\Doge\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Doge\Renderer\Renderer.h">
+      <Filter>src\Doge\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Doge\Renderer\RendererBaseShaders.h">
       <Filter>src\Doge\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Doge\Renderer\RendererCommands.h">
@@ -1683,8 +1689,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Doge\Renderer\RendererBaseShaders.h" />
-    <ClInclude Include="src\Doge\Core\Base.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Doge\Core\Application.cpp">
