@@ -7,7 +7,7 @@ namespace Doge
 {
 	// Cuboid Object Implementations
 
-	Cuboid::Cuboid(glm::vec3 length, uint32_t texIndex)
+	Cube::Cube(glm::vec3 length, uint32_t texIndex)
 	{
 		std::vector<Vertex> vertices(24);
 		length = length / 2.0f;
@@ -47,7 +47,7 @@ namespace Doge
 		m_Mesh.SetIndices(CalculateIndices());
 	}
 
-	const std::vector<uint32_t> Cuboid::CalculateIndices()
+	const std::vector<uint32_t> Cube::CalculateIndices()
 	{
 		std::vector<uint32_t> indices(36);
 		uint32_t offset = 0;

@@ -15,11 +15,11 @@ namespace Doge
 		Mesh m_Mesh;
 	};
 
-	class Cuboid : public SceneObject3D
+	class Cube : public SceneObject3D
 	{
 	public:
-		explicit Cuboid(glm::vec3 length, uint32_t texIndex = 0);
-		~Cuboid() = default;
+		explicit Cube(glm::vec3 length, uint32_t texIndex = 0);
+		~Cube() = default;
 	private:
 		virtual const std::vector<uint32_t> CalculateIndices() override;
 	};
