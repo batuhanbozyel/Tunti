@@ -7,7 +7,7 @@
 
 namespace Doge
 {
-	constexpr uint32_t max_textures = 1024;
+	uint32_t TextureManager::s_TextureCount = 0;
 	Scope<TextureManager> TextureManager::s_TextureManager = nullptr;
 
 	// Texture
@@ -24,7 +24,7 @@ namespace Doge
 		return nullptr;
 	}
 
-	Scope<Doge::Texture> Texture::CreateWhiteTexture()
+	Scope<Texture> Texture::CreateWhiteTexture()
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -36,89 +36,157 @@ namespace Doge
 		return nullptr;
 	}
 
+	// CubemapTexture
+
+	Scope<CubemapTexture> CubemapTexture::Create(const std::array<std::string, 6>& CubemapFiles)
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
+		case RendererAPI::OpenGL: return CreateScope<OpenGLCubemapTexture>(CubemapFiles);
+		}
+
+		LOG_ASSERT(false, "RendererAPI initialization failed!");
+		return nullptr;
+	}
+
 	// TextureManager
 
 	TextureManager::TextureManager()
 	{
-		s_Textures.reserve(max_textures);
-		m_SSBO = ShaderStorageBuffer::Create(sizeof(TextureMaps) * max_textures, 0);
+		m_SSBO = ShaderStorageBuffer::Create(SizeofTextureMap * MAX_TEXTURES, 0);
 
-		s_Textures.emplace_back(Texture::CreateWhiteTexture());
+		Ref<Texture> texture = Texture::CreateWhiteTexture();
+		texture->SetShaderStorageIndex(0);
+		m_TextureMap.insert(std::make_pair("default", texture));
 		// Get Handle with Texture index and store in SSBO
 		m_SSBO->Bind();
-		uint64_t handle = s_Textures[0]->GetTextureHandle();
-		m_SSBO->SetData(&handle, sizeof(TextureMaps) * m_Count + static_cast<size_t>(TextureType::Diffuse), sizeof(uint64_t));
-		m_SSBO->SetData(&handle, sizeof(TextureMaps) * m_Count + static_cast<size_t>(TextureType::Specular), sizeof(uint64_t));
-
-		m_Count++;
+		uint64_t handle = texture->GetTextureHandle();
+		m_SSBO->SetData(&handle, SizeofTextureMap * 0 + OffsetofTextureType(TextureType::Diffuse), sizeof(uint64_t));
+		m_SSBO->SetData(&handle, SizeofTextureMap * 0 + OffsetofTextureType(TextureType::Specular), sizeof(uint64_t));
+		s_TextureCount++;
 	}
 
-	uint32_t TextureManager::LoadTextureImpl(const std::string& path)
+	Ref<Texture> TextureManager::LoadTextureImpl(const std::string& path)
 	{
-		auto& textureIt = s_TextureMap.find(path);
-		uint32_t index = 0;
-		// Texture does not exist: Create a new Texture
-		if (textureIt == s_TextureMap.end())
-		{
-			index = static_cast<uint32_t>(s_Textures.size());
-			s_Textures.emplace_back(Texture::Create(path));
-			s_TextureMap.emplace(std::make_pair(path, index));
-		}
-		// Texture already exists: Get existing Texture's index
-		else
-		{
-			index = textureIt->second;
-		}
-		// Get Handle with Texture index and store in SSBO
-		m_SSBO->Bind();
-		uint64_t handle = s_Textures[index]->GetTextureHandle();
-		m_SSBO->SetData(&handle, sizeof(TextureMaps) * m_Count + static_cast<size_t>(TextureType::Diffuse), sizeof(uint64_t));
-		m_SSBO->SetData(&handle, sizeof(TextureMaps) * m_Count + static_cast<size_t>(TextureType::Specular), sizeof(uint64_t));
-
-		// Return SSBO storage index
-		return m_Count++;
+		return LoadTextureMapsImpl({ {path, TextureType::Diffuse}, {path, TextureType::Specular} });
 	}
 
-	uint32_t TextureManager::LoadTextureMapsImpl(const std::vector<std::pair<std::string, TextureType>>& texturePaths)
+	Ref<Texture> TextureManager::LoadTextureMapsImpl(const std::vector<std::pair<std::string, TextureType>>& texturePaths)
 	{
-		m_SSBO->Bind();
-		for (const auto& texture : texturePaths)
+		// To return first Texture in the TextureMap which is Diffuse Texture
+		Ref<Texture> diffuseTexture = nullptr;
+
+		bool isUnique = true;
+		std::vector<std::pair<Ref<Texture>, TextureType>> textures;
+		for (const auto& texturePair : texturePaths)
 		{
-			auto& textureIt = s_TextureMap.find(texture.first);
-			uint32_t index = 0;
-			// Texture does not exist: Create a new Texture
-			if (textureIt == s_TextureMap.end())
+			const auto& textureIt = m_TextureMap.find(texturePair.first);
+			Ref<Texture> texture;
+			TextureType type = texturePair.second;
+
+			// If any of the texturePaths lead to an existing Texture
+			// Set isUnique to false
+			if (textureIt != m_TextureMap.end())
 			{
-				index = static_cast<uint32_t>(s_Textures.size());
-				s_Textures.emplace_back(Texture::Create(texture.first));
-				s_TextureMap.emplace(std::make_pair(texture.first, index));
+				isUnique = false;
+				texture = textureIt->second;
 			}
-			// Texture already exists: Get existing Texture's index
+			// Create Textures that don't already exist
 			else
 			{
-				index = textureIt->second;
+				std::string texturePath = texturePair.first;
+				texture = Texture::Create(texturePath);
+				texture->SetShaderStorageIndex(s_TextureCount);
+				m_TextureMap.insert(std::make_pair(texturePath, texture));
 			}
-			// Get Handle with Texture index and store in SSBO
-			uint64_t handle = s_Textures[index]->GetTextureHandle();
-			m_SSBO->SetData(&handle, sizeof(TextureMaps) * m_Count + static_cast<size_t>(texture.second), sizeof(uint64_t));
+			textures.push_back(std::make_pair(texture, type));
+
+			if (type == TextureType::Diffuse)
+				diffuseTexture = texture;
 		}
 
-		// Return SSBO storage index
-		return m_Count++;
+		// If the TextureMap is flagged as New
+		// Set each Texture's index into Shader Storage Buffer
+		// Increment TextureMap count
+		if (isUnique)
+		{
+			diffuseTexture = nullptr;
+			m_SSBO->Bind();
+			for (const auto& texture : textures)
+			{
+				uint64_t handle = texture.first->GetTextureHandle();
+				TextureType type = texture.second;
+				m_SSBO->SetData(&handle, SizeofTextureMap * s_TextureCount + OffsetofTextureType(type), sizeof(uint64_t));
+
+				if (type == TextureType::Diffuse)
+					diffuseTexture = texture.first;
+			}
+			s_TextureCount++;
+		}
+
+		LOG_ASSERT(diffuseTexture, "Diffuse Texture must be specified!");
+
+		return diffuseTexture;
+	}
+
+	Ref<CubemapTexture> TextureManager::LoadCubemapImpl(const std::string& folderPath, const std::array<std::string, 6>& cubemapFaces)
+	{
+		const auto& mapIt = m_CubemapMap.find(folderPath);
+
+		if (mapIt == m_CubemapMap.end())
+		{
+			Ref<CubemapTexture> newCubemap = CubemapTexture::Create(cubemapFaces);
+			m_CubemapMap.insert(std::make_pair(folderPath, newCubemap));
+			return newCubemap;
+		}
+
+		return mapIt->second;
 	}
 
 	void TextureManager::Init()
 	{
-		s_TextureManager.reset(new TextureManager);
+		if (s_TextureManager == nullptr)
+			s_TextureManager = CreateScope<TextureManager>();
 	}
 
-	uint32_t TextureManager::LoadTexture(const std::string& path)
+	Ref<Texture> TextureManager::LoadTexture(const std::string& path)
 	{
 		return s_TextureManager->LoadTextureImpl(path);
 	}
 
-	uint32_t TextureManager::LoadTextureMaps(const std::vector<std::pair<std::string, TextureType>>& texturePaths)
+	Ref<Texture> TextureManager::LoadTextureMaps(const std::vector<std::pair<std::string, TextureType>>& texturePaths)
 	{
 		return s_TextureManager->LoadTextureMapsImpl(texturePaths);
+	}
+
+	Ref<CubemapTexture> TextureManager::LoadCubemap(const std::string& folderPath,
+		const std::string& PosXFilename,
+		const std::string& NegXFilename,
+		const std::string& PosYFilename,
+		const std::string& NegYFilename,
+		const std::string& PosZFilename,
+		const std::string& NegZFilename)
+	{
+		if (*folderPath.rbegin() == '/')
+		{
+			return s_TextureManager->LoadCubemapImpl(folderPath, {
+				folderPath + PosXFilename,
+				folderPath + NegXFilename,
+				folderPath + PosYFilename,
+				folderPath + NegYFilename,
+				folderPath + PosZFilename,
+				folderPath + NegZFilename });
+		}
+		else
+		{
+			return s_TextureManager->LoadCubemapImpl(folderPath, {
+				folderPath + "/" + PosXFilename,
+				folderPath + "/" + NegXFilename,
+				folderPath + "/" + PosYFilename,
+				folderPath + "/" + NegYFilename,
+				folderPath + "/" + PosZFilename,
+				folderPath + "/" + NegZFilename });
+		}
 	}
 }
