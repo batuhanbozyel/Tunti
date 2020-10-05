@@ -16,6 +16,9 @@
     <Filter Include="src\Doge\Renderer">
       <UniqueIdentifier>{A140F8E9-0D57-F67F-56CE-81A1C223C707}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Doge\Scene">
+      <UniqueIdentifier>{F81367E2-E4E1-5AE8-CD75-CB0EB9E2364D}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Doge\Utility">
       <UniqueIdentifier>{DE875FDA-CA80-7E2C-F3B2-63B1DF0A5E38}</UniqueIdentifier>
     </Filter>
@@ -162,22 +165,22 @@
     <ClInclude Include="src\Doge\Renderer\VertexArray.h">
       <Filter>src\Doge\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="src\Doge\Utility\Camera.h">
-      <Filter>src\Doge\Utility</Filter>
+    <ClInclude Include="src\Doge\Scene\CameraController.h">
+      <Filter>src\Doge\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="src\Doge\Utility\CameraController.h">
+    <ClInclude Include="src\Doge\Scene\Model.h">
+      <Filter>src\Doge\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Doge\Scene\SceneObject3D.h">
+      <Filter>src\Doge\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Doge\Utility\Camera.h">
       <Filter>src\Doge\Utility</Filter>
     </ClInclude>
     <ClInclude Include="src\Doge\Utility\Material.h">
       <Filter>src\Doge\Utility</Filter>
     </ClInclude>
     <ClInclude Include="src\Doge\Utility\Mesh.h">
-      <Filter>src\Doge\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Doge\Utility\Model.h">
-      <Filter>src\Doge\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Doge\Utility\SceneObject3D.h">
       <Filter>src\Doge\Utility</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h">
@@ -1733,19 +1736,19 @@
     <ClCompile Include="src\Doge\Renderer\VertexArray.cpp">
       <Filter>src\Doge\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Doge\Scene\CameraController.cpp">
+      <Filter>src\Doge\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Doge\Scene\Model.cpp">
+      <Filter>src\Doge\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Doge\Scene\SceneObject3D.cpp">
+      <Filter>src\Doge\Scene</Filter>
+    </ClCompile>
     <ClCompile Include="src\Doge\Utility\Camera.cpp">
       <Filter>src\Doge\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="src\Doge\Utility\CameraController.cpp">
-      <Filter>src\Doge\Utility</Filter>
-    </ClCompile>
     <ClCompile Include="src\Doge\Utility\Material.cpp">
-      <Filter>src\Doge\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Doge\Utility\Model.cpp">
-      <Filter>src\Doge\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Doge\Utility\SceneObject3D.cpp">
       <Filter>src\Doge\Utility</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp">

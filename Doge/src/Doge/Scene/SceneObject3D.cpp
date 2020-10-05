@@ -2,13 +2,16 @@
 #include "SceneObject3D.h"
 
 #include "Doge/Renderer/Renderer.h"
+#include "Doge/Renderer/Texture.h"
 
 namespace Doge
 {
 	// Cuboid Object Implementations
 
-	Cube::Cube(glm::vec3 length, uint32_t texIndex)
+	Cube::Cube(glm::vec3&& length, const Ref<Texture>& texture)
 	{
+		uint32_t texIndex = texture ? texture->GetShaderStorageIndex() : 0;
+
 		std::vector<Vertex> vertices(24);
 		length = length / 2.0f;
 
@@ -44,14 +47,54 @@ namespace Doge
 		vertices[23] = { glm::vec3(-length.x, -length.y,  length.z), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(0.0f, 1.0f), texIndex };
 
 		m_Mesh.SetVertices(vertices);
-		m_Mesh.SetIndices(CalculateIndices());
+		const auto& indices = CalculateIndices();
+		m_Mesh.SetIndices(std::vector<uint32_t>(indices.begin(), indices.end()));
 	}
 
-	const std::vector<uint32_t> Cube::CalculateIndices()
+	std::array<glm::vec3, 24> Cube::CalculatePositions(glm::vec3&& length)
 	{
-		std::vector<uint32_t> indices(36);
+		std::array<glm::vec3, 24> vertices;
+		length = length / 2.0f;
+
+		// Front
+		vertices[0] = { glm::vec3(-length.x, -length.y,  length.z) };
+		vertices[1] = { glm::vec3( length.x, -length.y,  length.z) };
+		vertices[2] = { glm::vec3( length.x,  length.y,  length.z) };
+		vertices[3] = { glm::vec3(-length.x,  length.y,  length.z) };
+		// Back
+		vertices[4] = { glm::vec3( length.x, -length.y, -length.z) };
+		vertices[5] = { glm::vec3(-length.x, -length.y, -length.z) };
+		vertices[6] = { glm::vec3(-length.x,  length.y, -length.z) };
+		vertices[7] = { glm::vec3( length.x,  length.y, -length.z) };
+		// Left
+		vertices[8] =  { glm::vec3(-length.x, -length.y, -length.z) };
+		vertices[9] =  { glm::vec3(-length.x, -length.y,  length.z) };
+		vertices[10] = { glm::vec3(-length.x,  length.y,  length.z) };
+		vertices[11] = { glm::vec3(-length.x,  length.y, -length.z) };
+		// Right	
+		vertices[12] = { glm::vec3(length.x, -length.y,  length.z) };
+		vertices[13] = { glm::vec3(length.x, -length.y, -length.z) };
+		vertices[14] = { glm::vec3(length.x,  length.y, -length.z) };
+		vertices[15] = { glm::vec3(length.x,  length.y,  length.z) };
+		// Top
+		vertices[16] = { glm::vec3(-length.x,  length.y,  length.z) };
+		vertices[17] = { glm::vec3( length.x,  length.y,  length.z) };
+		vertices[18] = { glm::vec3( length.x,  length.y, -length.z) };
+		vertices[19] = { glm::vec3(-length.x,  length.y, -length.z) };
+		// Bottom
+		vertices[20] = { glm::vec3(-length.x, -length.y, -length.z) };
+		vertices[21] = { glm::vec3( length.x, -length.y, -length.z) };
+		vertices[22] = { glm::vec3( length.x, -length.y,  length.z) };
+		vertices[23] = { glm::vec3(-length.x, -length.y,  length.z) };
+
+		return vertices;
+	}
+
+	std::array<uint32_t, 36> Cube::CalculateIndices()
+	{
+		std::array<uint32_t, 36> indices;
 		uint32_t offset = 0;
-		for (uint32_t i = 0; i < 36; i += 6)
+		for (uint32_t i = 0; i <= 30; i += 6)
 		{
 			indices[i + 0] = offset + 0;
 			indices[i + 1] = offset + 1;
@@ -65,11 +108,13 @@ namespace Doge
 		return indices;
 	}
 
+
 	// Sphere Object Implementations
 
-	Sphere::Sphere(float radius, uint32_t sectorCount, uint32_t stackCount, uint32_t texIndex)
-		: m_SectorCount(sectorCount), m_StackCount(stackCount)
+	Sphere::Sphere(float radius, uint32_t sectorCount, uint32_t stackCount, const Ref<Texture>& texture)
 	{
+		uint32_t texIndex = texture ? texture->GetShaderStorageIndex() : 0;
+
 		std::vector<Vertex> vertices;
 		radius = radius / 2.0f;
 		float x, y, z, xy;                              // vertex position
@@ -113,20 +158,20 @@ namespace Doge
 			vertex.Normal = transform * glm::vec4(vertex.Normal, 0.0f);
 		}
 		m_Mesh.SetVertices(vertices);
-		m_Mesh.SetIndices(CalculateIndices());
+		m_Mesh.SetIndices(CalculateIndices(sectorCount, stackCount));
 	}
 
-	const std::vector<uint32_t> Sphere::CalculateIndices()
+	std::vector<uint32_t> Sphere::CalculateIndices(uint32_t sectorCount, uint32_t stackCount)
 	{
 		std::vector<uint32_t> indices;
 		int k1, k2;
 		uint32_t offset = 0;
-		for (uint32_t i = 0; i < m_StackCount; ++i)
+		for (uint32_t i = 0; i < stackCount; ++i)
 		{
-			k1 = i * (m_SectorCount + 1);     // beginning of current stack
-			k2 = k1 + m_SectorCount + 1;      // beginning of next stack
+			k1 = i * (sectorCount + 1);     // beginning of current stack
+			k2 = k1 + sectorCount + 1;      // beginning of next stack
 
-			for (uint32_t j = 0; j < m_SectorCount; ++j, ++k1, ++k2)
+			for (uint32_t j = 0; j < sectorCount; ++j, ++k1, ++k2)
 			{
 				// 2 triangles per sector excluding first and last stacks
 				// k1 => k2 => k1+1
@@ -138,7 +183,7 @@ namespace Doge
 				}
 
 				// k1+1 => k2 => k2+1
-				if (i != (m_StackCount - 1))
+				if (i != (stackCount - 1))
 				{
 					indices.push_back(offset + k1 + 1);
 					indices.push_back(offset + k2);
@@ -146,8 +191,8 @@ namespace Doge
 				}
 			}
 		}
-		offset += static_cast<uint32_t>(m_Mesh.GetVertices().size());
-		m_IndexCount = static_cast<uint32_t>(indices.size());
+		uint32_t verticeCount = (stackCount + 1) * (sectorCount + 1);
+		offset += verticeCount;
 		return indices;
 	}
 }

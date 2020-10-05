@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Model.h"
 
-#include "Mesh.h"
+#include "Doge/Utility/Mesh.h"
 
 #include "Doge/Renderer/Texture.h"
 #include "Doge/Renderer/Renderer.h"
@@ -63,7 +63,7 @@ namespace Doge
 			AddTexturePath(texturePaths, material, aiTextureType_DIFFUSE, TextureType::Diffuse);
 			AddTexturePath(texturePaths, material, aiTextureType_SPECULAR, TextureType::Specular);
 
-			index = TextureManager::LoadTextureMaps(texturePaths);
+			index = TextureManager::LoadTextureMaps(texturePaths)->GetShaderStorageIndex();
 		}
 
 		for (uint32_t i = 0; i < mesh->mNumVertices; i++)

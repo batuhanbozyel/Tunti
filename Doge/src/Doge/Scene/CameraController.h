@@ -1,5 +1,5 @@
 #pragma once
-#include "Camera.h"
+#include "Doge/Utility/Camera.h"
 #include "Doge/Events/Event.h"
 #include "Doge/Events/WindowEvent.h"
 

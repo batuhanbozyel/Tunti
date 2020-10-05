@@ -13,11 +13,13 @@
 #include "Doge/Renderer/Texture.h"
 #include "Doge/Renderer/Shader.h"
 
+// Scene
+#include "Doge/Scene/Model.h"
+#include "Doge/Scene/SceneObject3D.h"
+#include "Doge/Scene/CameraController.h"
+
 // Utility
-#include "Doge/Utility/CameraController.h"
 #include "Doge/Utility/Mesh.h"
-#include "Doge/Utility/Model.h"
-#include "Doge/Utility/SceneObject3D.h"
 
 // 3rd-Party Includes
 #include <glm/glm.hpp>
