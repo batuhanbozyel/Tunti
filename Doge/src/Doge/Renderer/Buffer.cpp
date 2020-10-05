@@ -45,7 +45,7 @@ namespace Doge
 		return nullptr;
 	}
 
-	Scope<VertexBuffer> VertexBuffer::Create(const float* vertices, uint32_t size)
+	Scope<VertexBuffer> VertexBuffer::Create(const void* vertices, uint32_t size)
 	{
 		switch (Renderer::GetAPI())
 		{

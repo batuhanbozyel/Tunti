@@ -12,7 +12,7 @@ namespace Doge
 		glNamedBufferStorage(m_RendererID, size, nullptr, GL_DYNAMIC_STORAGE_BIT);
 	}
 
-	OpenGLVertexBuffer::OpenGLVertexBuffer(const float* vertices, uint32_t size)
+	OpenGLVertexBuffer::OpenGLVertexBuffer(const void* vertices, uint32_t size)
 	{
 		glCreateBuffers(1, &m_RendererID);
 		glNamedBufferStorage(m_RendererID, size, vertices, GL_DYNAMIC_STORAGE_BIT);
@@ -33,7 +33,7 @@ namespace Doge
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
-	void OpenGLVertexBuffer::SetData(const float* vertices, uint32_t offset, uint32_t size)
+	void OpenGLVertexBuffer::SetData(const void* vertices, uint32_t offset, uint32_t size)
 	{
 		glNamedBufferSubData(m_RendererID, offset, size, vertices);
 	}

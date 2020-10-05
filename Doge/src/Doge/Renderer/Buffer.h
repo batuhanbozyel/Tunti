@@ -57,12 +57,12 @@ namespace Doge
 	{
 	public:
 		static Scope<VertexBuffer> Create(uint32_t size);
-		static Scope<VertexBuffer> Create(const float* vertices, uint32_t size);
+		static Scope<VertexBuffer> Create(const void* vertices, uint32_t size);
 
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
-		virtual void SetData(const float* vertices, uint32_t offset, uint32_t size) = 0;
+		virtual void SetData(const void* vertices, uint32_t offset, uint32_t size) = 0;
 
 		inline const uint32_t GetID() const { return m_RendererID; }
 		inline const BufferLayout& GetLayout() const { return m_Layout; }

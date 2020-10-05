@@ -7,13 +7,13 @@ namespace Doge
 	{
 	public:
 		OpenGLVertexBuffer(uint32_t size);
-		OpenGLVertexBuffer(const float* vertices, uint32_t size);
+		OpenGLVertexBuffer(const void* vertices, uint32_t size);
 		~OpenGLVertexBuffer();
 
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
 
-		virtual void SetData(const float* vertices, uint32_t offset, uint32_t size);
+		virtual void SetData(const void* vertices, uint32_t offset, uint32_t size) override;
 	};
 
 	class OpenGLIndexBuffer : public IndexBuffer
