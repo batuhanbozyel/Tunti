@@ -12,8 +12,8 @@ namespace Doge
 
 	struct RenderData
 	{
-		RenderData(const std::vector<Ref<VertexBuffer>>& vertexBuffers,
-			const Ref<IndexBuffer>& indexBuffer,
+		RenderData(const std::vector<Ref<VertexBuffer>>&& vertexBuffers,
+			const Ref<IndexBuffer>&& indexBuffer,
 			const Ref<MaterialInstance>& matInstance)
 			: VBOs(vertexBuffers), IBO(indexBuffer), MaterialInstanceRef(matInstance)
 		{

@@ -12,10 +12,11 @@ namespace Doge
 	class IndexBuffer;
 	class Shader;
 
+	class Model;
 	class Camera;
 	class Material;
 	class SceneObject3D;
-	class Model;
+	class CubemapTexture;
 
 	struct WindowProps;
 
@@ -39,10 +40,11 @@ namespace Doge
 
 		static void SetAPI(const RendererAPI& api) { s_API = api; }
 		static const RendererAPI& GetAPI() { return s_API; }
-
+		
 		static void OnWindowResize(WindowResizeEvent& e);
 
-		static const Scope<Framebuffer>& GetFramebuffer() { return s_Renderer->s_QuadFramebuffer; }
+		static const Scope<Framebuffer>& GetFramebuffer() { return s_Instance->m_QuadFramebuffer; }
+		static void SetSkybox(const Ref<CubemapTexture>& skybox);
 	private:
 		void PrepareBufferObjects(const Camera& camera);
 		void BeginRender(const Camera& camera);
@@ -51,28 +53,36 @@ namespace Doge
 		void RenderObjectsIndexed();
 		void RenderOutlinedObjectsIndexed();
 		void RenderLightObjectsIndexed();
+		void RenderSkybox();
 		void RenderFramebuffer();
 
 		void DrawIndexed(const RenderData& renderData);
+
+		void ConstructScreenQuadProperties(const WindowProps& props);
+		void ConstructMainProperties(const WindowProps& props);
+		void ConstructSkyboxProperties();
 	private:
-		Scope<Framebuffer> s_QuadFramebuffer;
-		Scope<VertexArray> s_QuadVertexArray;
-		Scope<VertexBuffer> s_QuadVertexBuffer;
-		Scope<IndexBuffer> s_QuadIndexBuffer;
-		Ref<Shader> s_QuadTexturedShader;
+		Scope<Framebuffer> m_QuadFramebuffer;
+		Scope<VertexArray> m_QuadVertexArray;
+		Ref<Shader> m_QuadTexturedShader;
 
-		Scope<Framebuffer> s_MainFramebuffer;
-		Scope<VertexArray> s_VertexArray;
-		Scope<UniformBuffer> s_ViewProjectionUniformBuffer;
-		Scope<UniformBuffer> s_LightingUniformBuffer;
-		Ref<Shader> s_ObjectOutliningShader;
-		std::queue<RenderData> s_OutlineRenderQueue;
-		std::unordered_map<Ref<Material>, std::queue<RenderData>> s_RenderQueue;
+		Scope<Framebuffer> m_MainFramebuffer;
+		Scope<VertexArray> m_MainVertexArray;
+		Scope<UniformBuffer> m_ViewProjectionUniformBuffer;
+		Scope<UniformBuffer> m_LightingUniformBuffer;
+		Ref<Shader> m_ObjectOutliningShader;
 
-		Scope<RenderData> s_PointLight;
-		const Shader* s_LastShaderState = nullptr;
+		Scope<VertexArray> m_SkyboxVertexArray;
+		Ref<Shader> m_SkyboxShader;
 
-		static Scope<Renderer> s_Renderer;
+		std::queue<RenderData> m_OutlineRenderQueue;
+		std::unordered_map<Ref<Material>, std::queue<RenderData>> m_RenderQueue;
+
+		Ref<CubemapTexture> m_Skybox = nullptr;
+		Scope<RenderData> m_PointLight;
+		const Shader* m_LastShaderState = nullptr;
+
+		static Scope<Renderer> s_Instance;
 		static RendererAPI s_API;
 	};
 }

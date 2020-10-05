@@ -4,6 +4,17 @@
 namespace Doge
 {
 #pragma pack(push, 1)
+	struct QuadVertex
+	{
+		QuadVertex(const glm::vec2& position, const glm::vec2& texCoord)
+			: a_Position(position), a_TexCoord(texCoord) {}
+
+		glm::vec2 a_Position;
+		glm::vec2 a_TexCoord;
+	};
+#pragma pack(pop)
+
+#pragma pack(push, 1)
 	struct Vertex
 	{
 		Vertex() = default;

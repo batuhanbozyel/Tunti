@@ -21,16 +21,15 @@ namespace Doge
 
 		vertexBuffer->SetLayout({
 			{ ShaderDataType::Float4, "a_Position" },
-			{ ShaderDataType::Float3, "a_Normal" },
+			{ ShaderDataType::Float3, "a_Normal"   },
 			{ ShaderDataType::Float2, "a_TexCoord" },
-			{ ShaderDataType::UInt , "a_TexIndex" }
+			{ ShaderDataType::UInt,   "a_TexIndex" }
 		});
 		vertexBuffers.push_back(vertexBuffer);
 
-		Ref<IndexBuffer> indexBuffer = IndexBuffer::Create(mesh.GetIndices().data(),
-														   static_cast<uint32_t>(mesh.GetIndices().size()));
+		Ref<IndexBuffer> indexBuffer = IndexBuffer::Create(mesh.GetIndices().data(), static_cast<uint32_t>(mesh.GetIndices().size()));
 
-		return RenderData(vertexBuffers, indexBuffer, materialInstance);
+		return RenderData(std::move(vertexBuffers), std::move(indexBuffer), materialInstance);
 	}
 
 	Mesh RenderDataManager::BatchMeshes(const std::vector<Mesh>& meshes)
