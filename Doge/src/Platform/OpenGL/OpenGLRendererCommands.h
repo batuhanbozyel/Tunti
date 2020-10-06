@@ -13,6 +13,7 @@ namespace Doge
 
 		virtual void DisableDepthTestImpl() const override;
 		virtual void EnableDepthTestImpl() const override;
+		virtual void SetDepthTestFunctionImpl(const DepthTestFunction& func) const override;
 
 		virtual void DisableFaceCullingImpl() const override;
 		virtual void EnableFaceCullingImpl() const override;

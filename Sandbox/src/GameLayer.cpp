@@ -5,13 +5,20 @@ namespace Sandbox
 	GameLayer::GameLayer()
 		: m_CameraController(60.0f, Doge::Application::GetActiveWindow()->GetWindowProps().Width, Doge::Application::GetActiveWindow()->GetWindowProps().Height)
 	{
+		Doge::Ref<Doge::CubemapTexture> dummyCubemap = Doge::TextureManager::LoadCubemap("assets/cubemaps/learnopengl/",
+			"right.jpg", "left.jpg", "bottom.jpg", "top.jpg", "front.jpg", "back.jpg");
+
+		Doge::Renderer::SetSkybox(dummyCubemap);
+
 		Doge::Ref<Doge::Shader> shader = Doge::ShaderLibrary::CreateShader("assets/shaders/PhongLighting.glsl");
 
 		Doge::Ref<Doge::Material> material = Doge::CreateRef<Doge::Material>(shader);
 		material->SetBaseColor({ 1.0f, 1.0f, 1.0f });
 		material->SetBaseShininess(32.0f);
-
 		material->SetModifiable(Doge::MaterialProperty::Color);
+
+		Doge::Ref<Doge::MaterialInstance> defaultMaterialInstance = Doge::CreateRef<Doge::MaterialInstance>(material);
+
 		Doge::Ref<Doge::MaterialInstance> blueMaterialInstance = Doge::CreateRef<Doge::MaterialInstance>(material);
 		blueMaterialInstance->SetColor({ 0.2f, 0.3f, 0.8f });
 
@@ -26,6 +33,11 @@ namespace Sandbox
 		Doge::RenderData greenCubeData = Doge::RenderDataManager::Construct(cube.GetMesh(), greenMaterialInstance);
 		greenCubeData.ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-2.0f, 0.0f, 0.0f));
 		m_RenderDatas.push_back(greenCubeData);
+
+		Doge::Model backpack("assets/models/backpack/backpack.obj");
+		Doge::RenderData backpackData = Doge::RenderDataManager::ConstructBatched(backpack.GetMeshes(), defaultMaterialInstance);
+		backpackData.ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(3.0f, 0.0f, 0.0f));
+		m_RenderDatas.push_back(backpackData);
 
 		Doge::Application::DisableCursor();
 	}

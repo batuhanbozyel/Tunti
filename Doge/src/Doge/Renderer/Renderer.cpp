@@ -140,10 +140,13 @@ namespace Doge
 	{
 		if (m_Skybox)
 		{
-			RendererCommands::SetFaceCulling(CullFace::Back);
+			RendererCommands::SetDepthTestFunction(DepthTestFunction::LessEqual);
+
 			m_SkyboxVertexArray->Bind();
 			m_SkyboxShader->Bind();
 			RendererCommands::DrawIndexed(36);
+
+			RendererCommands::SetDepthTestFunction(DepthTestFunction::Less);
 		}
 	}
 

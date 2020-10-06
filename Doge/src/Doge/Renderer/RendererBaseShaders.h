@@ -87,8 +87,9 @@ namespace Doge
 
 	void main()
 	{
-		v_TexCoord = a_Position;
-		vec4 pos = u_Projection * u_View * vec4(a_Position, 1.0);
+		v_TexCoord = -a_Position;
+		mat4 view = mat4(mat3(u_View));
+		vec4 pos = u_Projection * view * vec4(a_Position, 1.0);
 		gl_Position = pos.xyww;
 	})"sv;
 

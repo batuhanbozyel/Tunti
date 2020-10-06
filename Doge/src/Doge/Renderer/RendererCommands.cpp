@@ -46,6 +46,11 @@ namespace Doge
 		s_RendererAPI->EnableDepthTestImpl();
 	}
 
+	void RendererCommands::SetDepthTestFunction(const DepthTestFunction& func)
+	{
+		s_RendererAPI->SetDepthTestFunctionImpl(func);
+	}
+
 	void RendererCommands::DisableFaceCulling()
 	{
 		s_RendererAPI->DisableFaceCullingImpl();

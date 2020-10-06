@@ -8,6 +8,18 @@ namespace Doge
 		Front, Back
 	};
 
+	enum class DepthTestFunction : unsigned char
+	{
+		Never,
+		Less,
+		Equal,
+		LessEqual,
+		Greater,
+		NotEqual,
+		GreaterEqual,
+		Always
+	};
+
 	class RendererCommands
 	{
 	public:
@@ -20,6 +32,7 @@ namespace Doge
 
 		static void DisableDepthTest();
 		static void EnableDepthTest();
+		static void SetDepthTestFunction(const DepthTestFunction& func);
 
 		static void DisableFaceCulling();
 		static void EnableFaceCulling();
@@ -36,6 +49,7 @@ namespace Doge
 
 		virtual void DisableDepthTestImpl() const = 0;
 		virtual void EnableDepthTestImpl() const = 0;
+		virtual void SetDepthTestFunctionImpl(const DepthTestFunction& func) const = 0;
 
 		virtual void DisableFaceCullingImpl() const = 0;
 		virtual void EnableFaceCullingImpl() const = 0;

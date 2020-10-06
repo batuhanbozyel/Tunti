@@ -30,6 +30,11 @@ namespace Doge
 		glEnable(GL_DEPTH_TEST);
 	}
 
+	void OpenGLRendererCommands::SetDepthTestFunctionImpl(const DepthTestFunction& func) const
+	{
+		glDepthFunc(GL_NEVER + static_cast<int>(func));
+	}
+
 	void OpenGLRendererCommands::DisableFaceCullingImpl() const
 	{
 		glDisable(GL_CULL_FACE);
