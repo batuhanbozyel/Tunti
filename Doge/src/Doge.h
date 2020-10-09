@@ -15,7 +15,9 @@
 
 // Scene
 #include "Doge/Scene/Model.h"
+#include "Doge/Scene/Light.h"
 #include "Doge/Scene/SceneObject3D.h"
+#include "Doge/Scene/LightingShader.h"
 #include "Doge/Scene/CameraController.h"
 
 // Utility

@@ -128,11 +128,14 @@
     <ClInclude Include="src\Doge\Renderer\Renderer.h" />
     <ClInclude Include="src\Doge\Renderer\RendererBaseShaders.h" />
     <ClInclude Include="src\Doge\Renderer\RendererCommands.h" />
+    <ClInclude Include="src\Doge\Renderer\RendererBindings.h" />
     <ClInclude Include="src\Doge\Renderer\Shader.h" />
     <ClInclude Include="src\Doge\Renderer\ShaderDataType.h" />
     <ClInclude Include="src\Doge\Renderer\Texture.h" />
     <ClInclude Include="src\Doge\Renderer\VertexArray.h" />
     <ClInclude Include="src\Doge\Scene\CameraController.h" />
+    <ClInclude Include="src\Doge\Scene\Light.h" />
+    <ClInclude Include="src\Doge\Scene\LightingShader.h" />
     <ClInclude Include="src\Doge\Scene\Model.h" />
     <ClInclude Include="src\Doge\Scene\SceneObject3D.h" />
     <ClInclude Include="src\Doge\Utility\Camera.h" />
@@ -658,6 +661,7 @@
     <ClCompile Include="src\Doge\Renderer\Texture.cpp" />
     <ClCompile Include="src\Doge\Renderer\VertexArray.cpp" />
     <ClCompile Include="src\Doge\Scene\CameraController.cpp" />
+    <ClCompile Include="src\Doge\Scene\Light.cpp" />
     <ClCompile Include="src\Doge\Scene\Model.cpp" />
     <ClCompile Include="src\Doge\Scene\SceneObject3D.cpp" />
     <ClCompile Include="src\Doge\Utility\Camera.cpp" />

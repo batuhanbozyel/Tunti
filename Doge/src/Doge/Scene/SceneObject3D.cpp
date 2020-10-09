@@ -56,36 +56,36 @@ namespace Doge
 		std::array<glm::vec3, 24> vertices;
 		length = length / 2.0f;
 
-		// Front
-		vertices[0] = { glm::vec3(-length.x, -length.y,  length.z) };
-		vertices[1] = { glm::vec3( length.x, -length.y,  length.z) };
-		vertices[2] = { glm::vec3( length.x,  length.y,  length.z) };
-		vertices[3] = { glm::vec3(-length.x,  length.y,  length.z) };
-		// Back
-		vertices[4] = { glm::vec3( length.x, -length.y, -length.z) };
-		vertices[5] = { glm::vec3(-length.x, -length.y, -length.z) };
-		vertices[6] = { glm::vec3(-length.x,  length.y, -length.z) };
-		vertices[7] = { glm::vec3( length.x,  length.y, -length.z) };
-		// Left
-		vertices[8] =  { glm::vec3(-length.x, -length.y, -length.z) };
-		vertices[9] =  { glm::vec3(-length.x, -length.y,  length.z) };
-		vertices[10] = { glm::vec3(-length.x,  length.y,  length.z) };
-		vertices[11] = { glm::vec3(-length.x,  length.y, -length.z) };
 		// Right	
-		vertices[12] = { glm::vec3(length.x, -length.y,  length.z) };
-		vertices[13] = { glm::vec3(length.x, -length.y, -length.z) };
-		vertices[14] = { glm::vec3(length.x,  length.y, -length.z) };
-		vertices[15] = { glm::vec3(length.x,  length.y,  length.z) };
+		vertices[0] =  { glm::vec3(length.x, -length.y,  length.z) };
+		vertices[1] =  { glm::vec3(length.x, -length.y, -length.z) };
+		vertices[2] =  { glm::vec3(length.x,  length.y, -length.z) };
+		vertices[3] =  { glm::vec3(length.x,  length.y,  length.z) };
+		// Left		   
+		vertices[4] =  { glm::vec3(-length.x, -length.y, -length.z) };
+		vertices[5] =  { glm::vec3(-length.x, -length.y,  length.z) };
+		vertices[6] =  { glm::vec3(-length.x,  length.y,  length.z) };
+		vertices[7] =  { glm::vec3(-length.x,  length.y, -length.z) };
 		// Top
-		vertices[16] = { glm::vec3(-length.x,  length.y,  length.z) };
-		vertices[17] = { glm::vec3( length.x,  length.y,  length.z) };
-		vertices[18] = { glm::vec3( length.x,  length.y, -length.z) };
-		vertices[19] = { glm::vec3(-length.x,  length.y, -length.z) };
+		vertices[8] =  { glm::vec3(-length.x,  length.y,  length.z) };
+		vertices[9] =  { glm::vec3( length.x,  length.y,  length.z) };
+		vertices[10] = { glm::vec3( length.x,  length.y, -length.z) };
+		vertices[11] = { glm::vec3(-length.x,  length.y, -length.z) };
 		// Bottom
-		vertices[20] = { glm::vec3(-length.x, -length.y, -length.z) };
-		vertices[21] = { glm::vec3( length.x, -length.y, -length.z) };
-		vertices[22] = { glm::vec3( length.x, -length.y,  length.z) };
-		vertices[23] = { glm::vec3(-length.x, -length.y,  length.z) };
+		vertices[12] = { glm::vec3(-length.x, -length.y, -length.z) };
+		vertices[13] = { glm::vec3( length.x, -length.y, -length.z) };
+		vertices[14] = { glm::vec3( length.x, -length.y,  length.z) };
+		vertices[15] = { glm::vec3(-length.x, -length.y,  length.z) };
+		// Front
+		vertices[16] = { glm::vec3(-length.x, -length.y,  length.z) };
+		vertices[17] = { glm::vec3( length.x, -length.y,  length.z) };
+		vertices[18] = { glm::vec3( length.x,  length.y,  length.z) };
+		vertices[19] = { glm::vec3(-length.x,  length.y,  length.z) };
+		// Back
+		vertices[20] = { glm::vec3( length.x, -length.y, -length.z) };
+		vertices[21] = { glm::vec3(-length.x, -length.y, -length.z) };
+		vertices[22] = { glm::vec3(-length.x,  length.y, -length.z) };
+		vertices[23] = { glm::vec3( length.x,  length.y, -length.z) };
 
 		return vertices;
 	}

@@ -1,13 +1,14 @@
 #include "pch.h"
 #include "Renderer.h"
 #include "RendererCommands.h"
-#include "RendererBaseShaders.h"
 
 #include "Shader.h"
 #include "Texture.h"
 #include "VertexArray.h"
 #include "Framebuffer.h"
 #include "ShaderDataType.h"
+#include "RendererBindings.h"
+#include "RendererBaseShaders.h"
 
 #include "Doge/Core/Window.h"
 
@@ -260,7 +261,7 @@ namespace Doge
 			m_QuadVertexArray->BindIndexBuffer(*QuadIndexBuffer);
 		}
 		// Create TexturedQuad Shader program for rendering Framebuffer
-		m_QuadTexturedShader = ShaderLibrary::CreateShader("TexturedQuad", TexturedQuadVertexShader.data(), TexturedQuadFragmentShader.data());
+		m_QuadTexturedShader = RendererBaseShaders::TexturedQuad();
 		m_QuadTexturedShader->Bind();
 		m_QuadTexturedShader->SetUniformInt("u_Texture", TextureBinding::QuadFramebufferColorAttachment);
 	}
@@ -284,7 +285,7 @@ namespace Doge
 		m_LightingUniformBuffer = UniformBuffer::Create(sizeof(glm::vec4) * 5, BufferBinding::LightingUniformBuffer);
 
 		// Create ObjectOutlining Shader program for outlining selected objects
-		m_ObjectOutliningShader = ShaderLibrary::CreateShader("ObjectOutlining", ObjectOutliningVertexShader.data(), ObjectOutliningFragmentShader.data());
+		m_ObjectOutliningShader = RendererBaseShaders::ObjectOutlining();
 
 		// Set Lighting properties
 		m_LightingUniformBuffer->Bind();
@@ -302,7 +303,7 @@ namespace Doge
 		whiteColorMaterial->SetBaseColor({ 1.0f, 1.0f, 1.0f });
 		Ref<MaterialInstance>  lightMaterialInstance = CreateRef<MaterialInstance>(whiteColorMaterial);
 
-		Sphere pointLight(1.0f);
+		Sphere pointLight(1.0f, 72, 72);
 		RenderData pointLightData = RenderDataManager::Construct(pointLight.GetMesh(), lightMaterialInstance);
 		pointLightData.ModelMatrix = glm::translate(glm::mat4(1.0f), position);
 		m_PointLight.reset(new RenderData(pointLightData));
@@ -327,6 +328,6 @@ namespace Doge
 		Scope<IndexBuffer> SkyboxIndexBuffer = IndexBuffer::Create(indices.data(), indices.size());
 		m_SkyboxVertexArray->BindIndexBuffer(*SkyboxIndexBuffer);
 
-		m_SkyboxShader = ShaderLibrary::CreateShader("SkyboxShader", SkyboxVertexShader.data(), SkyboxFragmentShader.data());
+		m_SkyboxShader = RendererBaseShaders::Skybox();
 	}
 }

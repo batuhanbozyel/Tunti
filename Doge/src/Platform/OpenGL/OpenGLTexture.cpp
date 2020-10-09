@@ -75,7 +75,7 @@ namespace Doge
 			int width, height, channels;
 		} faces[6];
 
-		stbi_set_flip_vertically_on_load(1);
+		stbi_set_flip_vertically_on_load(0);
 
 		glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_ID);
 

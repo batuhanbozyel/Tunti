@@ -3,14 +3,15 @@
 namespace Sandbox
 {
 	GameLayer::GameLayer()
-		: m_CameraController(60.0f, Doge::Application::GetActiveWindow()->GetWindowProps().Width, Doge::Application::GetActiveWindow()->GetWindowProps().Height)
+		: m_CameraController(60.0f, Doge::Application::GetActiveWindow()->GetWindowProps().Width,
+									Doge::Application::GetActiveWindow()->GetWindowProps().Height)
 	{
 		Doge::Ref<Doge::CubemapTexture> dummyCubemap = Doge::TextureManager::LoadCubemap("assets/cubemaps/learnopengl/",
-			"right.jpg", "left.jpg", "bottom.jpg", "top.jpg", "front.jpg", "back.jpg");
+			"right.jpg", "left.jpg", "top.jpg", "bottom.jpg", "front.jpg", "back.jpg");
 
 		Doge::Renderer::SetSkybox(dummyCubemap);
 
-		Doge::Ref<Doge::Shader> shader = Doge::ShaderLibrary::CreateShader("assets/shaders/PhongLighting.glsl");
+		Doge::Ref<Doge::Shader> shader = Doge::LightingShader::PhongLighting();
 
 		Doge::Ref<Doge::Material> material = Doge::CreateRef<Doge::Material>(shader);
 		material->SetBaseColor({ 1.0f, 1.0f, 1.0f });

@@ -5,7 +5,7 @@ namespace TEditor
 	SceneFrame::SceneFrame(uint32_t viewportWidth, uint32_t viewportHeight)
 		: m_CameraController(60.0f, viewportWidth, viewportHeight)
 	{
-		Doge::Ref<Doge::Shader> shader = Doge::ShaderLibrary::CreateShader("assets/shaders/PhongLighting.glsl");
+		Doge::Ref<Doge::Shader> shader = Doge::LightingShader::PhongLighting();
 
 		Doge::Ref<Doge::Material> material = Doge::CreateRef<Doge::Material>(shader);
 		material->SetBaseColor(glm::vec3(1.0f));
