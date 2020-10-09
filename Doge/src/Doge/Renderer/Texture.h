@@ -57,12 +57,12 @@ namespace Doge
 		static Ref<Texture> LoadTextureMaps(const std::vector<std::pair<std::string, TextureType>>& texturePaths);
 
 		static Ref<CubemapTexture> LoadCubemap(const std::string& folderPath,
-			const std::string& PosXFilename,
-			const std::string& NegXFilename,
-			const std::string& PosYFilename,
-			const std::string& NegYFilename,
-			const std::string& PosZFilename,
-			const std::string& NegZFilename);
+			const std::string& rightFace,
+			const std::string& leftFace,
+			const std::string& topFace,
+			const std::string& bottomFace,
+			const std::string& frontFace,
+			const std::string& backFace);
 	private:
 		Ref<Texture> LoadTextureImpl(const std::string& path);
 		Ref<Texture> LoadTextureMapsImpl(const std::vector<std::pair<std::string, TextureType>>& texturePaths);
@@ -71,8 +71,8 @@ namespace Doge
 	private:
 		Scope<ShaderStorageBuffer> m_SSBO;
 
-		std::unordered_map<std::string, Ref<Texture>> m_TextureMap;
-		std::unordered_map<std::string, Ref<CubemapTexture>> m_CubemapMap;
+		std::unordered_map<std::string, WeakRef<Texture>> m_TextureMap;
+		std::unordered_map<std::string, WeakRef<CubemapTexture>> m_CubemapMap;
 
 		static uint32_t s_TextureCount;
 		static Scope<TextureManager> s_TextureManager;

@@ -72,7 +72,7 @@ namespace Doge
 
 	// ShaderLibrary
 
-	std::unordered_map<std::string, Ref<Shader>> ShaderLibrary::s_ShaderCache;
+	std::unordered_map<std::string, WeakRef<Shader>> ShaderLibrary::s_ShaderCache;
 
 	Ref<Shader> ShaderLibrary::CreateShader(const char* filePath)
 	{
@@ -83,7 +83,11 @@ namespace Doge
 			s_ShaderCache.emplace(std::make_pair(filePath, shader));
 			return shader;
 		}
-		return shaderIt->second;
+
+		if(shaderIt->second.expired())
+			shaderIt->second = Ref<Shader>(Shader::Create(filePath));
+
+		return shaderIt->second.lock();
 	}
 
 	Ref<Shader> ShaderLibrary::CreateShader(const char* name, const std::string& vertexSrc, const std::string& fragmentSrc)
@@ -95,11 +99,10 @@ namespace Doge
 			s_ShaderCache.emplace(std::make_pair(name, shader));
 			return shader;
 		}
-		return shaderIt->second;
-	}
 
-	Shader& ShaderLibrary::GetShader(const std::string& shader)
-	{
-		return *s_ShaderCache.find(shader)->second;
+		if (shaderIt->second.expired())
+			shaderIt->second = Ref<Shader>(Shader::Create(name, vertexSrc, fragmentSrc));
+
+		return shaderIt->second.lock();
 	}
 }

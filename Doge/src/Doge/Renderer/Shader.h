@@ -52,9 +52,7 @@ namespace Doge
 	public:
 		static Ref<Shader> CreateShader(const char* filePath);
 		static Ref<Shader> CreateShader(const char* name, const std::string& vertexSrc, const std::string& fragmentSrc);
-
-		static Shader& GetShader(const std::string& shader);
 	private:
-		static std::unordered_map<std::string, Ref<Shader>> s_ShaderCache;
+		static std::unordered_map<std::string, WeakRef<Shader>> s_ShaderCache;
 	};
 }

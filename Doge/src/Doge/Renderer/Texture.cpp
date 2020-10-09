@@ -52,19 +52,27 @@ namespace Doge
 
 	// TextureManager
 
+	void TextureManager::Init()
+	{
+		s_TextureManager = CreateScope<TextureManager>();
+	}
+
 	TextureManager::TextureManager()
 	{
-		m_SSBO = ShaderStorageBuffer::Create(SizeofTextureMap * MAX_TEXTURES, 0);
+		if (!s_TextureManager)
+		{
+			m_SSBO = ShaderStorageBuffer::Create(SizeofTextureMap * MAX_TEXTURES, 0);
 
-		Ref<Texture> texture = Texture::CreateWhiteTexture();
-		texture->SetShaderStorageIndex(0);
-		m_TextureMap.insert(std::make_pair("default", texture));
-		// Get Handle with Texture index and store in SSBO
-		m_SSBO->Bind();
-		uint64_t handle = texture->GetTextureHandle();
-		m_SSBO->SetData(&handle, SizeofTextureMap * 0 + OffsetofTextureType(TextureType::Diffuse), sizeof(uint64_t));
-		m_SSBO->SetData(&handle, SizeofTextureMap * 0 + OffsetofTextureType(TextureType::Specular), sizeof(uint64_t));
-		s_TextureCount++;
+			Ref<Texture> texture = Texture::CreateWhiteTexture();
+			texture->SetShaderStorageIndex(0);
+			m_TextureMap.insert(std::make_pair("default", texture));
+			// Get Handle with Texture index and store in SSBO
+			m_SSBO->Bind();
+			uint64_t handle = texture->GetTextureHandle();
+			m_SSBO->SetData(&handle, SizeofTextureMap * 0 + OffsetofTextureType(TextureType::Diffuse), sizeof(uint64_t));
+			m_SSBO->SetData(&handle, SizeofTextureMap * 0 + OffsetofTextureType(TextureType::Specular), sizeof(uint64_t));
+			s_TextureCount++;
+		}
 	}
 
 	Ref<Texture> TextureManager::LoadTextureImpl(const std::string& path)
@@ -84,18 +92,18 @@ namespace Doge
 			const auto& textureIt = m_TextureMap.find(texturePair.first);
 			Ref<Texture> texture;
 			TextureType type = texturePair.second;
+			std::string texturePath = texturePair.first;
 
 			// If any of the texturePaths lead to an existing Texture
 			// Set isUnique to false
 			if (textureIt != m_TextureMap.end())
 			{
 				isUnique = false;
-				texture = textureIt->second;
+				texture = (textureIt->second.expired() ? textureIt->second.lock() : Texture::Create(texturePath));
 			}
 			// Create Textures that don't already exist
 			else
 			{
-				std::string texturePath = texturePair.first;
 				texture = Texture::Create(texturePath);
 				texture->SetShaderStorageIndex(s_TextureCount);
 				m_TextureMap.insert(std::make_pair(texturePath, texture));
@@ -140,14 +148,10 @@ namespace Doge
 			m_CubemapMap.insert(std::make_pair(folderPath, newCubemap));
 			return newCubemap;
 		}
+		if (mapIt->second.expired())
+			mapIt->second = Ref<CubemapTexture>(CubemapTexture::Create(cubemapFaces));
 
-		return mapIt->second;
-	}
-
-	void TextureManager::Init()
-	{
-		if (s_TextureManager == nullptr)
-			s_TextureManager = CreateScope<TextureManager>();
+		return mapIt->second.lock();
 	}
 
 	Ref<Texture> TextureManager::LoadTexture(const std::string& path)
@@ -161,32 +165,32 @@ namespace Doge
 	}
 
 	Ref<CubemapTexture> TextureManager::LoadCubemap(const std::string& folderPath,
-		const std::string& PosXFilename,
-		const std::string& NegXFilename,
-		const std::string& PosYFilename,
-		const std::string& NegYFilename,
-		const std::string& PosZFilename,
-		const std::string& NegZFilename)
+		const std::string& rightFace,
+		const std::string& leftFace,
+		const std::string& topFace,
+		const std::string& bottomFace,
+		const std::string& frontFace,
+		const std::string& backFace)
 	{
 		if (*folderPath.rbegin() == '/')
 		{
 			return s_TextureManager->LoadCubemapImpl(folderPath, {
-				folderPath + PosXFilename,
-				folderPath + NegXFilename,
-				folderPath + PosYFilename,
-				folderPath + NegYFilename,
-				folderPath + PosZFilename,
-				folderPath + NegZFilename });
+				folderPath + rightFace,
+				folderPath + leftFace,
+				folderPath + topFace,
+				folderPath + bottomFace,
+				folderPath + frontFace,
+				folderPath + backFace });
 		}
 		else
 		{
 			return s_TextureManager->LoadCubemapImpl(folderPath, {
-				folderPath + "/" + PosXFilename,
-				folderPath + "/" + NegXFilename,
-				folderPath + "/" + PosYFilename,
-				folderPath + "/" + NegYFilename,
-				folderPath + "/" + PosZFilename,
-				folderPath + "/" + NegZFilename });
+				folderPath + "/" + rightFace,
+				folderPath + "/" + leftFace,
+				folderPath + "/" + topFace,
+				folderPath + "/" + bottomFace,
+				folderPath + "/" + frontFace,
+				folderPath + "/" + backFace });
 		}
 	}
 }
