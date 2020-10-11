@@ -9,7 +9,7 @@ namespace Sandbox
 		GameLayer();
 		~GameLayer() = default;
 
-		virtual void OnUpdate(float dt) override;
+		virtual void OnUpdate(Doge::Timestep ts) override;
 		virtual void OnEvent(Doge::Event& e) override;
 	private:
 		bool OnKeyPress(Doge::KeyPressedEvent& e);

@@ -52,13 +52,13 @@ namespace Doge
 		}
 	}
 
-	void LayerStack::OnUpdate(float dt)
+	void LayerStack::OnUpdate(Timestep ts)
 	{
 		for (Layer* layer : m_Layers)
-			layer->OnUpdate(dt);
+			layer->OnUpdate(ts);
 
 		for (Layer* overlay : m_Overlays)
-			overlay->OnUpdate(dt);
+			overlay->OnUpdate(ts);
 	}
 
 }

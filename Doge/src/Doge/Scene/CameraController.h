@@ -1,4 +1,5 @@
 #pragma once
+#include "Doge/Core/Timestep.h"
 #include "Doge/Utility/Camera.h"
 #include "Doge/Events/Event.h"
 #include "Doge/Events/WindowEvent.h"
@@ -11,7 +12,7 @@ namespace Doge
 		virtual ~CameraController() = default;
 
 		virtual void OnEvent(Event& e) = 0;
-		virtual void OnUpdate(float dt) = 0;
+		virtual void OnUpdate(Timestep ts) = 0;
 
 		virtual const Camera& GetCamera() const = 0;
 	protected:
@@ -26,7 +27,7 @@ namespace Doge
 		~OrthographicCameraController() = default;
 
 		virtual void OnEvent(Event& e) override;
-		virtual void OnUpdate(float dt) override;
+		virtual void OnUpdate(Timestep ts) override;
 
 		virtual const OrthographicCamera& GetCamera() const override { return m_Camera; }
 	private:
@@ -43,7 +44,7 @@ namespace Doge
 		~PerspectiveCameraController() = default;
 
 		virtual void OnEvent(Event& e) override;
-		virtual void OnUpdate(float dt) override;
+		virtual void OnUpdate(Timestep ts) override;
 
 		virtual const PerspectiveCamera& GetCamera() const override { return m_Camera; }
 	private:
@@ -54,7 +55,7 @@ namespace Doge
 		float m_Yaw = -90.0f;
 		float m_Pitch = 0.0f;
 
-		float m_Speed = 0.004f;
+		float m_Speed = 0.002f;
 		float m_Sensitivity = 0.05f;
 		std::pair<float, float> m_LastMousePos;
 	};

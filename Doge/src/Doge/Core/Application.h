@@ -29,7 +29,7 @@ namespace Doge
 		inline static const Scope<Window>& GetActiveWindow() { return s_Instance->s_ActiveWindow; }
 	protected:
 		// To be defined in Client
-		virtual void OnUpdate(float dt) {};
+		virtual void OnUpdate(Timestep ts) {};
 
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);
@@ -44,7 +44,7 @@ namespace Doge
 	private:
 		Scope<Window> s_ActiveWindow;
 		LayerStack m_LayerStack;
-		Timestep m_FrameTime = 0.0f;
+		Timestep m_Timestep = 0.0f;
 		bool s_Running = false;
 	private:
 		static Application* s_Instance;

@@ -7,19 +7,14 @@ namespace Doge
 	{
 	public:
 		Timestep(float time = 0.0f)
-			: m_LastFrameTime(time) {}
+			: m_Time(time) {}
 
-		inline float DeltaTime()
-		{
-			float time = static_cast<float>(glfwGetTime());
-			m_DeltaTime = time - m_LastFrameTime;
-			m_LastFrameTime = time;
-			return m_DeltaTime * 1000.0f;
-		}
+		// Returns in seconds
+		operator float() const { return m_Time; }
 
-		inline float GetDeltaTime() { return m_DeltaTime * 1000.0f; }
+		inline float GetMilliseconds() const { return m_Time * 1000.0f; }
+		inline float GetSeconds() const { return m_Time; }
 	private:
-		float m_LastFrameTime = 0.0f;
-		float m_DeltaTime = 0.0f;
+		float m_Time = 0.0f;
 	};
 }

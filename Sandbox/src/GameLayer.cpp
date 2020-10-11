@@ -43,9 +43,9 @@ namespace Sandbox
 		Doge::Application::DisableCursor();
 	}
 
-	void GameLayer::OnUpdate(float dt)
+	void GameLayer::OnUpdate(Doge::Timestep ts)
 	{
-		m_CameraController.OnUpdate(dt);
+		m_CameraController.OnUpdate(ts);
 
 		for (const auto& renderData : m_RenderDatas)
 		{

@@ -1,5 +1,6 @@
 #pragma once
 #include "Doge/Events/Event.h"
+#include "Doge/Core/Timestep.h"
 
 namespace Doge
 {
@@ -11,7 +12,7 @@ namespace Doge
 
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}
-		virtual void OnUpdate(float dt) {}
+		virtual void OnUpdate(Timestep ts) {}
 		virtual void OnEvent(Event& e) {}
 	};
 }
