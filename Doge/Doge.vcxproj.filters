@@ -150,6 +150,9 @@
     <ClInclude Include="src\Doge\Renderer\RendererBaseShaders.h">
       <Filter>src\Doge\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Doge\Renderer\RendererBindings.h">
+      <Filter>src\Doge\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Doge\Renderer\RendererCommands.h">
       <Filter>src\Doge\Renderer</Filter>
     </ClInclude>
@@ -168,7 +171,16 @@
     <ClInclude Include="src\Doge\Scene\CameraController.h">
       <Filter>src\Doge\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="src\Doge\Scene\Light.h">
+      <Filter>src\Doge\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Doge\Scene\LightingShader.h">
+      <Filter>src\Doge\Scene</Filter>
+    </ClInclude>
     <ClInclude Include="src\Doge\Scene\Model.h">
+      <Filter>src\Doge\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Doge\Scene\Scene.h">
       <Filter>src\Doge\Scene</Filter>
     </ClInclude>
     <ClInclude Include="src\Doge\Scene\SceneObject3D.h">
@@ -1692,9 +1704,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Doge\Scene\Light.h" />
-    <ClInclude Include="src\Doge\Scene\LightingShader.h" />
-    <ClInclude Include="src\Doge\Renderer\RendererBindings.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Doge\Core\Application.cpp">
@@ -1742,7 +1751,13 @@
     <ClCompile Include="src\Doge\Scene\CameraController.cpp">
       <Filter>src\Doge\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="src\Doge\Scene\Light.cpp">
+      <Filter>src\Doge\Scene</Filter>
+    </ClCompile>
     <ClCompile Include="src\Doge\Scene\Model.cpp">
+      <Filter>src\Doge\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Doge\Scene\Scene.cpp">
       <Filter>src\Doge\Scene</Filter>
     </ClCompile>
     <ClCompile Include="src\Doge\Scene\SceneObject3D.cpp">
@@ -1787,6 +1802,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Doge\Scene\Light.cpp" />
   </ItemGroup>
 </Project>

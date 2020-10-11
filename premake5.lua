@@ -23,6 +23,7 @@ IncludeDir["assimp"] = "%{wks.location}/Doge/vendor/assimp/include"
 IncludeDir["glm"] = "%{wks.location}/Doge/vendor/glm"
 IncludeDir["stb_image"] = "%{wks.location}/Doge/vendor/stb_image"
 IncludeDir["ImGui"] = "%{wks.location}/TuntiEditor/vendor/imgui"
+IncludeDir["entt"] = "%{wks.location}/Doge/vendor/entt/include"
 
 LibraryDir = {}
 LibraryDir["assimp"] = "%{wks.location}/Doge/vendor/assimp/lib"
