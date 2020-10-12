@@ -5,7 +5,7 @@
 
 #include "Base.h"
 #include "Window.h"
-#include "Timestep.h"
+#include "Time.h"
 #include "LayerStack.h"
 
 int main(int argc, char** argv);
@@ -18,8 +18,8 @@ namespace Doge
 		Application(const std::string& appName = "Doge", const WindowFlag& flag = WindowFlag::CustomWindow);
 		~Application();
 
-		static void Run();
-		static void Shutdown();
+		void Run();
+		void Shutdown();
 
 		// Application Utility Methods
 		static void DisableCursor();
@@ -27,9 +27,10 @@ namespace Doge
 		static void SetCursorPos(float x, float y);
 
 		inline static const Scope<Window>& GetActiveWindow() { return s_Instance->s_ActiveWindow; }
+		static Application *const GetInstance() { return s_Instance; }
 	protected:
 		// To be defined in Client
-		virtual void OnUpdate(Timestep ts) {};
+		virtual void OnUpdate() {};
 
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);
@@ -44,7 +45,6 @@ namespace Doge
 	private:
 		Scope<Window> s_ActiveWindow;
 		LayerStack m_LayerStack;
-		Timestep m_Timestep = 0.0f;
 		bool s_Running = false;
 	private:
 		static Application* s_Instance;

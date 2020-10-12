@@ -8,24 +8,28 @@
 
 namespace Doge
 {
-	Application* Application::s_Instance = nullptr;
+	Scope<Time> Time::s_Instance = nullptr;
 
+	Application* Application::s_Instance = nullptr;
 	Application::Application(const std::string& appName, const WindowFlag& flag)
 	{
-		LOG_ASSERT(s_Instance == nullptr, "Application already exists!");
-		s_Instance = this;
-		s_Running = true;
-		Log::Init();
+		if (!s_Instance)
+		{
+			s_Instance = this;
+			s_Running = true;
+			Log::Init();
+			Time::Init();
 
-		Renderer::SetAPI(Doge::RendererAPI::OpenGL);
-		Window* window = new Window(WindowProps(appName), flag);
-		window->SetEventCallbackFn(BIND_EVENT_FN(OnEvent));
-		s_ActiveWindow.reset(window);
+			Renderer::SetAPI(Doge::RendererAPI::OpenGL);
+			Window* window = new Window(WindowProps(appName), flag);
+			window->SetEventCallbackFn(BIND_EVENT_FN(OnEvent));
+			s_ActiveWindow.reset(window);
 
-		Renderer::Init(s_ActiveWindow->GetWindowProps());
-		SetCursorPos(s_ActiveWindow->GetWindowProps().Width / 2.0f, s_ActiveWindow->GetWindowProps().Height / 2.0f);
+			Renderer::Init(s_ActiveWindow->GetWindowProps());
+			SetCursorPos(s_ActiveWindow->GetWindowProps().Width / 2.0f, s_ActiveWindow->GetWindowProps().Height / 2.0f);
 
-		Log::Trace("Application started running!");
+			Log::Trace("Application started running!");
+		}
 	}
 
 	Application::~Application()
@@ -36,17 +40,15 @@ namespace Doge
 
 	void Application::Run()
 	{
-		while (s_Instance->s_Running)
+		while (s_Running)
 		{
-			float time = static_cast<float>(glfwGetTime());
-			Timestep ts = (time - s_Instance->m_Timestep) * 1000.0f;
-			s_Instance->m_Timestep = time;
+			Time::Tick();
 
-			s_Instance->OnUpdate(ts);
+			OnUpdate();
 
-			s_Instance->m_LayerStack.OnUpdate(ts);
+			m_LayerStack.OnUpdate();
 
-			s_Instance->s_ActiveWindow->OnUpdate();
+			s_ActiveWindow->OnUpdate();
 		}
 	}
 

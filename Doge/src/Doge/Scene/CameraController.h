@@ -1,5 +1,5 @@
 #pragma once
-#include "Doge/Core/Timestep.h"
+#include "Doge/Core/Time.h"
 #include "Doge/Utility/Camera.h"
 #include "Doge/Events/Event.h"
 #include "Doge/Events/WindowEvent.h"
@@ -12,7 +12,7 @@ namespace Doge
 		virtual ~CameraController() = default;
 
 		virtual void OnEvent(Event& e) = 0;
-		virtual void OnUpdate(Timestep ts) = 0;
+		virtual void OnUpdate() = 0;
 
 		virtual const Camera& GetCamera() const = 0;
 	protected:
@@ -27,7 +27,7 @@ namespace Doge
 		~OrthographicCameraController() = default;
 
 		virtual void OnEvent(Event& e) override;
-		virtual void OnUpdate(Timestep ts) override;
+		virtual void OnUpdate() override;
 
 		virtual const OrthographicCamera& GetCamera() const override { return m_Camera; }
 	private:
@@ -44,7 +44,7 @@ namespace Doge
 		~PerspectiveCameraController() = default;
 
 		virtual void OnEvent(Event& e) override;
-		virtual void OnUpdate(Timestep ts) override;
+		virtual void OnUpdate() override;
 
 		virtual const PerspectiveCamera& GetCamera() const override { return m_Camera; }
 	private:

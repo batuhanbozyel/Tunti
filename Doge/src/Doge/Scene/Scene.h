@@ -4,7 +4,7 @@
 namespace Doge
 {
 	class Entity;
-	class Timestep;
+	class Time;
 
 	class Scene
 	{
@@ -14,7 +14,7 @@ namespace Doge
 
 		Entity CreateEntity(const std::string& name = std::string("Entity"));
 
-		void OnUpdate(Timestep ts);
+		void OnUpdate();
 	private:
 		entt::registry m_Registry;
 

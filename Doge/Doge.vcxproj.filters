@@ -108,9 +108,6 @@
     <ClInclude Include="src\Doge\Core\Platform.h">
       <Filter>src\Doge\Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\Doge\Core\Timestep.h">
-      <Filter>src\Doge\Core</Filter>
-    </ClInclude>
     <ClInclude Include="src\Doge\Core\Window.h">
       <Filter>src\Doge\Core</Filter>
     </ClInclude>
@@ -1706,6 +1703,9 @@
     </ClInclude>
     <ClInclude Include="src\Doge\Scene\Components.h" />
     <ClInclude Include="src\Doge\Scene\Entity.h" />
+    <ClInclude Include="src\Doge\Core\Time.h">
+      <Filter>src\Doge\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Doge\Core\Application.cpp">

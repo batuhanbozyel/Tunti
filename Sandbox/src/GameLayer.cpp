@@ -34,10 +34,10 @@ namespace Sandbox
 		Doge::Application::DisableCursor();
 	}
 
-	void GameLayer::OnUpdate(Doge::Timestep ts)
+	void GameLayer::OnUpdate()
 	{
-		m_CameraController.OnUpdate(ts);
-		m_Scene.OnUpdate(ts);
+		m_CameraController.OnUpdate();
+		m_Scene.OnUpdate();
 
 		Doge::Renderer::RenderIndexed(m_CameraController.GetCamera());
 	}
@@ -55,7 +55,7 @@ namespace Sandbox
 		{
 		case Doge::Key::Escape:
 		{
-			Doge::Application::Shutdown();
+			Doge::Application::GetInstance()->Shutdown();
 			return true;
 		}
 		}

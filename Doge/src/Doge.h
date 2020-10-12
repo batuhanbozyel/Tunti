@@ -3,7 +3,7 @@
 // Core
 #include "Doge/Core/Platform.h"
 #include "Doge/Core/Application.h"
-#include "Doge/Core/Timestep.h"
+#include "Doge/Core/Time.h"
 #include "Doge/Core/Input.h"
 #include "Doge/Core/Log.h"
 

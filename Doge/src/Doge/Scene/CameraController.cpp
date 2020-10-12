@@ -16,7 +16,7 @@ namespace Doge
 
 	}
 
-	void OrthographicCameraController::OnUpdate(Timestep ts)
+	void OrthographicCameraController::OnUpdate()
 	{
 
 	}
@@ -42,20 +42,20 @@ namespace Doge
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResize));
 	}
 
-	void PerspectiveCameraController::OnUpdate(Timestep ts)
+	void PerspectiveCameraController::OnUpdate()
 	{
 		// Camera movement
 		if (Input::IsKeyPressed(Key::W))
-			m_Camera.SetPosition(m_Camera.GetPosition() + (ts * m_Speed * m_Camera.GetFrontVector()));
+			m_Camera.SetPosition(m_Camera.GetPosition() + (Time::DeltaTime() * m_Speed * m_Camera.GetFrontVector()));
 			
 		if (Input::IsKeyPressed(Key::S))
-			m_Camera.SetPosition(m_Camera.GetPosition() - (ts * m_Speed * m_Camera.GetFrontVector()));
+			m_Camera.SetPosition(m_Camera.GetPosition() - (Time::DeltaTime() * m_Speed * m_Camera.GetFrontVector()));
 
 		if (Input::IsKeyPressed(Key::A))
-			m_Camera.SetPosition(m_Camera.GetPosition() - (ts * m_Speed * glm::normalize(glm::cross(m_Camera.GetFrontVector(), m_Camera.GetUpVector()))));
+			m_Camera.SetPosition(m_Camera.GetPosition() - (Time::DeltaTime() * m_Speed * glm::normalize(glm::cross(m_Camera.GetFrontVector(), m_Camera.GetUpVector()))));
 
 		if (Input::IsKeyPressed(Key::D))
-			m_Camera.SetPosition(m_Camera.GetPosition() + (ts * m_Speed * glm::normalize(glm::cross(m_Camera.GetFrontVector(), m_Camera.GetUpVector()))));
+			m_Camera.SetPosition(m_Camera.GetPosition() + (Time::DeltaTime() * m_Speed * glm::normalize(glm::cross(m_Camera.GetFrontVector(), m_Camera.GetUpVector()))));
 
 		// Camera rotation
 		std::pair<float, float> mousePos = Input::GetMousePos();

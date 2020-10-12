@@ -113,7 +113,7 @@
     <ClInclude Include="src\Doge\Core\Log.h" />
     <ClInclude Include="src\Doge\Core\MouseButtonCodes.h" />
     <ClInclude Include="src\Doge\Core\Platform.h" />
-    <ClInclude Include="src\Doge\Core\Timestep.h" />
+    <ClInclude Include="src\Doge\Core\Time.h" />
     <ClInclude Include="src\Doge\Core\Window.h" />
     <ClInclude Include="src\Doge\Events\ApplicationEvent.h" />
     <ClInclude Include="src\Doge\Events\Event.h" />

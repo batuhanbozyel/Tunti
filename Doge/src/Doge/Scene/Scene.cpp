@@ -12,7 +12,7 @@ namespace Doge
 		return entity;
 	}
 
-	void Scene::OnUpdate(Timestep ts)
+	void Scene::OnUpdate()
 	{
 		auto group = m_Registry.group<TransformComponent>(entt::get<MeshRendererComponent>);
 		for (auto entity : group)
