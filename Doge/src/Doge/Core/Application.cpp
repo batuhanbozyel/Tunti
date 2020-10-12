@@ -39,11 +39,12 @@ namespace Doge
 		while (s_Instance->s_Running)
 		{
 			float time = static_cast<float>(glfwGetTime());
-			s_Instance->m_Timestep = time - s_Instance->m_Timestep;
+			Timestep ts = (time - s_Instance->m_Timestep) * 1000.0f;
+			s_Instance->m_Timestep = time;
 
-			s_Instance->OnUpdate(s_Instance->m_Timestep);
+			s_Instance->OnUpdate(ts);
 
-			s_Instance->m_LayerStack.OnUpdate(s_Instance->m_Timestep);
+			s_Instance->m_LayerStack.OnUpdate(ts);
 
 			s_Instance->s_ActiveWindow->OnUpdate();
 		}
