@@ -134,9 +134,11 @@
     <ClInclude Include="src\Doge\Renderer\Texture.h" />
     <ClInclude Include="src\Doge\Renderer\VertexArray.h" />
     <ClInclude Include="src\Doge\Scene\CameraController.h" />
+    <ClInclude Include="src\Doge\Scene\Components.h" />
     <ClInclude Include="src\Doge\Scene\Light.h" />
     <ClInclude Include="src\Doge\Scene\LightingShader.h" />
     <ClInclude Include="src\Doge\Scene\Model.h" />
+    <ClInclude Include="src\Doge\Scene\Entity.h" />
     <ClInclude Include="src\Doge\Scene\Scene.h" />
     <ClInclude Include="src\Doge\Scene\SceneObject3D.h" />
     <ClInclude Include="src\Doge\Utility\Camera.h" />

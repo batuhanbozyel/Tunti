@@ -1,16 +1,27 @@
 #pragma once
-#include "Material.h"
 
 namespace Doge
 {
 #pragma pack(push, 1)
-	struct QuadVertex
+	struct FramebufferQuadVertex
 	{
-		QuadVertex(const glm::vec2& position, const glm::vec2& texCoord)
+		FramebufferQuadVertex(const glm::vec2& position, const glm::vec2& texCoord)
 			: a_Position(position), a_TexCoord(texCoord) {}
 
 		glm::vec2 a_Position;
 		glm::vec2 a_TexCoord;
+	};
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+	struct QuadVertex
+	{
+		QuadVertex(const glm::vec2& position, const glm::vec2& texCoord, uint32_t index = 0)
+			: a_Position(position), a_TexCoord(texCoord), TexIndex(index) {}
+
+		glm::vec2 a_Position;
+		glm::vec2 a_TexCoord;
+		uint32_t TexIndex;
 	};
 #pragma pack(pop)
 

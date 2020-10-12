@@ -22,6 +22,6 @@ namespace Doge
 		static Ref<Shader> TexturedQuad()
 		{
 			return ShaderLibrary::CreateShader("../Doge/assets/shaders/TexturedQuad.glsl");
-		}		
+		}
 	};
 }

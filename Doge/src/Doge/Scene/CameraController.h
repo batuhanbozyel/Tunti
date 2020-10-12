@@ -55,7 +55,7 @@ namespace Doge
 		float m_Yaw = -90.0f;
 		float m_Pitch = 0.0f;
 
-		float m_Speed = 0.002f;
+		float m_Speed = 0.005f;
 		float m_Sensitivity = 0.05f;
 		std::pair<float, float> m_LastMousePos;
 	};

@@ -27,18 +27,9 @@ namespace Sandbox
 		greenMaterialInstance->SetColor({ 0.3f, 0.8f, 0.2f });
 
 		Doge::Cube cube(glm::vec3(1.0f));
-		Doge::RenderData blueCubeData = Doge::RenderDataManager::Construct(cube.GetMesh(), blueMaterialInstance);
-		blueCubeData.Selected = true;
-		m_RenderDatas.push_back(blueCubeData);
 
-		Doge::RenderData greenCubeData = Doge::RenderDataManager::Construct(cube.GetMesh(), greenMaterialInstance);
-		greenCubeData.ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-2.0f, 0.0f, 0.0f));
-		m_RenderDatas.push_back(greenCubeData);
-
-		Doge::Model backpack("assets/models/backpack/backpack.obj");
-		Doge::RenderData backpackData = Doge::RenderDataManager::ConstructBatched(backpack.GetMeshes(), defaultMaterialInstance);
-		backpackData.ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(3.0f, 0.0f, 0.0f));
-		m_RenderDatas.push_back(backpackData);
+		Doge::Entity backpackEntity = m_Scene.CreateEntity("backpack");
+		backpackEntity.AddComponent<Doge::MeshRendererComponent>(Doge::Model("assets/models/backpack/backpack.obj").GetMeshes(), defaultMaterialInstance);
 
 		Doge::Application::DisableCursor();
 	}
@@ -46,11 +37,7 @@ namespace Sandbox
 	void GameLayer::OnUpdate(Doge::Timestep ts)
 	{
 		m_CameraController.OnUpdate(ts);
-
-		for (const auto& renderData : m_RenderDatas)
-		{
-			Doge::Renderer::Submit(renderData);
-		}
+		m_Scene.OnUpdate(ts);
 
 		Doge::Renderer::RenderIndexed(m_CameraController.GetCamera());
 	}

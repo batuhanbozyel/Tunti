@@ -5,18 +5,19 @@ namespace Doge
 {
 	class WindowResizeEvent;
 
+	class Shader;
 	class Framebuffer;
 	class VertexArray;
-	class UniformBuffer;
-	class VertexBuffer;
 	class IndexBuffer;
-	class Shader;
+	class VertexBuffer;
+	class UniformBuffer;
+	class CubemapTexture;
 
-	class Model;
+	class Mesh;
 	class Camera;
 	class Material;
-	class SceneObject3D;
-	class CubemapTexture;
+	class MaterialInstance;
+	
 
 	struct WindowProps;
 
@@ -35,7 +36,7 @@ namespace Doge
 		Renderer(const WindowProps& props);
 		~Renderer() = default;
 
-		static void Submit(const RenderData& data);
+		static void Submit(const MeshRendererData& meshData, const Ref<MaterialInstance>& material, const glm::mat4& transform);
 		static void RenderIndexed(const Camera& camera);
 
 		static void SetAPI(const RendererAPI& api) { s_API = api; }

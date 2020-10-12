@@ -8,14 +8,26 @@
 
 namespace Doge
 {
-	RenderData RenderDataManager::ConstructBatched(const std::vector<Mesh>& meshes, const Ref<MaterialInstance>& materialInstance)
+	MeshRendererData::MeshRendererData(const std::vector<Mesh>& meshes)
 	{
-		return Construct(BatchMeshes(meshes), materialInstance);
+		Mesh mesh = BatchMeshes(meshes);
+
+		Ref<VertexBuffer> vertexBuffer = VertexBuffer::Create(&mesh.GetVertices().data()->Position.x,
+			static_cast<uint32_t>(mesh.GetVertices().size() * sizeof(Vertex)));
+
+		vertexBuffer->SetLayout({
+			{ ShaderDataType::Float4, "a_Position" },
+			{ ShaderDataType::Float3, "a_Normal"   },
+			{ ShaderDataType::Float2, "a_TexCoord" },
+			{ ShaderDataType::UInt,   "a_TexIndex" }
+			});
+		VBOs.push_back(vertexBuffer);
+
+		IBO = IndexBuffer::Create(mesh.GetIndices().data(), static_cast<uint32_t>(mesh.GetIndices().size()));
 	}
 
-	RenderData RenderDataManager::Construct(const Mesh& mesh, const Ref<MaterialInstance>& materialInstance)
+	MeshRendererData::MeshRendererData(const Mesh& mesh)
 	{
-		std::vector<Ref<VertexBuffer>> vertexBuffers;
 		Ref<VertexBuffer> vertexBuffer = VertexBuffer::Create(&mesh.GetVertices().data()->Position.x,
 															  static_cast<uint32_t>(mesh.GetVertices().size() * sizeof(Vertex)));
 
@@ -25,14 +37,12 @@ namespace Doge
 			{ ShaderDataType::Float2, "a_TexCoord" },
 			{ ShaderDataType::UInt,   "a_TexIndex" }
 		});
-		vertexBuffers.push_back(vertexBuffer);
+		VBOs.push_back(vertexBuffer);
 
-		Ref<IndexBuffer> indexBuffer = IndexBuffer::Create(mesh.GetIndices().data(), static_cast<uint32_t>(mesh.GetIndices().size()));
-
-		return RenderData(std::move(vertexBuffers), std::move(indexBuffer), materialInstance);
+		IBO = IndexBuffer::Create(mesh.GetIndices().data(), static_cast<uint32_t>(mesh.GetIndices().size()));
 	}
 
-	Mesh RenderDataManager::BatchMeshes(const std::vector<Mesh>& meshes)
+	Mesh MeshRendererData::BatchMeshes(const std::vector<Mesh>& meshes)
 	{
 		uint32_t offset = 0;
 		std::vector<Vertex> vertices;
@@ -54,5 +64,4 @@ namespace Doge
 		}
 		return Mesh(vertices, indices);
 	}
-
 }

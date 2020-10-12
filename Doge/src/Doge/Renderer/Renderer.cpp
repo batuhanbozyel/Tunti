@@ -12,6 +12,7 @@
 
 #include "Doge/Core/Window.h"
 
+#include "Doge/Utility/Mesh.h"
 #include "Doge/Utility/Camera.h"
 #include "Doge/Utility/Material.h"
 
@@ -107,7 +108,7 @@ namespace Doge
 				const auto& renderData = renderQueue.front();
 				// Set Unique Material properties and the Model matrix
 				renderData.MaterialInstanceRef->AssignUniqueUniforms();
-				renderData.MaterialInstanceRef->GetShaderRef()->SetUniformMat4("u_Model", renderData.ModelMatrix);
+				renderData.MaterialInstanceRef->GetShaderRef()->SetUniformMat4("u_Model", renderData.Transform);
 				DrawIndexed(renderData);
 				renderQueue.pop();
 			}
@@ -123,8 +124,8 @@ namespace Doge
 		while (!m_OutlineRenderQueue.empty())
 		{
 			auto& renderData = m_OutlineRenderQueue.front();
-			renderData.ModelMatrix = glm::scale(renderData.ModelMatrix, glm::vec3(1.03f));
-			m_ObjectOutliningShader->SetUniformMat4("u_Model", renderData.ModelMatrix);
+			renderData.Transform = glm::scale(renderData.Transform, glm::vec3(1.03f));
+			m_ObjectOutliningShader->SetUniformMat4("u_Model", renderData.Transform);
 			DrawIndexed(renderData);
 			m_OutlineRenderQueue.pop();
 		}
@@ -133,7 +134,7 @@ namespace Doge
 	void Renderer::RenderLightObjectsIndexed()
 	{
  		m_ObjectOutliningShader->SetUniformFloat3("u_OutlineColor", { 1.0f, 1.0f, 1.0f });
- 		m_ObjectOutliningShader->SetUniformMat4("u_Model", m_PointLight->ModelMatrix);
+ 		m_ObjectOutliningShader->SetUniformMat4("u_Model", m_PointLight->Transform);
 		DrawIndexed(*m_PointLight);
 	}
 
@@ -163,14 +164,14 @@ namespace Doge
 		RendererCommands::DrawIndexed(6);
 	}
 
-	void Renderer::Submit(const RenderData& data)
+	void Renderer::Submit(const MeshRendererData& meshData, const Ref<MaterialInstance>& material, const glm::mat4& transform)
 	{
 		// Emplace the Object to the appropriate Material bucket in the Map
-		s_Instance->m_RenderQueue[data.MaterialInstanceRef->GetBaseMaterialRef()].emplace(data);
+		s_Instance->m_RenderQueue[material->GetBaseMaterialRef()].emplace(RenderData(meshData, material, transform));
 
 		// Emplace the Object to the Outline RenderQueue if marked as Selected
-		if (data.Selected)
-			s_Instance->m_OutlineRenderQueue.emplace(data);
+// 		if (data.Selected)
+// 			s_Instance->m_OutlineRenderQueue.emplace(data);
 	}
 
 	void Renderer::SetSkybox(const Ref<CubemapTexture>& skybox)
@@ -188,14 +189,14 @@ namespace Doge
 	{
 		// Bind Buffers
 		uint32_t binding = 0;
-		for (const auto& vertexBuffer : renderData.VBOs)
+		for (const auto& vertexBuffer : renderData.MeshData.VBOs)
 		{
 			m_MainVertexArray->BindVertexBuffer(*vertexBuffer, binding);
 			binding++;
 		}
-		m_MainVertexArray->BindIndexBuffer(*renderData.IBO);
+		m_MainVertexArray->BindIndexBuffer(*renderData.MeshData.IBO);
 
-		RendererCommands::DrawIndexed(renderData.IBO->GetCount());
+		RendererCommands::DrawIndexed(renderData.MeshData.IBO->GetCount());
 	}
 
 	void Renderer::RenderIndexed(const Camera& camera)
@@ -243,13 +244,13 @@ namespace Doge
 			{ ShaderDataType::Float2, "a_TexCoord" }
 		}, 0);
 		{
-			QuadVertex vertices[4] = {
-				QuadVertex({-1.0f, -1.0f}, {0.0f, 0.0f}),
-				QuadVertex({ 1.0f, -1.0f}, {1.0f, 0.0f}),
-				QuadVertex({ 1.0f,  1.0f}, {1.0f, 1.0f}),
-				QuadVertex({-1.0f,  1.0f}, {0.0f, 1.0f})
+			FramebufferQuadVertex vertices[4] = {
+				FramebufferQuadVertex({-1.0f, -1.0f}, {0.0f, 0.0f}),
+				FramebufferQuadVertex({ 1.0f, -1.0f}, {1.0f, 0.0f}),
+				FramebufferQuadVertex({ 1.0f,  1.0f}, {1.0f, 1.0f}),
+				FramebufferQuadVertex({-1.0f,  1.0f}, {0.0f, 1.0f})
 			};
-			Scope<VertexBuffer> QuadVertexBuffer = VertexBuffer::Create(&vertices->a_Position.x, sizeof(QuadVertex) * 4);
+			Scope<VertexBuffer> QuadVertexBuffer = VertexBuffer::Create(&vertices->a_Position.x, sizeof(FramebufferQuadVertex) * 4);
 			QuadVertexBuffer->SetLayout({
 				{ ShaderDataType::Float2, "a_Position" },
 				{ ShaderDataType::Float2, "a_TexCoord" }
@@ -304,8 +305,7 @@ namespace Doge
 		Ref<MaterialInstance>  lightMaterialInstance = CreateRef<MaterialInstance>(whiteColorMaterial);
 
 		Sphere pointLight(1.0f, 72, 72);
-		RenderData pointLightData = RenderDataManager::Construct(pointLight.GetMesh(), lightMaterialInstance);
-		pointLightData.ModelMatrix = glm::translate(glm::mat4(1.0f), position);
+		RenderData pointLightData(MeshRendererData(pointLight.GetMesh()), lightMaterialInstance, glm::translate(glm::mat4(1.0f), position));
 		m_PointLight.reset(new RenderData(pointLightData));
 	}
 

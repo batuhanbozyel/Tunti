@@ -10,29 +10,24 @@ namespace Doge
 	class Material;
 	class MaterialInstance;
 
-	struct RenderData
+	struct MeshRendererData
 	{
-		RenderData(const std::vector<Ref<VertexBuffer>>&& vertexBuffers,
-			const Ref<IndexBuffer>&& indexBuffer,
-			const Ref<MaterialInstance>& matInstance)
-			: VBOs(vertexBuffers), IBO(indexBuffer), MaterialInstanceRef(matInstance)
-		{
-
-		}
-
 		std::vector<Ref<VertexBuffer>> VBOs;
 		Ref<IndexBuffer> IBO;
-		Ref<MaterialInstance> MaterialInstanceRef;
-		glm::mat4 ModelMatrix = glm::mat4(1.0f);
-		bool Selected = false;
-	};
 
-	class RenderDataManager
-	{
-	public:
-		static RenderData Construct(const Mesh& mesh, const Ref<MaterialInstance>& materialInstance);
-		static RenderData ConstructBatched(const std::vector<Mesh>& meshes, const Ref<MaterialInstance>& materialInstance);
+		MeshRendererData(const Mesh& mesh);
+		MeshRendererData(const std::vector<Mesh>& meshes);
 	private:
 		static Mesh BatchMeshes(const std::vector<Mesh>& meshes);
+	};
+
+	struct RenderData
+	{
+		MeshRendererData MeshData;
+		Ref<MaterialInstance> MaterialInstanceRef;
+		glm::mat4 Transform;
+
+		RenderData(const MeshRendererData& meshData, const Ref<MaterialInstance>& material, const glm::mat4& transform)
+			: MeshData(meshData), MaterialInstanceRef(material), Transform(transform) {}
 	};
 }
