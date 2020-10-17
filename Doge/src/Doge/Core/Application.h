@@ -26,12 +26,9 @@ namespace Doge
 		static void EnableCursor();
 		static void SetCursorPos(float x, float y);
 
-		inline static const Scope<Window>& GetActiveWindow() { return s_Instance->s_ActiveWindow; }
-		static Application *const GetInstance() { return s_Instance; }
+		inline const Scope<Window>& GetActiveWindow() { return m_ActiveWindow; }
+		static inline Application& GetInstance() { return *s_Instance; }
 	protected:
-		// To be defined in Client
-		virtual void OnUpdate() {};
-
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);
 		void PopLayer(Layer* layer);
@@ -39,11 +36,10 @@ namespace Doge
 	private:
 		// Application Event Handling Methods
 		void OnEvent(Event& e);
-
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
 	private:
-		Scope<Window> s_ActiveWindow;
+		Scope<Window> m_ActiveWindow;
 		LayerStack m_LayerStack;
 		bool s_Running = false;
 	private:

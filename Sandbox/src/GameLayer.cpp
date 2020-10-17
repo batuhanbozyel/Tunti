@@ -3,8 +3,8 @@
 namespace Sandbox
 {
 	GameLayer::GameLayer()
-		: m_CameraController(60.0f, Doge::Application::GetActiveWindow()->GetWindowProps().Width,
-									Doge::Application::GetActiveWindow()->GetWindowProps().Height)
+		: m_CameraController(60.0f, Doge::Application::GetInstance().GetActiveWindow()->GetWindowProps().Width,
+									Doge::Application::GetInstance().GetActiveWindow()->GetWindowProps().Height)
 	{
 		Doge::Ref<Doge::CubemapTexture> dummyCubemap = Doge::TextureManager::LoadCubemap("assets/cubemaps/learnopengl/",
 			"right.jpg", "left.jpg", "top.jpg", "bottom.jpg", "front.jpg", "back.jpg");
@@ -53,11 +53,11 @@ namespace Sandbox
 	{
 		switch (e.GetKeyCode())
 		{
-		case Doge::Key::Escape:
-		{
-			Doge::Application::GetInstance()->Shutdown();
-			return true;
-		}
+			case Doge::Key::Escape:
+			{
+				Doge::Application::GetInstance().Shutdown();
+				return true;
+			}
 		}
 		return false;
 	}
@@ -66,12 +66,12 @@ namespace Sandbox
 	{
 		switch (e.GetMouseButton())
 		{
-		case Doge::Mouse::ButtonRight:
-		{
-			m_IsMouseVisible ? Doge::Application::DisableCursor() : Doge::Application::EnableCursor();
-			m_IsMouseVisible = !m_IsMouseVisible;
-			return true;
-		}
+			case Doge::Mouse::ButtonRight:
+			{
+				m_IsMouseVisible ? Doge::Application::DisableCursor() : Doge::Application::EnableCursor();
+				m_IsMouseVisible = !m_IsMouseVisible;
+				return true;
+			}
 		}
 		return false;
 	}

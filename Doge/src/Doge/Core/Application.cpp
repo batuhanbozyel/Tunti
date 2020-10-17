@@ -4,13 +4,12 @@
 #include "Doge/Renderer/Renderer.h"
 #include "Doge/Renderer/Framebuffer.h"
 #include "Doge/Renderer/RendererCommands.h"
-#include "Doge/Utility/Camera.h"
 
 namespace Doge
 {
-	Scope<Time> Time::s_Instance = nullptr;
-
+	Time* Time::s_Instance = nullptr;
 	Application* Application::s_Instance = nullptr;
+
 	Application::Application(const std::string& appName, const WindowFlag& flag)
 	{
 		if (!s_Instance)
@@ -18,15 +17,14 @@ namespace Doge
 			s_Instance = this;
 			s_Running = true;
 			Log::Init();
-			Time::Init();
 
 			Renderer::SetAPI(Doge::RendererAPI::OpenGL);
 			Window* window = new Window(WindowProps(appName), flag);
 			window->SetEventCallbackFn(BIND_EVENT_FN(OnEvent));
-			s_ActiveWindow.reset(window);
+			m_ActiveWindow.reset(window);
 
-			Renderer::Init(s_ActiveWindow->GetWindowProps());
-			SetCursorPos(s_ActiveWindow->GetWindowProps().Width / 2.0f, s_ActiveWindow->GetWindowProps().Height / 2.0f);
+			Renderer::Init(m_ActiveWindow->GetWindowProps());
+			SetCursorPos(m_ActiveWindow->GetWindowProps().Width / 2.0f, m_ActiveWindow->GetWindowProps().Height / 2.0f);
 
 			Log::Trace("Application started running!");
 		}
@@ -42,13 +40,11 @@ namespace Doge
 	{
 		while (s_Running)
 		{
-			Time::Tick();
-
-			OnUpdate();
+			Time::GetInstance().OnTick();
 
 			m_LayerStack.OnUpdate();
 
-			s_ActiveWindow->OnUpdate();
+			m_ActiveWindow->OnUpdate();
 		}
 	}
 
@@ -108,23 +104,23 @@ namespace Doge
 
 	bool Application::OnWindowResize(WindowResizeEvent& e)
 	{
-		s_ActiveWindow->OnWindowResize(e);
+		m_ActiveWindow->OnWindowResize(e);
 		Renderer::OnWindowResize(e);
 		return true;
 	}
 
 	void Application::DisableCursor()
 	{
-		s_Instance->s_ActiveWindow->HideCursor();
+		s_Instance->m_ActiveWindow->HideCursor();
 	}
 
 	void Application::EnableCursor()
 	{
-		s_Instance->s_ActiveWindow->ShowCursor();
+		s_Instance->m_ActiveWindow->ShowCursor();
 	}
 
 	void Application::SetCursorPos(float x, float y)
 	{
-		s_Instance->s_ActiveWindow->SetCursorPos(x, y);
+		s_Instance->m_ActiveWindow->SetCursorPos(x, y);
 	}
 }
