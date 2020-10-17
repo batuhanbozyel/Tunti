@@ -3,12 +3,12 @@
 
 namespace Doge
 {
-	class OpenGLTexture : public Texture
+	class OpenGLTexture2D : public Texture2D
 	{
 	public:
-		explicit OpenGLTexture();
-		explicit OpenGLTexture(const std::string& texturePath);
-		~OpenGLTexture();
+		explicit OpenGLTexture2D();
+		explicit OpenGLTexture2D(const std::string& texturePath);
+		~OpenGLTexture2D();
 	private:
 		virtual uint64_t GetTextureHandle() override;
 	private:

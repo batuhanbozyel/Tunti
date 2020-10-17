@@ -19,7 +19,7 @@ namespace Doge
 
 	static constexpr uint32_t SizeofTextureMap = static_cast<uint32_t>(TextureType::COUNT) * sizeof(uint64_t);
 
-	class Texture
+	class Texture2D
 	{
 	public:
 		uint32_t GetShaderStorageIndex() const { return m_Index; }
@@ -28,8 +28,8 @@ namespace Doge
 
 		virtual uint64_t GetTextureHandle() = 0;
 	private:
-		static Scope<Texture> Create(const std::string& texturePath);
-		static Scope<Texture> CreateWhiteTexture();
+		static Scope<Texture2D> Create(const std::string& texturePath);
+		static Scope<Texture2D> CreateWhiteTexture();
 	private:
 		uint32_t m_Index = 0;
 
@@ -53,8 +53,8 @@ namespace Doge
 		TextureManager();
 		~TextureManager() = default;
 
-		static Ref<Texture> LoadTexture(const std::string& path);
-		static Ref<Texture> LoadTextureMaps(const std::vector<std::pair<std::string, TextureType>>& texturePaths);
+		static Ref<Texture2D> LoadTexture(const std::string& path);
+		static Ref<Texture2D> LoadTextureMaps(const std::vector<std::pair<std::string, TextureType>>& texturePaths);
 
 		static Ref<CubemapTexture> LoadCubemap(const std::string& folderPath,
 			const std::string& rightFace,
@@ -64,14 +64,14 @@ namespace Doge
 			const std::string& frontFace,
 			const std::string& backFace);
 	private:
-		Ref<Texture> LoadTextureImpl(const std::string& path);
-		Ref<Texture> LoadTextureMapsImpl(const std::vector<std::pair<std::string, TextureType>>& texturePaths);
+		Ref<Texture2D> LoadTextureImpl(const std::string& path);
+		Ref<Texture2D> LoadTextureMapsImpl(const std::vector<std::pair<std::string, TextureType>>& texturePaths);
 
 		Ref<CubemapTexture> LoadCubemapImpl(const std::string& folderPath, const std::array<std::string, 6>& cubemapFaces);
 	private:
 		Scope<ShaderStorageBuffer> m_SSBO;
 
-		std::unordered_map<std::string, WeakRef<Texture>> m_TextureMap;
+		std::unordered_map<std::string, WeakRef<Texture2D>> m_TextureMap;
 		std::unordered_map<std::string, WeakRef<CubemapTexture>> m_CubemapMap;
 
 		static uint32_t s_TextureCount;

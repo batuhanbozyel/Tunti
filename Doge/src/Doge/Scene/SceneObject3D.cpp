@@ -8,7 +8,7 @@ namespace Doge
 {
 	// Cuboid Object Implementations
 
-	Cube::Cube(glm::vec3&& length, const Ref<Texture>& texture)
+	Cube::Cube(glm::vec3&& length, const Ref<Texture2D>& texture)
 	{
 		uint32_t texIndex = texture ? texture->GetShaderStorageIndex() : 0;
 
@@ -111,7 +111,7 @@ namespace Doge
 
 	// Sphere Object Implementations
 
-	Sphere::Sphere(float radius, uint32_t sectorCount, uint32_t stackCount, const Ref<Texture>& texture)
+	Sphere::Sphere(float radius, uint32_t sectorCount, uint32_t stackCount, const Ref<Texture2D>& texture)
 	{
 		uint32_t texIndex = texture ? texture->GetShaderStorageIndex() : 0;
 

@@ -8,7 +8,7 @@ namespace Doge
 {
 	// OpenGLTexture
 
-	OpenGLTexture::OpenGLTexture(const std::string& texturePath)
+	OpenGLTexture2D::OpenGLTexture2D(const std::string& texturePath)
 	{
 		stbi_set_flip_vertically_on_load(1);
 
@@ -33,7 +33,7 @@ namespace Doge
 		stbi_image_free(buffer);
 	}
 
-	OpenGLTexture::OpenGLTexture()
+	OpenGLTexture2D::OpenGLTexture2D()
 	{
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_ID);
 
@@ -52,7 +52,7 @@ namespace Doge
 		glMakeTextureHandleResidentARB(handle);
 	}
 
-	OpenGLTexture::~OpenGLTexture()
+	OpenGLTexture2D::~OpenGLTexture2D()
 	{
 		uint64_t handle = glGetTextureHandleARB(m_ID);
 		glMakeTextureHandleNonResidentARB(handle);
@@ -60,7 +60,7 @@ namespace Doge
 		glDeleteTextures(1, &m_ID);
 	}
 
-	uint64_t OpenGLTexture::GetTextureHandle()
+	uint64_t OpenGLTexture2D::GetTextureHandle()
 	{
 		return glGetTextureHandleARB(m_ID);
 	}

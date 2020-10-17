@@ -12,24 +12,24 @@ namespace Doge
 
 	// Texture
 
-	Scope<Texture> Texture::Create(const std::string& texturePath)
+	Scope<Texture2D> Texture2D::Create(const std::string& texturePath)
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!");  return nullptr;
-		case RendererAPI::OpenGL: return CreateScope<OpenGLTexture>(texturePath);
+		case RendererAPI::OpenGL: return CreateScope<OpenGLTexture2D>(texturePath);
 		}
 
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
 		return nullptr;
 	}
 
-	Scope<Texture> Texture::CreateWhiteTexture()
+	Scope<Texture2D> Texture2D::CreateWhiteTexture()
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!");  return nullptr;
-		case RendererAPI::OpenGL: return CreateScope<OpenGLTexture>();
+		case RendererAPI::OpenGL: return CreateScope<OpenGLTexture2D>();
 		}
 
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
@@ -63,7 +63,7 @@ namespace Doge
 		{
 			m_SSBO = ShaderStorageBuffer::Create(SizeofTextureMap * MAX_TEXTURES, 0);
 
-			Ref<Texture> texture = Texture::CreateWhiteTexture();
+			Ref<Texture2D> texture = Texture2D::CreateWhiteTexture();
 			texture->SetShaderStorageIndex(0);
 			m_TextureMap.insert(std::make_pair("default", texture));
 			// Get Handle with Texture index and store in SSBO
@@ -75,22 +75,22 @@ namespace Doge
 		}
 	}
 
-	Ref<Texture> TextureManager::LoadTextureImpl(const std::string& path)
+	Ref<Texture2D> TextureManager::LoadTextureImpl(const std::string& path)
 	{
 		return LoadTextureMapsImpl({ {path, TextureType::Diffuse}, {path, TextureType::Specular} });
 	}
 
-	Ref<Texture> TextureManager::LoadTextureMapsImpl(const std::vector<std::pair<std::string, TextureType>>& texturePaths)
+	Ref<Texture2D> TextureManager::LoadTextureMapsImpl(const std::vector<std::pair<std::string, TextureType>>& texturePaths)
 	{
 		// To return first Texture in the TextureMap which is Diffuse Texture
-		Ref<Texture> diffuseTexture = nullptr;
+		Ref<Texture2D> diffuseTexture = nullptr;
 
 		bool isUnique = true;
-		std::vector<std::pair<Ref<Texture>, TextureType>> textures;
+		std::vector<std::pair<Ref<Texture2D>, TextureType>> textures;
 		for (const auto& texturePair : texturePaths)
 		{
 			const auto& textureIt = m_TextureMap.find(texturePair.first);
-			Ref<Texture> texture;
+			Ref<Texture2D> texture;
 			TextureType type = texturePair.second;
 			std::string texturePath = texturePair.first;
 
@@ -99,12 +99,12 @@ namespace Doge
 			if (textureIt != m_TextureMap.end())
 			{
 				isUnique = false;
-				texture = (textureIt->second.expired() ? textureIt->second.lock() : Texture::Create(texturePath));
+				texture = (textureIt->second.expired() ? textureIt->second.lock() : Texture2D::Create(texturePath));
 			}
 			// Create Textures that don't already exist
 			else
 			{
-				texture = Texture::Create(texturePath);
+				texture = Texture2D::Create(texturePath);
 				texture->SetShaderStorageIndex(s_TextureCount);
 				m_TextureMap.insert(std::make_pair(texturePath, texture));
 			}
@@ -154,12 +154,12 @@ namespace Doge
 		return mapIt->second.lock();
 	}
 
-	Ref<Texture> TextureManager::LoadTexture(const std::string& path)
+	Ref<Texture2D> TextureManager::LoadTexture(const std::string& path)
 	{
 		return s_TextureManager->LoadTextureImpl(path);
 	}
 
-	Ref<Texture> TextureManager::LoadTextureMaps(const std::vector<std::pair<std::string, TextureType>>& texturePaths)
+	Ref<Texture2D> TextureManager::LoadTextureMaps(const std::vector<std::pair<std::string, TextureType>>& texturePaths)
 	{
 		return s_TextureManager->LoadTextureMapsImpl(texturePaths);
 	}

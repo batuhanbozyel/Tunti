@@ -3,7 +3,7 @@
 
 namespace Doge
 {
-	class Texture;
+	class Texture2D;
 	class CubemapTexture;
 
 	class SceneObject3D
@@ -19,7 +19,7 @@ namespace Doge
 	class Cube : public SceneObject3D
 	{
 	public:
-		explicit Cube(glm::vec3&& length, const Ref<Texture>& texture = nullptr);
+		explicit Cube(glm::vec3&& length, const Ref<Texture2D>& texture = nullptr);
 		~Cube() = default;
 
 		static std::array<glm::vec3, 24> CalculatePositions(glm::vec3&& length);
@@ -29,7 +29,7 @@ namespace Doge
 	class Sphere : public SceneObject3D
 	{
 	public:
-		explicit Sphere(float radius, uint32_t sectorCount = 18, uint32_t stackCount = 18, const Ref<Texture>& texture = nullptr);
+		explicit Sphere(float radius, uint32_t sectorCount = 18, uint32_t stackCount = 18, const Ref<Texture2D>& texture = nullptr);
 		~Sphere() = default;
 	private:
 		static std::vector<uint32_t> CalculateIndices(uint32_t sectorCount, uint32_t stackCount);
