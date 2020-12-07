@@ -2,9 +2,7 @@
 #include "Model.h"
 
 #include "Doge/Utility/Mesh.h"
-
 #include "Doge/Renderer/Texture.h"
-#include "Doge/Renderer/Renderer.h"
 
 namespace Doge
 {
@@ -63,7 +61,7 @@ namespace Doge
 			AddTexturePath(texturePaths, material, aiTextureType_DIFFUSE, TextureType::Diffuse);
 			AddTexturePath(texturePaths, material, aiTextureType_SPECULAR, TextureType::Specular);
 
-			index = TextureManager::LoadTextureMaps(texturePaths)->GetShaderStorageIndex();
+			index = TextureLibrary::LoadTextureMap(texturePaths);
 		}
 
 		for (uint32_t i = 0; i < mesh->mNumVertices; i++)
@@ -109,22 +107,6 @@ namespace Doge
 			aiString path;
 			material->GetTexture(type, 0, &path);
 			texturePaths.push_back(std::make_pair((m_Directory + path.C_Str()), textureType));
-		}
-	}
-
-	void Model::Translate(const glm::vec3& pos)
-	{
-		for (auto& mesh : m_Meshes)
-		{
-			mesh.Translate(pos);
-		}
-	}
-
-	void Model::Rotate(float angle, const glm::vec3& axis)
-	{
-		for (auto& mesh : m_Meshes)
-		{
-			mesh.Rotate(angle, axis);
 		}
 	}
 }
