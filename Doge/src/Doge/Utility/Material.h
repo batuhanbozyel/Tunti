@@ -2,49 +2,57 @@
 
 namespace Doge
 {
-	class Shader;
+	struct Shader;
 
-	enum class MaterialProperty
-	{
-		Color,
-		Shininess
-	};
+	class MaterialInstance;
+
+	using MaterialProperty = std::variant<float, glm::vec2, glm::vec3, glm::vec4>;
 
 	class Material
 	{
 	public:
-		explicit Material(const Ref<Shader>& shader);
+		static const Ref<Material> PhongMaterial;
 
-		void AssignCommonUniforms() const;
+		enum class DataIndex : uint16_t
+		{
+			Float	= 0,
+			Float2	= 1,
+			Float3	= 2,
+			Float4	= 3
+		};
+	public:
+		explicit Material(const Shader& shader, const std::vector<std::pair<std::string, MaterialProperty>>& properties);
 
-		void SetModifiable(const MaterialProperty& prop);
+		void SetModifiable(const std::string& name);
 
-		void SetBaseColor(const glm::vec3& color);
-		void SetBaseShininess(const float shininess);
-
-		const Ref<Shader>& GetShaderRef() const { return m_Shader; }
-	protected:
-		template <class T>
-		using MaterialData = std::pair<Ref<T>, bool>;
-
-		MaterialData<glm::vec3> m_Color = MaterialData<glm::vec3>(nullptr, false);
-		MaterialData<float> m_Shininess = MaterialData<float>(nullptr, false);
+		const std::unordered_map<std::string, MaterialProperty>& GetProperties() const { return m_Properties; }
+		const Shader GetShader() const { return m_Shader; }
 	private:
-		const Ref<Shader> m_Shader;
+		std::unordered_map<std::string, MaterialProperty> m_Properties;
+		std::unordered_map<std::string, MaterialProperty> m_ModifiableProperties;
+		Shader m_Shader;
+
+		friend class MaterialInstance;
 	};
 
-	class MaterialInstance : public Material
+	class MaterialInstance
 	{
 	public:
-		explicit MaterialInstance(const Ref<Material>& material);
+		explicit MaterialInstance(const Ref<Material>& baseMaterial);
 
-		void SetColor(const glm::vec3& color);
-		void SetShininess(const float shininess);
+		template<typename T>
+		void AddProperty(const std::string& name, const T& value);
 
-		void AssignUniqueUniforms() const;
+		template<typename T>
+		void ModifyProperty(const std::string& name, const T& value);
 
-		const Ref<Material>& GetBaseMaterialRef() const { return m_BaseMaterialRef; }
+		const std::unordered_map<std::string, MaterialProperty>& GetAddedProperties() const { return m_AddedProperties; }
+		const std::unordered_map<std::string, MaterialProperty>& GetModifiedProperties() const { return m_ModifiedProperties; }
+
+		const Ref<Material>& GetBaseMaterial() const { return m_BaseMaterial; }
 	private:
-		const Ref<Material> m_BaseMaterialRef;
+		std::unordered_map<std::string, MaterialProperty> m_AddedProperties;
+		std::unordered_map<std::string, MaterialProperty> m_ModifiedProperties;
+		Ref<Material> m_BaseMaterial;
 	};
 }

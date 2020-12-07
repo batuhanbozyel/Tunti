@@ -1,77 +1,66 @@
 #include "pch.h"
-#include "Material.h"
-
 #include "Doge/Renderer/Shader.h"
+#include "Doge/Renderer/Texture.h"
+#include "Material.h"
 
 namespace Doge
 {
-	// Master Material methods
+	const Ref<Material> Material::PhongMaterial = CreateRef<Material>(ShaderLibrary::PhongLighting,
+		std::vector<std::pair<std::string, MaterialProperty>>{
+			{ "u_Material.Shininess", 32.0f },
+			{ "u_Material.Color", glm::vec3(1.0f) }
+		});
 
-	Material::Material(const Ref<Shader>& shader)
+	// Material
+
+	Material::Material(const Shader& shader, const std::vector<std::pair<std::string, MaterialProperty>>& properties)
 		: m_Shader(shader)
 	{
-
+		
 	}
 
-	void Material::AssignCommonUniforms() const
+	void Material::SetModifiable(const std::string& name)
 	{
-		if (!m_Color.second && m_Color.first != nullptr)
-			m_Shader->SetUniformFloat3("u_Material.Color", *m_Color.first);
-
-		if (!m_Shininess.second && m_Shininess.first != nullptr)
-			m_Shader->SetUniformFloat("u_Material.Shininess", *m_Shininess.first);
-	}
-
-	void Material::SetModifiable(const MaterialProperty& prop)
-	{
-		switch (prop)
+		const auto& propIt = m_Properties.find(name);
+		if (propIt != m_Properties.end())
 		{
-		case MaterialProperty::Color:
-			if (m_Color.first != nullptr) m_Color.second = true;
-			break;
-		case MaterialProperty::Shininess:
-			if (m_Shininess.first != nullptr) m_Shininess.second = true;
-			break;
+			m_ModifiableProperties.emplace(std::move(*propIt));
+			m_Properties.erase(name);
 		}
 	}
 
-	void Material::SetBaseColor(const glm::vec3& color)
-	{
-		m_Color.first = CreateRef<glm::vec3>(color);
-	}
+	// MaterialInstance
 
-	void Material::SetBaseShininess(const float shininess)
-	{
-		m_Shininess.first = CreateRef<float>(shininess);
-	}
-
-	// Material Instance methods
-
-	MaterialInstance::MaterialInstance(const Ref<Material>& material)
-		: Material(*material), m_BaseMaterialRef(material)
+	MaterialInstance::MaterialInstance(const Ref<Material>& baseMaterial)
+		: m_BaseMaterial(baseMaterial), m_ModifiedProperties(baseMaterial->m_ModifiableProperties)
 	{
 
 	}
 
-	void MaterialInstance::AssignUniqueUniforms() const
+	template<typename T>
+	void MaterialInstance::AddProperty(const std::string& name, const T& value)
 	{
-		const Ref<Shader>& shader = m_BaseMaterialRef->GetShaderRef();
-		if (m_Color.second)
-			shader->SetUniformFloat3("u_Material.Color", *m_Color.first);
-
-		if (m_Shininess.second)
-			shader->SetUniformFloat("u_Material.Shininess", *m_Shininess.first);
+		if (m_AddedProperties.find(name) == m_AddedProperties.end()
+			&& m_BaseMaterial->m_Properties.find(name) == m_BaseMaterial->m_Properties.end()
+			&& m_BaseMaterial->m_ModifiableProperties.find(name) == m_BaseMaterial->m_ModifiableProperties.end())
+		{
+			m_AddedProperties.insert(m_AddedProperties.end(), { name, value });
+		}
 	}
 
-	void MaterialInstance::SetColor(const glm::vec3& color)
+	template<typename T>
+	void MaterialInstance::ModifyProperty(const std::string& name, const T& value)
 	{
-		if (m_Color.second)
-			m_Color.first = CreateRef<glm::vec3>(color);
-	}
+		auto& propertyIt = m_ModifiedProperties.find(name);
 
-	void MaterialInstance::SetShininess(const float shininess)
-	{
-		if (m_Shininess.second)
-			m_Shininess.first = CreateRef<float>(shininess);
+		if (propertyIt == m_ModifiedProperties.end())
+		{
+			propertyIt = m_AddedProperties.find(name);
+			if (propertyIt == m_AddedProperties.end())
+				return;
+		}
+		
+		T& propValue = std::get<T>(propertyIt->second);
+		propValue = value;
 	}
 }
