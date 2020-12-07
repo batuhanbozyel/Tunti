@@ -52,13 +52,14 @@ namespace Doge
 		inline void SetEventCallbackFn(std::function<void(Event&)> callback) { m_Props.EventCallback = callback; }
 		inline bool VSync() const { return m_Props.VSync; }
 
-		inline void* GetNativeWindow() const { return m_Context->GetNativeWindow(); }
+		inline void* GetNativeWindow() const { return m_Window; }
 		inline const WindowProps& GetWindowProps() const { return m_Props; }
 	private:
 		void* CreateNativeWindow(const WindowFlag& flag);
 	private:
-		Scope<Context> m_Context;
 		WindowProps m_Props;
+		void* m_Window;
+		Scope<Context> m_Context;
 
 		static uint8_t s_WindowCount;
 	};

@@ -17,6 +17,8 @@
 #include <vector>
 #include <queue>
 #include <list>
+#include <tuple>
+#include <variant>
 #include <unordered_map>
 #include <unordered_set>
 

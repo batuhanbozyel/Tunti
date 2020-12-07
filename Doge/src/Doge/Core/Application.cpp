@@ -2,12 +2,9 @@
 #include "Application.h"
 
 #include "Doge/Renderer/Renderer.h"
-#include "Doge/Renderer/Framebuffer.h"
-#include "Doge/Renderer/RendererCommands.h"
 
 namespace Doge
 {
-	Time* Time::s_Instance = nullptr;
 	Application* Application::s_Instance = nullptr;
 
 	Application::Application(const std::string& appName, const WindowFlag& flag)
@@ -18,7 +15,7 @@ namespace Doge
 			s_Running = true;
 			Log::Init();
 
-			Renderer::SetAPI(Doge::RendererAPI::OpenGL);
+			Renderer::SetRendererAPI(RendererAPI::OpenGL);
 			Window* window = new Window(WindowProps(appName), flag);
 			window->SetEventCallbackFn(BIND_EVENT_FN(OnEvent));
 			m_ActiveWindow.reset(window);

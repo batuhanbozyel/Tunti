@@ -38,6 +38,6 @@ namespace Doge
 		float m_LastFrameTime = 0.0f;
 		float m_DeltaTime = 0.0f;
 
-		static Time* s_Instance;
+		static inline Time* s_Instance = nullptr;
 	};
 }

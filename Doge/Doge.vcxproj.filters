@@ -135,22 +135,10 @@
     <ClInclude Include="src\Doge\Renderer\Framebuffer.h">
       <Filter>src\Doge\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="src\Doge\Renderer\Pipeline.h">
-      <Filter>src\Doge\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="src\Doge\Renderer\RenderDataManager.h">
       <Filter>src\Doge\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Doge\Renderer\Renderer.h">
-      <Filter>src\Doge\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Doge\Renderer\RendererBaseShaders.h">
-      <Filter>src\Doge\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Doge\Renderer\RendererBindings.h">
-      <Filter>src\Doge\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Doge\Renderer\RendererCommands.h">
       <Filter>src\Doge\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Doge\Renderer\Shader.h">
@@ -162,16 +150,10 @@
     <ClInclude Include="src\Doge\Renderer\Texture.h">
       <Filter>src\Doge\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="src\Doge\Renderer\VertexArray.h">
-      <Filter>src\Doge\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="src\Doge\Scene\CameraController.h">
       <Filter>src\Doge\Scene</Filter>
     </ClInclude>
     <ClInclude Include="src\Doge\Scene\Light.h">
-      <Filter>src\Doge\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Doge\Scene\LightingShader.h">
       <Filter>src\Doge\Scene</Filter>
     </ClInclude>
     <ClInclude Include="src\Doge\Scene\Model.h">
@@ -201,13 +183,7 @@
     <ClInclude Include="src\Platform\OpenGL\OpenGLFramebuffer.h">
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="src\Platform\OpenGL\OpenGLRendererCommands.h">
-      <Filter>src\Platform\OpenGL</Filter>
-    </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLShader.h">
-      <Filter>src\Platform\OpenGL</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Platform\OpenGL\OpenGLShaderDataType.h">
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLTexture.h">
@@ -1706,6 +1682,10 @@
     <ClInclude Include="src\Doge\Core\Time.h">
       <Filter>src\Doge\Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLRenderer.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLConstants.h">
+      <Filter>src\Doge\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Doge\Core\Application.cpp">
@@ -1717,16 +1697,7 @@
     <ClCompile Include="src\Doge\Core\Log.cpp">
       <Filter>src\Doge\Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\Doge\Renderer\Buffer.cpp">
-      <Filter>src\Doge\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="src\Doge\Renderer\Context.cpp">
-      <Filter>src\Doge\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Doge\Renderer\Framebuffer.cpp">
-      <Filter>src\Doge\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Doge\Renderer\Pipeline.cpp">
       <Filter>src\Doge\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Doge\Renderer\RenderDataManager.cpp">
@@ -1735,19 +1706,10 @@
     <ClCompile Include="src\Doge\Renderer\Renderer.cpp">
       <Filter>src\Doge\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\Doge\Renderer\RendererCommands.cpp">
-      <Filter>src\Doge\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="src\Doge\Renderer\Shader.cpp">
       <Filter>src\Doge\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\Doge\Renderer\ShaderDataType.cpp">
-      <Filter>src\Doge\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="src\Doge\Renderer\Texture.cpp">
-      <Filter>src\Doge\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Doge\Renderer\VertexArray.cpp">
       <Filter>src\Doge\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Doge\Scene\CameraController.cpp">
@@ -1780,9 +1742,6 @@
     <ClCompile Include="src\Platform\OpenGL\OpenGLFramebuffer.cpp">
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="src\Platform\OpenGL\OpenGLRendererCommands.cpp">
-      <Filter>src\Platform\OpenGL</Filter>
-    </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLShader.cpp">
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
@@ -1804,5 +1763,6 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLRenderer.cpp" />
   </ItemGroup>
 </Project>
