@@ -1,37 +1,17 @@
 #include "pch.h"
 #include "Shader.h"
 #include "Renderer.h"
+
+#include <glad/glad.h>
 #include "Platform/OpenGL/OpenGLShader.h"
 
 #include <fstream>
 
 namespace Doge
 {
-	// Shader Program initialization methods
+	const Shader ShaderLibrary::PhongLighting = LoadShader("../Doge/assets/shaders/PhongLighting.glsl");
 
-	Scope<Shader> Shader::Create(const char* filePath)
-	{
-		switch (Renderer::GetAPI())
-		{
-		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
-		case RendererAPI::OpenGL: return CreateScope<OpenGLShader>(filePath);
-		}
-		LOG_ASSERT(false, "RendererAPI initialization failed!");
-		return nullptr;
-	}
-
-	Scope<Doge::Shader> Shader::Create(const char* name, const std::string& vertexSrc, const std::string& fragmentSrc)
-	{
-		switch (Renderer::GetAPI())
-		{
-		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
-		case RendererAPI::OpenGL: return CreateScope<OpenGLShader>(name, vertexSrc, fragmentSrc);
-		}
-		LOG_ASSERT(false, "RendererAPI initialization failed!");
-		return nullptr;
-	}
-
-	std::string Shader::ReadFile(const char* filePath)
+	std::string ShaderLibrary::ReadFile(const std::string& filePath)
 	{
 		std::string source;
 		std::ifstream shaderFile(filePath, std::ios::in | std::ios::binary);
@@ -59,50 +39,29 @@ namespace Doge
 		return source;
 	}
 
-
-	bool Shader::operator==(const Shader& shader) const
+	Shader ShaderLibrary::LoadShader(const std::string& filePath)
 	{
-		return m_RendererID == shader.m_RendererID;
-	}
+		const std::string& source = ReadFile(filePath);
 
-	bool Shader::operator!=(const Shader& shader) const
-	{
-		return m_RendererID != shader.m_RendererID;
-	}
-
-	// ShaderLibrary
-
-	std::unordered_map<std::string, WeakRef<Shader>> ShaderLibrary::s_ShaderCache;
-
-	Ref<Shader> ShaderLibrary::CreateShader(const char* filePath)
-	{
-		auto& shaderIt = s_ShaderCache.find(filePath);
-		if (shaderIt == s_ShaderCache.end())
+		switch (Renderer::GetRendererAPI())
 		{
-			Ref<Shader> shader = Shader::Create(filePath);
-			s_ShaderCache.emplace(std::make_pair(filePath, shader));
-			return shader;
+			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return Shader();
+			case RendererAPI::OpenGL: return OpenGLShaderCache::GetInstance()->LoadShader(filePath, source);
 		}
 
-		if(shaderIt->second.expired())
-			shaderIt->second = Ref<Shader>(Shader::Create(filePath));
-
-		return shaderIt->second.lock();
+		LOG_ASSERT(false, "RendererAPI is not specified!");
+		return Shader();
 	}
 
-	Ref<Shader> ShaderLibrary::CreateShader(const char* name, const std::string& vertexSrc, const std::string& fragmentSrc)
+	Shader ShaderLibrary::LoadShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
 	{
-		auto& shaderIt = s_ShaderCache.find(name);
-		if (shaderIt == s_ShaderCache.end())
+		switch (Renderer::GetRendererAPI())
 		{
-			Ref<Shader> shader = Shader::Create(name, vertexSrc, fragmentSrc);
-			s_ShaderCache.emplace(std::make_pair(name, shader));
-			return shader;
+			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return Shader();
+			case RendererAPI::OpenGL: return OpenGLShaderCache::GetInstance()->LoadShader(name, vertexSrc, fragmentSrc);
 		}
 
-		if (shaderIt->second.expired())
-			shaderIt->second = Ref<Shader>(Shader::Create(name, vertexSrc, fragmentSrc));
-
-		return shaderIt->second.lock();
+		LOG_ASSERT(false, "RendererAPI is not specified!");
+		return Shader();
 	}
 }

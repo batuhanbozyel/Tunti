@@ -1,24 +1,16 @@
 #pragma once
 #include "RenderDataManager.h"
 
+#include "Doge/Core/Window.h"
+
+#include "Doge/Utility/Mesh.h"
+#include "Doge/Utility/Camera.h"
+#include "Doge/Utility/Material.h"
+
 namespace Doge
 {
 	class WindowResizeEvent;
-
-	class Shader;
-	class Framebuffer;
-	class VertexArray;
-	class IndexBuffer;
-	class VertexBuffer;
-	class UniformBuffer;
-	class CubemapTexture;
-
-	class Mesh;
-	class Camera;
-	class Material;
-	class MaterialInstance;
 	
-
 	struct WindowProps;
 
 	enum class RendererAPI
@@ -31,59 +23,37 @@ namespace Doge
 	class Renderer
 	{
 	public:
+		virtual ~Renderer() = default;
 		static void Init(const WindowProps& props);
 
-		Renderer(const WindowProps& props);
-		~Renderer() = default;
+		static void Submit(const Mesh& mesh, const Ref<MaterialInstance>& material, const glm::mat4& transform, bool isSelected = false);
+		static void Submit(const std::vector<Mesh>& meshes, const Ref<MaterialInstance>& material, const glm::mat4& transform, bool isSelected = false);
 
-		static void Submit(const MeshRendererData& meshData, const Ref<MaterialInstance>& material, const glm::mat4& transform);
 		static void RenderIndexed(const Camera& camera);
 
-		static void SetAPI(const RendererAPI& api) { s_API = api; }
-		static const RendererAPI& GetAPI() { return s_API; }
+		static void SetRendererAPI(RendererAPI api) { s_RendererAPI = api; }
+		static RendererAPI GetRendererAPI() { return s_RendererAPI; }
 		
 		static void OnWindowResize(WindowResizeEvent& e);
+	protected:
+		virtual void BeginRender(const Camera& camera) = 0;
+		virtual void EndRender() = 0;
 
-		static const Scope<Framebuffer>& GetFramebuffer() { return s_Instance->m_QuadFramebuffer; }
-		static void SetSkybox(const Ref<CubemapTexture>& skybox);
-	private:
-		void PrepareBufferObjects(const Camera& camera);
-		void BeginRender(const Camera& camera);
-		void EndRender();
+		virtual void RenderObjectsIndexed() = 0;
+		virtual void RenderOutlinedObjectsIndexed() = 0;
+		virtual void RenderLightObjectsIndexed() = 0;
+		virtual void RenderSkybox() = 0;
 
-		void RenderObjectsIndexed();
-		void RenderOutlinedObjectsIndexed();
-		void RenderLightObjectsIndexed();
-		void RenderSkybox();
-		void RenderFramebuffer();
-
-		void DrawIndexed(const RenderData& renderData);
-
-		void ConstructScreenQuadProperties(const WindowProps& props);
-		void ConstructMainProperties(const WindowProps& props);
-		void ConstructSkyboxProperties();
-	private:
-		Scope<Framebuffer> m_QuadFramebuffer;
-		Scope<VertexArray> m_QuadVertexArray;
-		Ref<Shader> m_QuadTexturedShader;
-
-		Scope<Framebuffer> m_MainFramebuffer;
-		Scope<VertexArray> m_MainVertexArray;
-		Scope<UniformBuffer> m_ViewProjectionUniformBuffer;
-		Scope<UniformBuffer> m_LightingUniformBuffer;
-		Ref<Shader> m_ObjectOutliningShader;
-
-		Scope<VertexArray> m_SkyboxVertexArray;
-		Ref<Shader> m_SkyboxShader;
-
-		std::queue<RenderData> m_OutlineRenderQueue;
+		virtual void ResizeFramebuffer(uint32_t width, uint32_t height) = 0;
+	protected:
+		std::queue<RenderData> m_LightObjectsQueue;
+		std::queue<RenderData> m_OutlinedObjectsQueue;
 		std::unordered_map<Ref<Material>, std::queue<RenderData>> m_RenderQueue;
-
-		Ref<CubemapTexture> m_Skybox = nullptr;
-		Scope<RenderData> m_PointLight;
-		const Shader* m_LastShaderState = nullptr;
-
-		static Scope<Renderer> s_Instance;
-		static RendererAPI s_API;
+		std::unordered_set<uint64_t> m_ResidentTextureHandles;
+	private:
+		static Renderer* s_Instance;
+		static RendererAPI s_RendererAPI;
 	};
+
+	static Mesh BatchMeshes(const std::vector<Mesh>& meshes);
 }

@@ -5,8 +5,6 @@
 
 namespace Doge
 {
-	class VertexArray;
-
 	struct BufferElement
 	{
 		std::string Name;
@@ -20,7 +18,30 @@ namespace Doge
 		{
 		}
 
-		uint32_t GetComponentCount() const;
+		uint32_t GetComponentCount() const
+		{
+			switch (Type)
+			{
+				case ShaderDataType::Float:   return 1;
+				case ShaderDataType::Float2:  return 2;
+				case ShaderDataType::Float3:  return 3;
+				case ShaderDataType::Float4:  return 4;
+				case ShaderDataType::Mat3:    return 3 * 3;
+				case ShaderDataType::Mat4:    return 4 * 4;
+				case ShaderDataType::Int:     return 1;
+				case ShaderDataType::Int2:    return 2;
+				case ShaderDataType::Int3:    return 3;
+				case ShaderDataType::Int4:    return 4;
+				case ShaderDataType::UInt:    return 1;
+				case ShaderDataType::UInt2:   return 2;
+				case ShaderDataType::UInt3:   return 3;
+				case ShaderDataType::UInt4:   return 4;
+				case ShaderDataType::Bool:    return 1;
+			}
+
+			LOG_ASSERT(false, "Unknown ShaderDataType specified!");
+			return 0;
+		}
 	};
 
 	class BufferLayout
@@ -51,70 +72,5 @@ namespace Doge
 	private:
 		std::vector<BufferElement> m_Elements;
 		uint32_t m_Stride;
-	};
-
-	class VertexBuffer
-	{
-	public:
-		static Scope<VertexBuffer> Create(uint32_t size);
-		static Scope<VertexBuffer> Create(const void* vertices, uint32_t size);
-
-		virtual void Bind() const = 0;
-		virtual void Unbind() const = 0;
-
-		virtual void SetData(const void* vertices, uint32_t offset, uint32_t size) = 0;
-
-		inline const uint32_t GetID() const { return m_RendererID; }
-		inline const BufferLayout& GetLayout() const { return m_Layout; }
-		inline void SetLayout(const BufferLayout& layout) { m_Layout = layout; }
-	protected:
-		BufferLayout m_Layout;
-		uint32_t m_RendererID;
-	};
-
-	class IndexBuffer
-	{
-	public:
-		static Scope<IndexBuffer> Create(uint32_t count);
-		static Scope<IndexBuffer> Create(const uint32_t* indices, uint32_t count);
-
-		virtual void Bind() const = 0;
-		virtual void Unbind() const = 0;
-
-		virtual void SetData(const uint32_t* indices, uint32_t offset, uint32_t count) = 0;
-
-		inline const uint32_t GetID() const { return m_RendererID; }
-		inline uint32_t GetCount() const { return m_Count; }
-	protected:
-		uint32_t m_Count;
-		uint32_t m_RendererID;
-	};
-
-	class ShaderStorageBuffer
-	{
-	public:
-		static Scope<ShaderStorageBuffer> Create(uint32_t size, uint32_t location);
-
-		virtual void Bind() const = 0;
-		virtual void Unbind() const = 0;
-
-		virtual void SetData(const void* data, uint32_t offset, uint32_t size) = 0;
-	protected:
-		uint32_t m_RendererID;
-		uint32_t m_Location;
-	};
-
-	class UniformBuffer
-	{
-	public:
-		static Scope<UniformBuffer> Create(uint32_t size, uint32_t location);
-
-		virtual void Bind() const = 0;
-		virtual void Unbind() const = 0;
-
-		virtual void SetData(const void* data, uint32_t size, uint32_t offset) = 0;
-	protected:
-		uint32_t m_RendererID;
-		uint32_t m_Location;
 	};
 }

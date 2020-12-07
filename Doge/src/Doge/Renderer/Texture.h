@@ -3,8 +3,7 @@
 
 namespace Doge
 {
-	class ShaderStorageBuffer;
-	class TextureManager;
+	class TextureLibrary;
 
 	enum class TextureType {
 		Diffuse,
@@ -17,66 +16,37 @@ namespace Doge
 		return static_cast<uint32_t>(type) * sizeof(uint64_t);
 	}
 
+	static constexpr uint32_t MaxTextures = 1024;
 	static constexpr uint32_t SizeofTextureMap = static_cast<uint32_t>(TextureType::COUNT) * sizeof(uint64_t);
 
-	class Texture2D
+	struct Texture2D
 	{
-	public:
-		uint32_t GetShaderStorageIndex() const { return m_Index; }
-	protected:
-		void SetShaderStorageIndex(uint32_t index) { m_Index = index; }
+		uint32_t Index = 0;
 
-		virtual uint64_t GetTextureHandle() = 0;
-	private:
-		static Scope<Texture2D> Create(const std::string& texturePath);
-		static Scope<Texture2D> CreateWhiteTexture();
-	private:
-		uint32_t m_Index = 0;
-
-		friend class TextureManager;
+		operator uint32_t() const { return Index; }
 	};
 
-	class CubemapTexture
+	struct CubemapTexture
 	{
-	public:
-		virtual void Bind(uint32_t slot) const = 0;
-	private:
-		static Scope<CubemapTexture> Create(const std::array<std::string, 6>& CubemapFiles);
+		uint32_t TextureID = 0;
 
-		friend class TextureManager;
+		operator uint32_t() const { return TextureID; }
 	};
 
-	class TextureManager
+	class TextureLibrary
 	{
 	public:
-		static void Init();
-		TextureManager();
-		~TextureManager() = default;
+		static constexpr Texture2D DefaultTexture = Texture2D();
+	public:
+		static Texture2D LoadTexture2D(const std::string& textureFile);
+		static Texture2D LoadTextureMap(const std::vector<std::tuple<std::string, TextureType>>& textureFiles);
 
-		static Ref<Texture2D> LoadTexture(const std::string& path);
-		static Ref<Texture2D> LoadTextureMaps(const std::vector<std::pair<std::string, TextureType>>& texturePaths);
-
-		static Ref<CubemapTexture> LoadCubemap(const std::string& folderPath,
+		static CubemapTexture LoadCubemap(const std::string& folderPath,
 			const std::string& rightFace,
 			const std::string& leftFace,
 			const std::string& topFace,
 			const std::string& bottomFace,
 			const std::string& frontFace,
 			const std::string& backFace);
-	private:
-		Ref<Texture2D> LoadTextureImpl(const std::string& path);
-		Ref<Texture2D> LoadTextureMapsImpl(const std::vector<std::pair<std::string, TextureType>>& texturePaths);
-
-		Ref<CubemapTexture> LoadCubemapImpl(const std::string& folderPath, const std::array<std::string, 6>& cubemapFaces);
-	private:
-		Scope<ShaderStorageBuffer> m_SSBO;
-
-		std::unordered_map<std::string, WeakRef<Texture2D>> m_TextureMap;
-		std::unordered_map<std::string, WeakRef<CubemapTexture>> m_CubemapMap;
-
-		static uint32_t s_TextureCount;
-		static Scope<TextureManager> s_TextureManager;
-
-		static constexpr uint32_t MAX_TEXTURES = 1024;
 	};
 }
