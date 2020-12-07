@@ -12,7 +12,7 @@ namespace Doge
 
 	OpenGLFramebuffer::~OpenGLFramebuffer()
 	{
-		glDeleteFramebuffers(1, &m_RendererID);
+		glDeleteFramebuffers(1, &m_FramebufferHandle);
 
 		if (m_Specification.SwapChainTarget)
 			glDeleteRenderbuffers(1, &m_ColorAttachment);
@@ -22,14 +22,30 @@ namespace Doge
 		glDeleteRenderbuffers(1, &m_DepthAttachment);
 	}
 
-	void OpenGLFramebuffer::BlitMultisampled(uint32_t fboID) const
+	void OpenGLFramebuffer::BlitMultisampled(const OpenGLFramebuffer& target) const
 	{
-		glBlitNamedFramebuffer(m_RendererID, fboID, 0, 0, m_Specification.Width, m_Specification.Height, 0, 0, m_Specification.Width, m_Specification.Height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+		glBlitNamedFramebuffer(m_FramebufferHandle, target.m_FramebufferHandle, 0, 0, m_Specification.Width, m_Specification.Height, 0, 0, m_Specification.Width, m_Specification.Height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	}
+
+	void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height)
+	{
+		if (width == 0 || height == 0 || width > MaxFramebufferSize || height > MaxFramebufferSize)
+		{
+			Log::Warn("Attempted to rezize framebuffer to {0}, {1}", width, height);
+			return;
+		}
+
+		if (m_Specification.Width == width && m_Specification.Height == height) return;
+
+		m_Specification.Width = width;
+		m_Specification.Height = height;
+
+		Construct();
 	}
 
 	void OpenGLFramebuffer::Bind() const
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_FramebufferHandle);
 		glViewport(0, 0, m_Specification.Width, m_Specification.Height);
 	}
 
@@ -45,9 +61,9 @@ namespace Doge
 
 	void OpenGLFramebuffer::Construct()
 	{
-		if (m_RendererID)
+		if (m_FramebufferHandle)
 		{
-			glDeleteFramebuffers(1, &m_RendererID);
+			glDeleteFramebuffers(1, &m_FramebufferHandle);
 
 			if (m_Specification.SwapChainTarget)
 				glDeleteRenderbuffers(1, &m_ColorAttachment);
@@ -57,7 +73,7 @@ namespace Doge
 			glDeleteRenderbuffers(1, &m_DepthAttachment);
 		}
 
-		glCreateFramebuffers(1, &m_RendererID);
+		glCreateFramebuffers(1, &m_FramebufferHandle);
 
 		// Construct Color Buffer Texture
 		if (m_Specification.SwapChainTarget)
@@ -65,7 +81,7 @@ namespace Doge
 			glCreateRenderbuffers(1, &m_ColorAttachment);
 			glNamedRenderbufferStorageMultisample(m_ColorAttachment, m_Specification.Samples, GL_RGBA8, m_Specification.Width, m_Specification.Height);
 			// Set Framebuffer's Color Attachment
-			glNamedFramebufferRenderbuffer(m_RendererID, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, m_ColorAttachment);
+			glNamedFramebufferRenderbuffer(m_FramebufferHandle, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, m_ColorAttachment);
 		}
 		else
 		{
@@ -74,7 +90,7 @@ namespace Doge
 			glTextureParameteri(m_ColorAttachment, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTextureStorage2D(m_ColorAttachment, 1, GL_RGBA8, m_Specification.Width, m_Specification.Height);
 			// Set Framebuffer's Color Attachment
-			glNamedFramebufferTexture(m_RendererID, GL_COLOR_ATTACHMENT0, m_ColorAttachment, 0);
+			glNamedFramebufferTexture(m_FramebufferHandle, GL_COLOR_ATTACHMENT0, m_ColorAttachment, 0);
 		}
 
 		// Construct Depth Render Buffer
@@ -84,7 +100,7 @@ namespace Doge
 		else
 			glNamedRenderbufferStorage(m_DepthAttachment, GL_DEPTH24_STENCIL8, m_Specification.Width, m_Specification.Height);
 		// Set Framebuffer's Depth Attachment
-		glNamedFramebufferRenderbuffer(m_RendererID, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_DepthAttachment);
+		glNamedFramebufferRenderbuffer(m_FramebufferHandle, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_DepthAttachment);
 
 		LOG_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer does not meet the requirements!");
 	}

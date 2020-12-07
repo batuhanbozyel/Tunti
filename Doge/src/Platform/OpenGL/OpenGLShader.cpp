@@ -1,13 +1,11 @@
 #include "pch.h"
-#include "OpenGLShader.h"
 #include <glad/glad.h>
+#include "OpenGLShader.h"
 
 namespace Doge
 {
-
-	OpenGLShader::OpenGLShader(const char* filePath)
+	OpenGLShader::OpenGLShader(const std::string& source)
 	{
-		const std::string& source = ReadFile(filePath);
 		auto& parsedSource = ParseShaderSource(source);
 		Compile(parsedSource[GL_VERTEX_SHADER], parsedSource[GL_FRAGMENT_SHADER]);
 		CalculateUniformLocations();
@@ -21,12 +19,12 @@ namespace Doge
 
 	OpenGLShader::~OpenGLShader()
 	{
-		glDeleteProgram(m_RendererID);
+		glDeleteProgram(m_ShaderHandle);
 	}
 
 	void OpenGLShader::Bind() const
 	{
-		glUseProgram(m_RendererID);
+		glUseProgram(m_ShaderHandle);
 	}
 
 	void OpenGLShader::Unbind() const
@@ -114,7 +112,7 @@ namespace Doge
 	void OpenGLShader::CalculateUniformLocations()
 	{
 		GLint uniform_count = 0;
-		glGetProgramiv(m_RendererID, GL_ACTIVE_UNIFORMS, &uniform_count);
+		glGetProgramiv(m_ShaderHandle, GL_ACTIVE_UNIFORMS, &uniform_count);
 
 		if (uniform_count != 0)
 		{
@@ -122,15 +120,15 @@ namespace Doge
 			GLsizei length = 0;
 			GLsizei count = 0;
 			GLenum 	type = GL_NONE;
-			glGetProgramiv(m_RendererID, GL_ACTIVE_UNIFORM_MAX_LENGTH, &max_name_len);
+			glGetProgramiv(m_ShaderHandle, GL_ACTIVE_UNIFORM_MAX_LENGTH, &max_name_len);
 
-			auto uniform_name = std::make_unique<char[]>(max_name_len);
+			Scope<char[]> uniform_name = CreateScope<char[]>(max_name_len);
 
 			for (GLint i = 0; i < uniform_count; ++i)
 			{
-				glGetActiveUniform(m_RendererID, i, max_name_len, &length, &count, &type, uniform_name.get());
+				glGetActiveUniform(m_ShaderHandle, i, max_name_len, &length, &count, &type, uniform_name.get());
 
-				uint32_t location = glGetUniformLocation(m_RendererID, uniform_name.get());
+				uint32_t location = glGetUniformLocation(m_ShaderHandle, uniform_name.get());
 
 				m_UniformCache.emplace(std::make_pair(std::string(uniform_name.get(), length), location));
 			}
@@ -165,8 +163,7 @@ namespace Doge
 			glDeleteShader(vertexShader);
 
 			// Vertex shader compilation failed
-			Log::Error("Vertex Shader complation failed: {0}", infoLog.data());
-			LOG_ASSERT(false, "Vertex Shader compilation failed!");
+			LOG_ASSERT(false, "Vertex Shader complation failed: {0}", infoLog.data());
 			return;
 		}
 
@@ -197,50 +194,48 @@ namespace Doge
 			glDeleteShader(vertexShader);
 
 			// Fragment shader compilation failed
-			Log::Error("Fragment Shader compilation failed: {0}", infoLog.data());
-			LOG_ASSERT(false, "Fragment Shader compilation failed!");
+			LOG_ASSERT(false, "Fragment Shader compilation failed: {0}", infoLog.data());
 			return;
 		}
 
 		// Vertex and fragment shaders are successfully compiled.
 		// Now time to link them together into a program.
 		// Get a program object.
-		m_RendererID = glCreateProgram();
+		m_ShaderHandle = glCreateProgram();
 
 		// Attach our shaders to our program
-		glAttachShader(m_RendererID, vertexShader);
-		glAttachShader(m_RendererID, fragmentShader);
+		glAttachShader(m_ShaderHandle, vertexShader);
+		glAttachShader(m_ShaderHandle, fragmentShader);
 
 		// Link our program
-		glLinkProgram(m_RendererID);
+		glLinkProgram(m_ShaderHandle);
 
 		// Note the different functions here: glGetProgram* instead of glGetShader*.
 		GLint isLinked = 0;
-		glGetProgramiv(m_RendererID, GL_LINK_STATUS, (int*)&isLinked);
+		glGetProgramiv(m_ShaderHandle, GL_LINK_STATUS, (int*)&isLinked);
 		if (isLinked == GL_FALSE)
 		{
 			GLint maxLength = 0;
-			glGetProgramiv(m_RendererID, GL_INFO_LOG_LENGTH, &maxLength);
+			glGetProgramiv(m_ShaderHandle, GL_INFO_LOG_LENGTH, &maxLength);
 
 			// The maxLength includes the NULL character
 			std::vector<GLchar> infoLog(maxLength);
-			glGetProgramInfoLog(m_RendererID, maxLength, &maxLength, &infoLog[0]);
+			glGetProgramInfoLog(m_ShaderHandle, maxLength, &maxLength, &infoLog[0]);
 
 			// We don't need the program anymore.
-			glDeleteProgram(m_RendererID);
+			glDeleteProgram(m_ShaderHandle);
 			// Don't leak shaders either.
 			glDeleteShader(vertexShader);
 			glDeleteShader(fragmentShader);
 
 			// Shader linking failed
-			Log::Error("Shader Linking failed: {0}", infoLog.data());
-			LOG_ASSERT(false, "Shader Linking failed!");
+			LOG_ASSERT(false, "Shader Linking failed: {0}", infoLog.data());
 			return;
 		}
 
 		// Always detach shaders after a successful link.
-		glDetachShader(m_RendererID, vertexShader);
-		glDetachShader(m_RendererID, fragmentShader);
+		glDetachShader(m_ShaderHandle, vertexShader);
+		glDetachShader(m_ShaderHandle, fragmentShader);
 	}
 
 	std::unordered_map<uint32_t, std::string> OpenGLShader::ParseShaderSource(const std::string& source)
@@ -277,5 +272,51 @@ namespace Doge
 			begin = end;
 		}
 		return shaderSources;
+	}
+
+	// OpenGLShaderCache
+
+	OpenGLShaderCache* OpenGLShaderCache::s_Instance = nullptr;
+
+	Shader OpenGLShaderCache::LoadShader(const std::string& filePath, const std::string& source)
+	{
+		Shader shader;
+		const auto& shaderFileIt = m_ShaderFiles.find(filePath);
+
+		if (shaderFileIt != m_ShaderFiles.end())
+		{
+			shader = shaderFileIt->second;
+			LOG_ASSERT(m_Shaders.find(shader) != m_Shaders.end(), "OpenGL Shader Program is not loaded properly!");
+		}
+		else
+		{
+			Scope<OpenGLShader> newShader = CreateScope<OpenGLShader>(source);
+			shader.Handle = newShader->m_ShaderHandle;
+			m_ShaderFiles.insert(shaderFileIt, std::make_pair(filePath, shader));
+			m_Shaders.insert(std::make_pair(shader, newShader));
+		}
+
+		return shader;
+	}
+
+	Shader OpenGLShaderCache::LoadShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
+	{
+		Shader shader;
+		const auto& shaderFileIt = m_ShaderFiles.find(name);
+
+		if (shaderFileIt != m_ShaderFiles.end())
+		{
+			shader = shaderFileIt->second;
+			LOG_ASSERT(m_Shaders.find(shader) != m_Shaders.end(), "OpenGL Shader Program is not loaded properly!");
+		}
+		else
+		{
+			Scope<OpenGLShader> newShader = CreateScope<OpenGLShader>(vertexSrc, fragmentSrc);
+			shader.Handle = newShader->m_ShaderHandle;
+			m_ShaderFiles.insert(shaderFileIt, std::make_pair(name, shader));
+			m_Shaders.insert(std::make_pair(shader, newShader));
+		}
+
+		return shader;
 	}
 }

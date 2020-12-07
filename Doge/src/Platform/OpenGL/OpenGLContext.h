@@ -11,7 +11,6 @@ namespace Doge
 		~OpenGLContext() = default;
 
 		virtual void SwapBuffers() const override;
-		virtual inline void* GetNativeWindow() const { return m_Window; }
 	private:
 		GLFWwindow* m_Window;
 	};
