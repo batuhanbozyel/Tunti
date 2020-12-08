@@ -1,18 +1,16 @@
 #pragma once
 #include "RenderDataManager.h"
 
-#include "Doge/Core/Window.h"
-
-#include "Doge/Utility/Mesh.h"
-#include "Doge/Utility/Camera.h"
-#include "Doge/Utility/Material.h"
-
 namespace Doge
 {
+	struct Mesh;
+	struct WindowProps;
+	struct CubemapTexture;
+
+	class Camera;
+	class MaterialInstance;
 	class WindowResizeEvent;
 	
-	struct WindowProps;
-
 	enum class RendererAPI
 	{
 		None = 0,
@@ -26,10 +24,15 @@ namespace Doge
 		virtual ~Renderer() = default;
 		static void Init(const WindowProps& props);
 
+		static void RenderIndexed(const Camera& camera);
+
 		static void Submit(const Mesh& mesh, const Ref<MaterialInstance>& material, const glm::mat4& transform, bool isSelected = false);
 		static void Submit(const std::vector<Mesh>& meshes, const Ref<MaterialInstance>& material, const glm::mat4& transform, bool isSelected = false);
 
-		static void RenderIndexed(const Camera& camera);
+		static void SetSkybox(CubemapTexture skybox);
+		static void ClearSkybox();
+
+		static void FlushRenderer();
 
 		static void SetRendererAPI(RendererAPI api) { s_RendererAPI = api; }
 		static RendererAPI GetRendererAPI() { return s_RendererAPI; }
@@ -44,11 +47,15 @@ namespace Doge
 		virtual void RenderLightObjectsIndexed() = 0;
 		virtual void RenderSkybox() = 0;
 
+		virtual void FlushImpl() = 0;
+		virtual void SetSkyboxImpl(CubemapTexture skybox) = 0;
+		virtual void ClearSkyboxImpl() = 0;
+
 		virtual void ResizeFramebuffer(uint32_t width, uint32_t height) = 0;
 	protected:
-		std::queue<RenderData> m_LightObjectsQueue;
-		std::queue<RenderData> m_OutlinedObjectsQueue;
-		std::unordered_map<Ref<Material>, std::queue<RenderData>> m_RenderQueue;
+		std::vector<RenderData> m_LightObjectsQueue;
+		std::vector<RenderData> m_OutlinedObjectsQueue;
+		std::unordered_map<Ref<Material>, std::vector<RenderData>> m_RenderQueue;
 		std::unordered_set<uint64_t> m_ResidentTextureHandles;
 	private:
 		static Renderer* s_Instance;

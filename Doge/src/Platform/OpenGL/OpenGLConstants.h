@@ -11,8 +11,8 @@ namespace Doge
 
 		// Buffer Bindings
 
-		static constexpr uint8_t ShaderStorageBuffer			= 0;
-		static constexpr uint8_t ViewProjectionUniformBuffer	= 1;
+		static constexpr uint8_t ViewProjectionUniformBuffer	= 0;
+		static constexpr uint8_t ShaderStorageBuffer			= 1;
 		static constexpr uint8_t LightingUniformBuffer			= 2;
 	}
 

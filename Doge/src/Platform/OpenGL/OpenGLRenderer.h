@@ -25,6 +25,10 @@ namespace Doge
 		virtual void RenderLightObjectsIndexed() override;
 		virtual void RenderSkybox() override;
 
+		virtual void FlushImpl() override;
+		virtual void SetSkyboxImpl(CubemapTexture skybox) override;
+		virtual void ClearSkyboxImpl() override;
+
 		virtual void ResizeFramebuffer(uint32_t width, uint32_t height) override;
 	private:
 		void ConstructScreenQuadProperties(const WindowProps& props);
@@ -36,9 +40,6 @@ namespace Doge
 
 		void PrepareBufferObjects(const Camera& camera);
 		void DrawIndexed(const std::vector<OpenGLVertexBuffer>& VBOs, const OpenGLIndexBuffer& IBO);
-
-		void SetSkybox(CubemapTexture skybox);
-		void ClearSkybox();
 	private:
 		// Screen Rendering data
 		Scope<OpenGLFramebuffer> m_QuadFramebuffer;

@@ -12,7 +12,7 @@ flat out uint v_TexIndex;
 
 out vec3 v_FragPos;
 
-layout(std140, binding = 1) uniform ViewProjectionUniform
+layout(std140, binding = 0) uniform ViewProjectionUniform
 {
 	mat4 u_View;
 	mat4 u_Projection;
@@ -45,7 +45,7 @@ struct TextureMap
 layout(std430, binding = 0) readonly buffer TextureMaps
 {
 	TextureMap textures[];
-} textureBuffer;
+} textureArray;
 
 struct Material
 {
@@ -78,19 +78,19 @@ layout(std140, binding = 2) uniform LightingUniform
 void main()
 {
 	// Ambient Lighting
-	vec3 ambient = u_Light.Ambient * vec3(texture(sampler2D(textureBuffer.textures[v_TexIndex].Diffuse), v_TexCoord));
+	vec3 ambient = u_Light.Ambient * vec3(texture(sampler2D(textureArray.textures[v_TexIndex].Diffuse), v_TexCoord));
 
 	// Diffuse Lighting
 	vec3 norm = normalize(v_Normal);
 	vec3 lightDir = normalize(u_Light.Position - v_FragPos);
 	float diff = max(dot(norm, lightDir), 0.0);
-	vec3 diffuse = u_Light.Diffuse * diff * vec3(texture(sampler2D(textureBuffer.textures[v_TexIndex].Diffuse), v_TexCoord));
+	vec3 diffuse = u_Light.Diffuse * diff * vec3(texture(sampler2D(textureArray.textures[v_TexIndex].Diffuse), v_TexCoord));
 
 	// Specular Lighting
 	vec3 viewDir = normalize(u_CameraPos - v_FragPos);
 	vec3 reflectDir = reflect(-lightDir, norm);
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), u_Material.Shininess);
-	vec3 specular = u_Light.Specular * spec * vec3(texture(sampler2D(textureBuffer.textures[v_TexIndex].Specular), v_TexCoord));
+	vec3 specular = u_Light.Specular * spec * vec3(texture(sampler2D(textureArray.textures[v_TexIndex].Specular), v_TexCoord));
 
 	color = vec4(ambient + diffuse + specular, 1.0) * vec4(u_Material.Color, 1.0);
 }

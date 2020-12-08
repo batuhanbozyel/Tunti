@@ -10,9 +10,9 @@
 #include "OpenGLFramebuffer.h"
 
 #include "Doge/Core/Window.h"
-
-// Temporary
-#include "Doge/Scene/SceneObject3D.h"
+#include "Doge/Utility/Mesh.h"
+#include "Doge/Utility/Camera.h"
+#include "Doge/Utility/Material.h"
 
 namespace Doge
 {
@@ -148,25 +148,6 @@ namespace Doge
 		glDrawElements(GL_TRIANGLES, IBO.GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
 
-	void OpenGLRenderer::SetSkybox(CubemapTexture skybox)
-	{
-		if (!m_SkyboxShader || !m_SkyboxVertexArray)
-			ConstructSkyboxProperties();
-
-		glBindTextureUnit(OpenGLBindings::SkyboxTextureUnit, skybox);
-
-		m_SkyboxShader->Bind();
-		m_SkyboxShader->SetUniformInt("u_Skybox", OpenGLBindings::SkyboxTextureUnit);
-	}
-
-	void OpenGLRenderer::ClearSkybox()
-	{
-		glBindTextureUnit(OpenGLBindings::SkyboxTextureUnit, 0);
-
-		m_SkyboxShader.reset();
-		m_SkyboxVertexArray.reset();
-	}
-
 	void OpenGLRenderer::BindCommonUniformProperties(const Ref<Material>& material) const
 	{
 		for (const auto& [name, prop] : material->GetProperties())
@@ -233,37 +214,30 @@ namespace Doge
 				}
 			}
 		}
+	}
 
-		for (const auto& [name, prop] : materialInstance->GetAddedProperties())
-		{
-			switch (static_cast<Material::DataIndex>(prop.index()))
-			{
-				case Material::DataIndex::Float:
-				{
-					float value = std::get<float>(prop);
-					m_LastShaderState->SetUniformFloat(name.c_str(), value);
-					break;
-				}
-				case Material::DataIndex::Float2:
-				{
-					const glm::vec2& value = std::get<glm::vec2>(prop);
-					m_LastShaderState->SetUniformFloat2(name.c_str(), value);
-					break;
-				}
-				case Material::DataIndex::Float3:
-				{
-					const glm::vec3& value = std::get<glm::vec3>(prop);
-					m_LastShaderState->SetUniformFloat3(name.c_str(), value);
-					break;
-				}
-				case Material::DataIndex::Float4:
-				{
-					const glm::vec4& value = std::get<glm::vec4>(prop);
-					m_LastShaderState->SetUniformFloat4(name.c_str(), value);
-					break;
-				}
-			}
-		}
+	void OpenGLRenderer::FlushImpl()
+	{
+		// TODO: 
+	}
+
+	void OpenGLRenderer::SetSkyboxImpl(CubemapTexture skybox)
+	{
+		if (!m_SkyboxShader || !m_SkyboxVertexArray)
+			ConstructSkyboxProperties();
+
+		glBindTextureUnit(OpenGLBindings::SkyboxTextureUnit, skybox);
+
+		m_SkyboxShader->Bind();
+		m_SkyboxShader->SetUniformInt("u_Skybox", OpenGLBindings::SkyboxTextureUnit);
+	}
+
+	void OpenGLRenderer::ClearSkyboxImpl()
+	{
+		glBindTextureUnit(OpenGLBindings::SkyboxTextureUnit, 0);
+
+		m_SkyboxShader.reset();
+		m_SkyboxVertexArray.reset();
 	}
 
 	void OpenGLRenderer::ResizeFramebuffer(uint32_t width, uint32_t height)

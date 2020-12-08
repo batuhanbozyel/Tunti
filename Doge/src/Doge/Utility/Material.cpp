@@ -6,61 +6,52 @@
 namespace Doge
 {
 	const Ref<Material> Material::PhongMaterial = CreateRef<Material>(ShaderLibrary::PhongLighting,
-		std::vector<std::pair<std::string, MaterialProperty>>{
+		std::unordered_map<std::string, MaterialProperty>{
 			{ "u_Material.Shininess", 32.0f },
 			{ "u_Material.Color", glm::vec3(1.0f) }
 		});
 
 	// Material
 
-	Material::Material(const Shader& shader, const std::vector<std::pair<std::string, MaterialProperty>>& properties)
-		: m_Shader(shader)
+	Material::Material(const Shader& shader, const std::unordered_map<std::string, MaterialProperty>& properties)
+		: m_Shader(shader), m_Properties(properties)
 	{
-		
+
 	}
 
-	void Material::SetModifiable(const std::string& name)
+	Ref<MaterialInstance> Material::CreateInstance(const Ref<Material>& material)
 	{
-		const auto& propIt = m_Properties.find(name);
-		if (propIt != m_Properties.end())
-		{
-			m_ModifiableProperties.emplace(std::move(*propIt));
-			m_Properties.erase(name);
-		}
+		Ref<MaterialInstance> childInstance = CreateRef<MaterialInstance>(material);
+		material->m_ChildInstances.push_back(childInstance);
+		return childInstance;
 	}
 
 	// MaterialInstance
 
-	MaterialInstance::MaterialInstance(const Ref<Material>& baseMaterial)
-		: m_BaseMaterial(baseMaterial), m_ModifiedProperties(baseMaterial->m_ModifiableProperties)
+	MaterialInstance::MaterialInstance(const Ref<Material>& parentMaterial)
+		: m_ParentMaterial(parentMaterial)
 	{
 
-	}
-
-	template<typename T>
-	void MaterialInstance::AddProperty(const std::string& name, const T& value)
-	{
-		if (m_AddedProperties.find(name) == m_AddedProperties.end()
-			&& m_BaseMaterial->m_Properties.find(name) == m_BaseMaterial->m_Properties.end()
-			&& m_BaseMaterial->m_ModifiableProperties.find(name) == m_BaseMaterial->m_ModifiableProperties.end())
-		{
-			m_AddedProperties.insert(m_AddedProperties.end(), { name, value });
-		}
 	}
 
 	template<typename T>
 	void MaterialInstance::ModifyProperty(const std::string& name, const T& value)
 	{
 		auto& propertyIt = m_ModifiedProperties.find(name);
-
-		if (propertyIt == m_ModifiedProperties.end())
+		if (propertyIt != m_ModifiedProperties.end())
 		{
-			propertyIt = m_AddedProperties.find(name);
-			if (propertyIt == m_AddedProperties.end())
-				return;
+			T& propValue = std::get<T>(propertyIt->second);
+			propValue = value;
+			return;
 		}
-		
-		T& propValue = std::get<T>(propertyIt->second);
-		propValue = value;
+
+		propertyIt = m_ParentMaterial->GetProperties().find(name);
+		if (propertyIt != m_ParentMaterial->GetProperties().end())
+		{
+			m_ModifiedProperties.insert(name, value);
+			return;
+		}
+
+		Log::Warn("Property does not exist: {0}", name);
 	}
 }

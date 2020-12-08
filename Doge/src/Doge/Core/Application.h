@@ -26,8 +26,8 @@ namespace Doge
 		static void EnableCursor();
 		static void SetCursorPos(float x, float y);
 
-		inline const Scope<Window>& GetActiveWindow() { return m_ActiveWindow; }
-		static inline Application& GetInstance() { return *s_Instance; }
+		const Scope<Window>& GetActiveWindow() { return m_ActiveWindow; }
+		static Application& GetInstance() { return *s_Instance; }
 	protected:
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);

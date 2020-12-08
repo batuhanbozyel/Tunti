@@ -1,9 +1,13 @@
 #include "pch.h"
 #include "Renderer.h"
+#include "Texture.h"
+
 #include "Platform/OpenGL/OpenGLRenderer.h"
 
-// Temp
-#include "Texture.h"
+#include "Doge/Core/Window.h"
+#include "Doge/Utility/Mesh.h"
+#include "Doge/Utility/Camera.h"
+#include "Doge/Utility/Material.h"
 
 namespace Doge
 {
@@ -35,6 +39,21 @@ namespace Doge
 	void Renderer::Submit(const std::vector<Mesh>& meshes, const Ref<MaterialInstance>& material, const glm::mat4& transform, bool isSelected)
 	{
 
+	}
+
+	void Renderer::SetSkybox(CubemapTexture skybox)
+	{
+		s_Instance->SetSkyboxImpl(skybox);
+	}
+
+	void Renderer::ClearSkybox()
+	{
+		s_Instance->ClearSkyboxImpl();
+	}
+
+	void Renderer::FlushRenderer()
+	{
+		s_Instance->FlushImpl();
 	}
 
 	void Renderer::RenderIndexed(const Camera& camera)
