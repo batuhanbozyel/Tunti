@@ -34,72 +34,72 @@ namespace Doge
 
 	void OpenGLShader::SetUniformInt(const char* name, int value) const
 	{
-		glUniform1i(GetUniformLocation(name), value);
+		glProgramUniform1i(m_ShaderHandle, GetUniformLocation(name), value);
 	}
 
 	void OpenGLShader::SetUniformInt2(const char* name, const glm::ivec2& value) const
 	{
-		glUniform2i(GetUniformLocation(name), value.x, value.y);
+		glProgramUniform2i(m_ShaderHandle, GetUniformLocation(name), value.x, value.y);
 	}
 
 	void OpenGLShader::SetUniformInt3(const char* name, const glm::ivec3& value) const
 	{
-		glUniform3i(GetUniformLocation(name), value.x, value.y, value.z);
+		glProgramUniform3i(m_ShaderHandle, GetUniformLocation(name), value.x, value.y, value.z);
 	}
 
 	void OpenGLShader::SetUniformInt4(const char* name, const glm::ivec4& value) const
 	{
-		glUniform4i(GetUniformLocation(name), value.x, value.y, value.z, value.w);
+		glProgramUniform4i(m_ShaderHandle, GetUniformLocation(name), value.x, value.y, value.z, value.w);
 	}
 
 	void OpenGLShader::SetUniformUInt(const char* name, uint32_t value) const
 	{
-		glUniform1ui(GetUniformLocation(name), value);
+		glProgramUniform1ui(m_ShaderHandle, GetUniformLocation(name), value);
 	}
 
 	void OpenGLShader::SetUniformUInt2(const char* name, const glm::uvec2& value) const
 	{
-		glUniform2ui(GetUniformLocation(name), value.x, value.y);
+		glProgramUniform2ui(m_ShaderHandle, GetUniformLocation(name), value.x, value.y);
 	}
 
 	void OpenGLShader::SetUniformUInt3(const char* name, const glm::uvec3& value) const
 	{
-		glUniform3ui(GetUniformLocation(name), value.x, value.y, value.z);
+		glProgramUniform3ui(m_ShaderHandle, GetUniformLocation(name), value.x, value.y, value.z);
 	}
 
 	void OpenGLShader::SetUniformUInt4(const char* name, const glm::uvec4& value) const
 	{
-		glUniform4ui(GetUniformLocation(name), value.x, value.y, value.z, value.w);
+		glProgramUniform4ui(m_ShaderHandle, GetUniformLocation(name), value.x, value.y, value.z, value.w);
 	}
 
 	void OpenGLShader::SetUniformFloat(const char* name, float value) const
 	{
-		glUniform1f(GetUniformLocation(name), value);
+		glProgramUniform1f(m_ShaderHandle, GetUniformLocation(name), value);
 	}
 
 	void OpenGLShader::SetUniformFloat2(const char* name, const glm::vec2& value) const
 	{
-		glUniform2f(GetUniformLocation(name), value.x, value.y);
+		glProgramUniform2f(m_ShaderHandle, GetUniformLocation(name), value.x, value.y);
 	}
 
 	void OpenGLShader::SetUniformFloat3(const char* name, const glm::vec3& value) const
 	{
-		glUniform3f(GetUniformLocation(name), value.x, value.y, value.z);
+		glProgramUniform3f(m_ShaderHandle, GetUniformLocation(name), value.x, value.y, value.z);
 	}
 
 	void OpenGLShader::SetUniformFloat4(const char* name, const glm::vec4& value) const
 	{
-		glUniform4f(GetUniformLocation(name), value.x, value.y, value.z, value.w);
+		glProgramUniform4f(m_ShaderHandle, GetUniformLocation(name), value.x, value.y, value.z, value.w);
 	}
 
 	void OpenGLShader::SetUniformMat3(const char* name, const glm::mat3& value) const
 	{
-		glUniformMatrix3fv(GetUniformLocation(name), 1, GL_FALSE, &value[0][0]);
+		glProgramUniformMatrix3fv(m_ShaderHandle, GetUniformLocation(name), 1, GL_FALSE, &value[0][0]);
 	}
 
 	void OpenGLShader::SetUniformMat4(const char* name, const glm::mat4& value) const
 	{
-		glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &value[0][0]);
+		glProgramUniformMatrix4fv(m_ShaderHandle, GetUniformLocation(name), 1, GL_FALSE, &value[0][0]);
 	}
 
 	uint32_t OpenGLShader::GetUniformLocation(const char* name) const

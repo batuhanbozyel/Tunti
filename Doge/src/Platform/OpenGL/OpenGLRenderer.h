@@ -35,8 +35,8 @@ namespace Doge
 		void ConstructMainProperties(const WindowProps& props);
 		void ConstructSkyboxProperties();
 
-		void BindCommonUniformProperties(const Ref<Material>& material) const;
-		void BindUniqueUniformProperties(const Ref<MaterialInstance>& materialInstance) const;
+		void SetCommonUniformProperties(const Ref<Material>& material) const;
+		void SetUniqueUniformProperties(const Ref<MaterialInstance>& materialInstance) const;
 
 		void PrepareBufferObjects(const Camera& camera);
 		void DrawIndexed(const std::vector<OpenGLVertexBuffer>& VBOs, const OpenGLIndexBuffer& IBO);

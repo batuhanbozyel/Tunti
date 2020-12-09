@@ -79,18 +79,16 @@ namespace Doge
 				materialShader.Bind();
 				m_LastShaderState = &materialShader;
 			}
-			BindCommonUniformProperties(materialLayer.first);
+			SetCommonUniformProperties(materialLayer.first);
 
 			// For each object in the current Material's RenderQueue, Draw the Object
 			auto& renderQueue = materialLayer.second;
-			while (!renderQueue.empty())
+			for (const auto& renderData : renderQueue)
 			{
-				const auto& renderData = renderQueue.front();
 				// Set Unique Material properties and the Model matrix
-				BindUniqueUniformProperties(renderData.MaterialInstanceRef);
+				SetUniqueUniformProperties(renderData.MaterialInstanceRef);
 				materialShader.SetUniformMat4("u_Model", renderData.Transform);
 				DrawIndexed(renderData.MeshData.VBOs, renderData.MeshData.IBO);
-				renderQueue.pop();
 			}
 		}
 	}
@@ -102,15 +100,11 @@ namespace Doge
 		m_ObjectOutliningShader->Bind();
 		m_ObjectOutliningShader->SetUniformFloat3("u_OutlineColor", { 0.8f, 0.5f, 0.2f });
 
-		while (!m_OutlinedObjectsQueue.empty())
+		for (auto renderData : m_OutlinedObjectsQueue)
 		{
-			auto& renderData = m_OutlinedObjectsQueue.front();
-
 			renderData.Transform = glm::scale(renderData.Transform, glm::vec3(1.03f));
 			m_ObjectOutliningShader->SetUniformMat4("u_Model", renderData.Transform);
 			DrawIndexed(renderData);
-
-			m_OutlinedObjectsQueue.pop();
 		}
 	}
 
@@ -148,7 +142,7 @@ namespace Doge
 		glDrawElements(GL_TRIANGLES, IBO.GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
 
-	void OpenGLRenderer::BindCommonUniformProperties(const Ref<Material>& material) const
+	void OpenGLRenderer::SetCommonUniformProperties(const Ref<Material>& material) const
 	{
 		for (const auto& [name, prop] : material->GetProperties())
 		{
@@ -182,7 +176,7 @@ namespace Doge
 		}
 	}
 
-	void OpenGLRenderer::BindUniqueUniformProperties(const Ref<MaterialInstance>& materialInstance) const
+	void OpenGLRenderer::SetUniqueUniformProperties(const Ref<MaterialInstance>& materialInstance) const
 	{
 		for (const auto& [name, prop] : materialInstance->GetModifiedProperties())
 		{
@@ -227,8 +221,7 @@ namespace Doge
 			ConstructSkyboxProperties();
 
 		glBindTextureUnit(OpenGLBindings::SkyboxTextureUnit, skybox);
-
-		m_SkyboxShader->Bind();
+		
 		m_SkyboxShader->SetUniformInt("u_Skybox", OpenGLBindings::SkyboxTextureUnit);
 	}
 
@@ -299,7 +292,7 @@ namespace Doge
 			{ ShaderDataType::UInt , "a_TexIndex" }
 		}, 0);
 
-		// ViewProjection Uniform Buffer: binding = 1
+		// ViewProjection Uniform Buffer: binding = 0
 		m_ViewProjectionUniformBuffer = CreateScope<OpenGLUniformBuffer>(sizeof(glm::mat4) * 2, OpenGLBindings::ViewProjectionUniformBuffer);
 		// Lighting Uniform buffer: binding = 2
 		m_LightingUniformBuffer = CreateScope<OpenGLUniformBuffer>(sizeof(glm::vec4) * 5, OpenGLBindings::LightingUniformBuffer);
