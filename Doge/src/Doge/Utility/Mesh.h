@@ -60,11 +60,44 @@ namespace Doge
 		Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices)
 			: m_Vertices(vertices), m_Indices(indices) {}
 
-		inline void SetVertices(const std::vector<Vertex>& vertices) { m_Vertices = vertices; }
-		inline void SetIndices(const std::vector<uint32_t>& indices) { m_Indices = indices; }
+		static Mesh BatchMeshes(const std::vector<Mesh>& meshes)
+		{
+			if (meshes.size() == 1)
+				return Mesh(std::move(meshes[0]));
 
-		inline const std::vector<Vertex>& GetVertices() const { return m_Vertices; }
-		inline const std::vector<uint32_t>& GetIndices() const { return m_Indices; }
+			size_t vertexCount{ 0 };
+			size_t indexCount{ 0 };
+			for (const Mesh& mesh : meshes)
+			{
+				vertexCount += mesh.GetVertices().size();
+				indexCount += mesh.GetIndices().size();
+			}
+
+			uint32_t offset{ 0 };
+			std::vector<Vertex> vertices(vertexCount);
+			std::vector<uint32_t> indices(indexCount);
+			for (const Mesh& mesh : meshes)
+			{
+				auto& meshVertices = mesh.GetVertices();
+				std::move(meshVertices.begin(), meshVertices.end(), std::back_inserter(vertices));
+
+				auto& meshIndices = mesh.GetIndices();
+				std::for_each(meshIndices.begin(), meshIndices.end(), [&offset = std::as_const(offset)](uint32_t& indice)
+				{
+					indice += offset;
+				});
+				std::move(meshIndices.begin(), meshIndices.end(), std::back_inserter(indices));
+
+				offset += static_cast<uint32_t>(meshVertices.size());
+			}
+			return Mesh(std::move(vertices), std::move(indices));
+		}
+
+		void SetVertices(const std::vector<Vertex>& vertices) { m_Vertices = vertices; }
+		void SetIndices(const std::vector<uint32_t>& indices) { m_Indices = indices; }
+
+		const std::vector<Vertex>& GetVertices() const { return m_Vertices; }
+		const std::vector<uint32_t>& GetIndices() const { return m_Indices; }
 	private:
 		std::vector<Vertex> m_Vertices;
 		std::vector<uint32_t> m_Indices;

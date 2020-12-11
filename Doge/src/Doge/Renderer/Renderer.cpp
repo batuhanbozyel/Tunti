@@ -1,6 +1,7 @@
 #include "pch.h"
-#include "Renderer.h"
+#include "Shader.h"
 #include "Texture.h"
+#include "Renderer.h"
 
 #include "Platform/OpenGL/OpenGLRenderer.h"
 
@@ -11,7 +12,6 @@
 
 namespace Doge
 {
-	RendererAPI Renderer::s_RendererAPI = RendererAPI::None;
 	Renderer* Renderer::s_Instance = nullptr;
 
 	void Renderer::Init(const WindowProps& props)
@@ -38,7 +38,7 @@ namespace Doge
 
 	void Renderer::Submit(const std::vector<Mesh>& meshes, const Ref<MaterialInstance>& material, const glm::mat4& transform, bool isSelected)
 	{
-
+		Submit(Mesh::BatchMeshes(meshes), material, transform, isSelected);
 	}
 
 	void Renderer::SetSkybox(CubemapTexture skybox)
@@ -81,38 +81,5 @@ namespace Doge
 	void Renderer::OnWindowResize(WindowResizeEvent& e)
 	{
 		s_Instance->ResizeFramebuffer(e.GetWidth(), e.GetHeight());
-	}
-
-	Mesh BatchMeshes(const std::vector<Mesh>& meshes)
-	{
-		if (meshes.size() == 1)
-			return Mesh(std::move(meshes[0]));
-
-		size_t vertexCount{ 0 };
-		size_t indexCount{ 0 };
-		for (const Mesh& mesh : meshes)
-		{
-			vertexCount += mesh.GetVertices().size();
-			indexCount += mesh.GetIndices().size();
-		}
-
-		uint32_t offset{ 0 };
-		std::vector<Vertex> vertices(vertexCount);
-		std::vector<uint32_t> indices(indexCount);
-		for (const Mesh& mesh : meshes)
-		{
-			auto& meshVertices = mesh.GetVertices();
-			std::move(meshVertices.begin(), meshVertices.end(), std::back_inserter(vertices));
-
-			auto& meshIndices = mesh.GetIndices();
-			std::for_each(meshIndices.begin(), meshIndices.end(), [&offset = std::as_const(offset)](uint32_t& indice)
-			{
-				indice += offset;
-			});
-			std::move(meshIndices.begin(), meshIndices.end(), std::back_inserter(indices));
-
-			offset += static_cast<uint32_t>(meshVertices.size());
-		}
-		return Mesh(std::move(vertices), std::move(indices));
 	}
 }

@@ -27,7 +27,7 @@ namespace Doge
 		const std::unordered_map<std::string, MaterialProperty>& GetProperties() const { return m_Properties; }
 		const Shader GetShader() const { return m_Shader; }
 	private:
-		std::unordered_map<std::string, MaterialProperty> m_Properties;
+		const std::unordered_map<std::string, MaterialProperty> m_Properties;
 
 		std::vector<Ref<MaterialInstance>> m_ChildInstances;
 		const Shader m_Shader;
@@ -42,7 +42,6 @@ namespace Doge
 		void ModifyProperty(const std::string& name, const T& value);
 
 		const std::unordered_map<std::string, MaterialProperty>& GetModifiedProperties() const { return m_ModifiedProperties; }
-
 		const Ref<Material>& GetParentMaterial() const { return m_ParentMaterial; }
 	private:
 		std::unordered_map<std::string, MaterialProperty> m_ModifiedProperties;

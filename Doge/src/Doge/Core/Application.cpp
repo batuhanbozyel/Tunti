@@ -15,7 +15,6 @@ namespace Doge
 			s_Running = true;
 			Log::Init();
 
-			Renderer::SetRendererAPI(RendererAPI::OpenGL);
 			Window* window = new Window(WindowProps(appName), flag);
 			window->SetEventCallbackFn(BIND_EVENT_FN(OnEvent));
 			m_ActiveWindow.reset(window);

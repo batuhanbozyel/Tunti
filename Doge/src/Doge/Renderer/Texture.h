@@ -5,7 +5,8 @@ namespace Doge
 {
 	class TextureLibrary;
 
-	enum class TextureType {
+	enum class TextureType : uint16_t
+	{
 		Diffuse,
 		Specular,
 		COUNT

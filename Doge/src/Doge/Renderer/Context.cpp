@@ -8,7 +8,7 @@ namespace Doge
 {
 	Scope<Context> Context::Create(void* window)
 	{
-		switch (Renderer::GetRendererAPI())
+		switch (Renderer::API)
 		{
 			case RendererAPI::None:		LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
 			case RendererAPI::OpenGL:	return CreateScope<OpenGLContext>(static_cast<GLFWwindow*>(window));

@@ -27,7 +27,7 @@ namespace Doge
 			LOG_ASSERT(glfw, "GLFW initialization failed!");
 
 #ifdef DEBUG_ENABLED
-			if (Renderer::GetRendererAPI() == RendererAPI::OpenGL)
+			if (Renderer::API == RendererAPI::OpenGL)
 				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
 			glfwSetErrorCallback(GLFWErrorCallback);

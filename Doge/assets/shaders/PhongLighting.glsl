@@ -42,7 +42,7 @@ struct TextureMap
 	uvec2 Specular;
 };
 
-layout(std430, binding = 0) readonly buffer TextureMaps
+layout(std430, binding = 1) readonly buffer TextureMaps
 {
 	TextureMap textures[];
 } textureArray;
