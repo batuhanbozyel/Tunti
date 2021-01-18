@@ -1,4 +1,5 @@
 #pragma once
+#include "Doge/Renderer/Shader.h"
 
 namespace Doge
 {
@@ -10,33 +11,31 @@ namespace Doge
 	class Material
 	{
 	public:
-		static const Ref<Material> PhongMaterial;
-
-		enum class DataIndex : uint16_t
-		{
-			Float	= 0,
-			Float2	= 1,
-			Float3	= 2,
-			Float4	= 3
-		};
+		const uint32_t MaterialIndex;
+		const Shader ShaderHandle;
 	public:
-		explicit Material(const Shader& shader, const std::unordered_map<std::string, MaterialProperty>& properties);
+		explicit Material(const Shader& shader);
 
-		static Ref<MaterialInstance> CreateInstance(const Ref<Material>& material);
+		static Ref<MaterialInstance> CreateInstanceFrom(const Ref<Material>& material);
+
+		template<typename T>
+		void ModifyProperty(const std::string& name, const T& value);
 
 		const std::unordered_map<std::string, MaterialProperty>& GetProperties() const { return m_Properties; }
-		const Shader GetShader() const { return m_Shader; }
 	private:
-		const std::unordered_map<std::string, MaterialProperty> m_Properties;
-
+		std::unordered_map<std::string, MaterialProperty> m_Properties;
 		std::vector<Ref<MaterialInstance>> m_ChildInstances;
-		const Shader m_Shader;
+		
+	private:
+		static uint32_t s_MaterialCount;
 	};
 
 	class MaterialInstance
 	{
 	public:
-		explicit MaterialInstance(const Ref<Material>& parentMaterial);
+		const uint32_t MaterialInstanceIndex;
+	public:
+		explicit MaterialInstance(const Ref<Material>& parentMaterial, uint32_t index);
 
 		template<typename T>
 		void ModifyProperty(const std::string& name, const T& value);
@@ -45,7 +44,6 @@ namespace Doge
 		const Ref<Material>& GetParentMaterial() const { return m_ParentMaterial; }
 	private:
 		std::unordered_map<std::string, MaterialProperty> m_ModifiedProperties;
-
 		const Ref<Material> m_ParentMaterial;
 	};
 }
