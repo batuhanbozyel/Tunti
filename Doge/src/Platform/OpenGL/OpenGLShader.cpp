@@ -11,7 +11,7 @@ namespace Doge
 		CalculateUniformLocations();
 	}
 
-	OpenGLShader::OpenGLShader(const char* name, const std::string& vertexSrc, const std::string& fragmentSrc)
+	OpenGLShader::OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc)
 	{
 		Compile(vertexSrc, fragmentSrc);
 		CalculateUniformLocations();
@@ -102,11 +102,22 @@ namespace Doge
 		glProgramUniformMatrix4fv(m_ShaderHandle, GetUniformLocation(name), 1, GL_FALSE, &value[0][0]);
 	}
 
+	std::unordered_map<std::string, UniformProperty> OpenGLShader::GetMaterialInfo() const
+	{
+		std::unordered_map<std::string, UniformProperty> uniforms;
+
+		for (const auto& uniform : m_UniformCache)
+			if(uniform.second.Type != MaterialDataIndex::NONE)
+				uniforms.insert(uniform);
+
+		return uniforms;
+	}
+
 	uint32_t OpenGLShader::GetUniformLocation(const char* name) const
 	{
 		auto& mapLocation = m_UniformCache.find(name);
 		LOG_ASSERT(mapLocation != m_UniformCache.end(), "Uniform could not found!");
-		return mapLocation->second;
+		return mapLocation->second.Location;
 	}
 
 	void OpenGLShader::CalculateUniformLocations()
@@ -127,10 +138,35 @@ namespace Doge
 			for (GLint i = 0; i < uniform_count; ++i)
 			{
 				glGetActiveUniform(m_ShaderHandle, i, max_name_len, &length, &count, &type, uniform_name.get());
+				
+				UniformProperty prop;
+				prop.Location = glGetUniformLocation(m_ShaderHandle, uniform_name.get());
+				prop.Type = MaterialDataIndex::NONE;
 
-				uint32_t location = glGetUniformLocation(m_ShaderHandle, uniform_name.get());
-
-				m_UniformCache.emplace(std::make_pair(std::string(uniform_name.get(), length), location));
+				switch (type)
+				{
+					case GL_FLOAT:
+					{
+						prop.Type = MaterialDataIndex::Float;
+						break;
+					}
+					case GL_FLOAT_VEC2:
+					{
+						prop.Type = MaterialDataIndex::Float2;
+						break;
+					}
+					case GL_FLOAT_VEC3:
+					{
+						prop.Type = MaterialDataIndex::Float3;
+						break;
+					}
+					case GL_FLOAT_VEC4:
+					{
+						prop.Type = MaterialDataIndex::Float4;
+						break;
+					}
+				}
+				m_UniformCache.emplace(std::make_pair(std::string(uniform_name.get(), length), prop));
 			}
 		}
 	}
@@ -163,7 +199,8 @@ namespace Doge
 			glDeleteShader(vertexShader);
 
 			// Vertex shader compilation failed
-			LOG_ASSERT(false, "Vertex Shader complation failed: {0}", infoLog.data());
+			Log::Error("Vertex Shader compilation failed:");
+			LOG_ASSERT(false, infoLog.data());
 			return;
 		}
 
@@ -194,7 +231,8 @@ namespace Doge
 			glDeleteShader(vertexShader);
 
 			// Fragment shader compilation failed
-			LOG_ASSERT(false, "Fragment Shader compilation failed: {0}", infoLog.data());
+			Log::Error("Fragment Shader compilation failed: ");
+			LOG_ASSERT(false, infoLog.data());
 			return;
 		}
 
@@ -229,7 +267,8 @@ namespace Doge
 			glDeleteShader(fragmentShader);
 
 			// Shader linking failed
-			LOG_ASSERT(false, "Shader Linking failed: {0}", infoLog.data());
+			Log::Error("Shader Linking failed: ");
+			LOG_ASSERT(false, infoLog.data());
 			return;
 		}
 
@@ -290,10 +329,10 @@ namespace Doge
 		}
 		else
 		{
-			Scope<OpenGLShader> newShader = CreateScope<OpenGLShader>(source);
+			Ref<OpenGLShader> newShader = CreateRef<OpenGLShader>(source);
 			shader.Handle = newShader->m_ShaderHandle;
-			m_ShaderFiles.insert(shaderFileIt, std::make_pair(filePath, shader));
-			m_Shaders.insert(std::make_pair(shader, newShader));
+			m_ShaderFiles.insert(m_ShaderFiles.end(), { filePath, shader });
+			m_Shaders.insert(m_Shaders.end(), { shader, newShader });
 		}
 
 		return shader;
@@ -311,12 +350,43 @@ namespace Doge
 		}
 		else
 		{
-			Scope<OpenGLShader> newShader = CreateScope<OpenGLShader>(vertexSrc, fragmentSrc);
+			Ref<OpenGLShader> newShader = CreateRef<OpenGLShader>(vertexSrc, fragmentSrc);
 			shader.Handle = newShader->m_ShaderHandle;
-			m_ShaderFiles.insert(shaderFileIt, std::make_pair(name, shader));
-			m_Shaders.insert(std::make_pair(shader, newShader));
+			m_ShaderFiles.insert(m_ShaderFiles.end(), { name, shader });
+			m_Shaders.insert(m_Shaders.end(), { shader, newShader });
 		}
 
 		return shader;
+	}
+
+	Ref<OpenGLShader> OpenGLShaderCache::LoadShader(const std::string& filepath)
+	{
+		std::string source = ShaderLibrary::ReadFile(filepath);
+
+		Ref<OpenGLShader> shaderRef;
+		const auto& shaderFileIt = m_ShaderFiles.find(filepath);
+
+		if (shaderFileIt != m_ShaderFiles.end())
+		{
+			Shader shader = shaderFileIt->second;
+			LOG_ASSERT(m_Shaders.find(shader) != m_Shaders.end(), "OpenGL Shader Program is not loaded properly!");
+			shaderRef = m_Shaders.find(shader)->second;
+		}
+		else
+		{
+			Ref<OpenGLShader> newShader = CreateRef<OpenGLShader>(source);
+			Shader shader = newShader->m_ShaderHandle;
+			m_ShaderFiles.insert(m_ShaderFiles.end(), { filepath, shader });
+			m_Shaders.insert(m_Shaders.end(), { shader, newShader });
+			return newShader;
+		}
+
+		return shaderRef;
+	}
+
+	void OpenGLShaderCache::Flush()
+	{
+		m_ShaderFiles.clear();
+		m_Shaders.clear();
 	}
 }

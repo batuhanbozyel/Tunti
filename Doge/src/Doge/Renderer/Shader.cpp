@@ -9,8 +9,6 @@
 
 namespace Doge
 {
-	const Shader ShaderLibrary::PhongLighting = LoadShader("../Doge/assets/shaders/PhongLighting.glsl");
-
 	std::string ShaderLibrary::ReadFile(const std::string& filePath)
 	{
 		std::string source;
@@ -43,7 +41,7 @@ namespace Doge
 	{
 		const std::string& source = ReadFile(filePath);
 
-		switch (Renderer::API)
+		switch (Renderer::GetAPI())
 		{
 			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return Shader();
 			case RendererAPI::OpenGL: return OpenGLShaderCache::GetInstance()->LoadShader(filePath, source);
@@ -55,7 +53,7 @@ namespace Doge
 
 	Shader ShaderLibrary::LoadShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
 	{
-		switch (Renderer::API)
+		switch (Renderer::GetAPI())
 		{
 			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return Shader();
 			case RendererAPI::OpenGL: return OpenGLShaderCache::GetInstance()->LoadShader(name, vertexSrc, fragmentSrc);
@@ -63,5 +61,24 @@ namespace Doge
 
 		LOG_ASSERT(false, "RendererAPI is not specified!");
 		return Shader();
+	}
+
+	std::unordered_map<std::string, UniformProperty> ShaderLibrary::GetMaterialInfo(Shader shader)
+	{
+		switch (Renderer::GetAPI())
+		{
+			case RendererAPI::None:
+			{
+				LOG_ASSERT(false, "RendererAPI is not specified!");
+				return std::unordered_map<std::string, UniformProperty>();
+			}
+			case RendererAPI::OpenGL:
+			{
+				Ref<OpenGLShader> apiShader = (*OpenGLShaderCache::GetInstance())[shader];
+				return apiShader->GetMaterialInfo();
+			}
+		}
+		LOG_ASSERT(false, "RendererAPI is not specified!");
+		return std::unordered_map<std::string, UniformProperty>();
 	}
 }

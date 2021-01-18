@@ -27,6 +27,12 @@ namespace Doge
 		operator uint32_t() const { return Index; }
 	};
 
+	struct TextureData
+	{
+		unsigned char* buffer;
+		int width, height, channel;
+	};
+
 	struct CubemapTexture
 	{
 		uint32_t TextureID = 0;

@@ -77,8 +77,7 @@ namespace Doge
 
 	/////////// ShaderStorageBuffer ///////////
 
-	OpenGLShaderStorageBuffer::OpenGLShaderStorageBuffer(uint32_t size, uint32_t location)
-		: m_Location(location)
+	OpenGLShaderStorageBuffer::OpenGLShaderStorageBuffer(uint32_t size)
 	{
 		glCreateBuffers(1, &m_BufferHandle);
 		glNamedBufferStorage(m_BufferHandle, size, nullptr, GL_DYNAMIC_STORAGE_BIT);
@@ -89,14 +88,14 @@ namespace Doge
 		glDeleteBuffers(1, &m_BufferHandle);
 	}
 
-	void OpenGLShaderStorageBuffer::Bind() const
+	void OpenGLShaderStorageBuffer::Bind(uint32_t location) const
 	{
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_Location, m_BufferHandle);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, location, m_BufferHandle);
 	}
 
-	void OpenGLShaderStorageBuffer::Unbind() const
+	void OpenGLShaderStorageBuffer::Unbind(uint32_t location) const
 	{
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_Location, 0);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, location, 0);
 	}
 
 	void OpenGLShaderStorageBuffer::SetData(const void* data, uint32_t offset, uint32_t size) const
@@ -106,8 +105,7 @@ namespace Doge
 
 	/////////// UniformBuffer ///////////
 
-	OpenGLUniformBuffer::OpenGLUniformBuffer(uint32_t size, uint32_t location)
-		: m_Location(location)
+	OpenGLUniformBuffer::OpenGLUniformBuffer(uint32_t size)
 	{
 		glCreateBuffers(1, &m_BufferHandle);
 		glNamedBufferStorage(m_BufferHandle, size, nullptr, GL_DYNAMIC_STORAGE_BIT);
@@ -118,18 +116,67 @@ namespace Doge
 		glDeleteBuffers(1, &m_BufferHandle);
 	}
 
-	void OpenGLUniformBuffer::Bind() const
+	void OpenGLUniformBuffer::Bind(uint32_t location) const
 	{
-		glBindBufferBase(GL_UNIFORM_BUFFER, m_Location, m_BufferHandle);
+		glBindBufferBase(GL_UNIFORM_BUFFER, location, m_BufferHandle);
 	}
 
-	void OpenGLUniformBuffer::Unbind() const
+	void OpenGLUniformBuffer::Unbind(uint32_t location) const
 	{
-		glBindBufferBase(GL_UNIFORM_BUFFER, m_Location, 0);
+		glBindBufferBase(GL_UNIFORM_BUFFER, location, 0);
 	}
 
 	void OpenGLUniformBuffer::SetData(const void* data, uint32_t size, uint32_t offset) const
 	{
 		glNamedBufferSubData(m_BufferHandle, offset, size, data);
+	}
+
+	// OpenGLBufferManager
+
+	template<typename BufferType T, typename ... Args>
+	Buffer<T> OpenGLBufferManager::AllocateBuffer(Args&& ... args)
+	{
+		switch (T)
+		{
+			case BufferType::Vertex:
+			{
+				Buffer<T> buffer;
+				buffer.Index = m_VertexBufferCache.size();
+				m_VertexBufferCache.push_back(CreateScope<OpenGLVertexBuffer>(std::forward(args)));
+				return buffer;
+			}
+			case BufferType::Index:
+			{
+				Buffer<T> buffer;
+				buffer.Index = m_IndexBufferCache.size();
+				m_IndexBufferCache.push_back(CreateScope<OpenGLIndexBuffer>(std::forward(args)));
+				return buffer;
+			}
+			case BufferType::Uniform:
+			{
+				Buffer<T> buffer;
+				buffer.Index = m_UniformBufferCache.size();
+				m_UniformBufferCache.push_back(CreateScope<OpenGLUniformBuffer>(std::forward(args)));
+				return buffer;
+			}
+			case BufferType::ShaderStorage:
+			{
+				Buffer<T> buffer;
+				buffer.Index = m_ShaderStorageBufferCache.size();
+				m_ShaderStorageBufferCache.push_back(CreateScope<OpenGLShaderStorageBuffer>(std::forward(args)));
+				return buffer;
+			}
+		}
+
+		LOG_ASSERT(false, "Unknown Buffer type, buffer could not be allocated!");
+		return Buffer<T>();
+	}
+
+	void OpenGLBufferManager::Flush()
+	{
+		m_VertexBufferCache.clear();
+		m_IndexBufferCache.clear();
+		m_UniformBufferCache.clear();
+		m_ShaderStorageBufferCache.clear();
 	}
 }

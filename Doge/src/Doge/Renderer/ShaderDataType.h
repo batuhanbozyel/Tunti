@@ -1,16 +1,15 @@
 #pragma once
-#include "Doge/Core/Log.h"
 
 namespace Doge
 {
 	class ShaderDataType
 	{
 	public:
-		enum Type {
+		enum {
 			Float, Float2, Float3, Float4, Mat3, Mat4, Int, Int2, Int3, Int4, UInt, UInt2, UInt3, UInt4, Bool
 		};
 
-		static uint32_t Size(const ShaderDataType::Type type)
+		static constexpr uint32_t Size(decltype(ShaderDataType::Float) type)
 		{
 			switch (type)
 			{

@@ -5,11 +5,11 @@ namespace Doge
 {
 	class OpenGLShaderCache;
 
-	class OpenGLShader
+	class OpenGLShader final
 	{
 	public:
 		explicit OpenGLShader(const std::string& source);
-		explicit OpenGLShader(const char* name, const std::string& vertexSrc, const std::string& fragmentSrc);
+		explicit OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc);
 		~OpenGLShader();
 
 		void Bind() const;
@@ -52,6 +52,8 @@ namespace Doge
 		{
 			return m_ShaderHandle != shader.m_ShaderHandle;
 		}
+
+		std::unordered_map<std::string, UniformProperty> GetMaterialInfo() const;
 	private:
 		void CalculateUniformLocations();
 		uint32_t GetUniformLocation(const char* name) const;
@@ -59,18 +61,22 @@ namespace Doge
 		std::unordered_map<uint32_t, std::string> ParseShaderSource(const std::string& source);
 	private:
 		GLuint m_ShaderHandle;
-		std::unordered_map<std::string, uint32_t> m_UniformCache;
+		std::unordered_map<std::string, UniformProperty> m_UniformCache;
 
 		friend class OpenGLShaderCache;
 	};
 
-	class OpenGLShaderCache
+	class OpenGLShaderCache final
 	{
 	public:
 		~OpenGLShaderCache() = default;
 
+		Ref<OpenGLShader> LoadShader(const std::string& filepath);
+
 		Shader LoadShader(const std::string& filePath, const std::string& source);
 		Shader LoadShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
+
+		void Flush();
 
 		static OpenGLShaderCache* const GetInstance()
 		{
@@ -80,14 +86,14 @@ namespace Doge
 			return s_Instance;
 		}
 
-		const OpenGLShader& operator[](const std::string& shaderFile)
+		const Ref<OpenGLShader>& operator[](const std::string& shaderFile) const
 		{
-			return *m_Shaders[m_ShaderFiles[shaderFile]];
+			return m_Shaders.find(m_ShaderFiles.find(shaderFile)->second)->second;
 		}
 
-		const OpenGLShader& operator[](const Shader& shader)
+		const Ref<OpenGLShader>& operator[](const Shader& shader) const
 		{
-			return *m_Shaders[shader];
+			return m_Shaders.find(shader)->second;
 		}
 
 		OpenGLShaderCache(const OpenGLShaderCache& other) = delete;
@@ -96,7 +102,7 @@ namespace Doge
 		explicit OpenGLShaderCache() = default;
 	private:
 		std::unordered_map<std::string, Shader> m_ShaderFiles;
-		std::unordered_map<Shader, Scope<OpenGLShader>> m_Shaders;
+		std::unordered_map<uint64_t, Ref<OpenGLShader>> m_Shaders;
 
 		static OpenGLShaderCache* s_Instance;
 	};

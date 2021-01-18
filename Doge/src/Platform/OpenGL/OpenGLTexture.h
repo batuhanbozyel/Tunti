@@ -1,27 +1,28 @@
 #pragma once
-#include "OpenGLBuffer.h"
 #include "Doge/Renderer/Texture.h"
 
 namespace Doge
 {
 	class OpenGLTextureCache;
+	class OpenGLShaderStorageBuffer;
 
-	class OpenGLTexture2D
+	class OpenGLTexture2D final
 	{
 	public:
 		explicit OpenGLTexture2D();
-		explicit OpenGLTexture2D(const std::string& texturePath);
+		explicit OpenGLTexture2D(const TextureData& data);
 		~OpenGLTexture2D();
 	private:
 		GLuint m_TextureID;
+		GLuint64 m_TextureHandle;
 
 		friend class OpenGLTextureCache;
 	};
 
-	class OpenGLCubemapTexture
+	class OpenGLCubemapTexture final
 	{
 	public:
-		explicit OpenGLCubemapTexture(const std::array<std::string, 6>& cubemapTexturePaths);
+		explicit OpenGLCubemapTexture(const std::array<TextureData, 6>& cubemapData);
 		~OpenGLCubemapTexture();
 	private:
 		GLuint m_TextureID;
@@ -29,7 +30,7 @@ namespace Doge
 		friend class OpenGLTextureCache;
 	};
 
-	class OpenGLTextureCache
+	class OpenGLTextureCache final
 	{
 	public:
 		~OpenGLTextureCache() = default;
@@ -38,7 +39,9 @@ namespace Doge
 		Texture2D AddTexture2D(const std::vector<std::tuple<std::string, TextureType>>& textureFiles);
 		CubemapTexture AddCubemap(const std::array<std::string, 6>& cubemapTextures);
 
-		static inline OpenGLTextureCache* const GetInstance()
+		void Flush();
+
+		static OpenGLTextureCache* const GetInstance()
 		{
 			if (!s_Instance)
 				s_Instance = new OpenGLTextureCache;
@@ -55,8 +58,9 @@ namespace Doge
 		uint32_t m_TextureCount = 1;
 		Scope<OpenGLShaderStorageBuffer> m_SSBO;
 
+		Scope<OpenGLTexture2D> m_DefaultTexture;
 		std::unordered_map<std::string, Scope<OpenGLTexture2D>> m_Textures;
-		std::unordered_map<std::array<std::string, 6>, Scope<OpenGLCubemapTexture>> m_Cubemaps;
+		std::unordered_map<std::string, Scope<OpenGLCubemapTexture>> m_Cubemaps;
 
 		static OpenGLTextureCache* s_Instance;
 	};

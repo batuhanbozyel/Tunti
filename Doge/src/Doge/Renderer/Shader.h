@@ -15,6 +15,21 @@ namespace Doge
 		Shader() = default;
 	};
 
+	enum class MaterialDataIndex : uint16_t
+	{
+		Float = 0,
+		Float2 = 1,
+		Float3 = 2,
+		Float4 = 3,
+		NONE
+	};
+
+	struct UniformProperty
+	{
+		MaterialDataIndex Type;
+		uint32_t Location;
+	};
+
 	class ShaderLibrary
 	{
 	public:
@@ -22,7 +37,8 @@ namespace Doge
 	public:
 		static Shader LoadShader(const std::string& filePath);
 		static Shader LoadShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
-	private:
+
+		static std::unordered_map<std::string, UniformProperty> GetMaterialInfo(Shader shader);
 		static std::string ReadFile(const std::string& filePath);
 	};
 }
