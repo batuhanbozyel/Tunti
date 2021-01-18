@@ -12,19 +12,16 @@
 #include "Doge/Renderer/Texture.h"
 #include "Doge/Renderer/Shader.h"
 
+// Utility
+#include "Doge/Utility/Mesh.h"
+#include "Doge/Utility/Material.h"
+
 // Scene
 #include "Doge/Scene/Scene.h"
 #include "Doge/Scene/Entity.h"
 #include "Doge/Scene/Components.h"
-#include "Doge/Scene/Model.h"
-#include "Doge/Scene/Light.h"
-#include "Doge/Scene/SceneObject3D.h"
-#include "Doge/Scene/LightingShader.h"
+#include "Doge/Scene/ModelLibrary.h"
 #include "Doge/Scene/CameraController.h"
-
-// Utility
-#include "Doge/Utility/Mesh.h"
-#include "Doge/Utility/Material.h"
 
 // 3rd-Party Includes
 #include <glm/glm.hpp>
