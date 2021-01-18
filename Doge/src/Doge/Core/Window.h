@@ -1,6 +1,4 @@
 #pragma once
-
-#include "Doge/Renderer/Context.h"
 #include "Doge/Events/WindowEvent.h"
 
 namespace Doge
@@ -59,7 +57,6 @@ namespace Doge
 	private:
 		WindowProps m_Props;
 		void* m_Window;
-		Scope<Context> m_Context;
 
 		static uint8_t s_WindowCount;
 	};

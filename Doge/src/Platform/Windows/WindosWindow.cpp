@@ -27,7 +27,7 @@ namespace Doge
 			LOG_ASSERT(glfw, "GLFW initialization failed!");
 
 #ifdef DEBUG_ENABLED
-			if (Renderer::API == RendererAPI::OpenGL)
+			if (Renderer::GetAPI() == RendererAPI::OpenGL)
 				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
 			glfwSetErrorCallback(GLFWErrorCallback);
@@ -36,7 +36,6 @@ namespace Doge
 		m_Window = CreateNativeWindow(flag);
 		GLFWwindow* windowContext = static_cast<GLFWwindow*>(m_Window);
 		LOG_ASSERT(windowContext, "Window creation failed");
-		m_Context = Context::Create(windowContext);
 
 		glfwSetWindowUserPointer(windowContext, &m_Props);
 		glfwSwapInterval(static_cast<int>(props.VSync));
@@ -158,7 +157,8 @@ namespace Doge
 	void Window::OnUpdate()
 	{
 		glfwPollEvents();
-		m_Context->SwapBuffers();
+		if(Renderer::GetAPI() == RendererAPI::OpenGL)
+			glfwSwapBuffers(static_cast<GLFWwindow*>(m_Window));
 	}
 
 	void Window::OnWindowResize(WindowResizeEvent& e)

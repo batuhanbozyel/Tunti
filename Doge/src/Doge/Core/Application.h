@@ -26,8 +26,8 @@ namespace Doge
 		static void EnableCursor();
 		static void SetCursorPos(float x, float y);
 
-		const Scope<Window>& GetActiveWindow() { return m_ActiveWindow; }
-		static Application& GetInstance() { return *s_Instance; }
+		static const Scope<Window>& GetActiveWindow() { return s_Instance->m_ActiveWindow; }
+		static Application* GetInstance() { return s_Instance; }
 	protected:
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);
@@ -41,7 +41,7 @@ namespace Doge
 	private:
 		Scope<Window> m_ActiveWindow;
 		LayerStack m_LayerStack;
-		bool s_Running = false;
+		bool m_Running = false;
 	private:
 		static Application* s_Instance;
 		friend int ::main(int argc, char** argv);

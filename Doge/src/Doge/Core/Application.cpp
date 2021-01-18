@@ -12,14 +12,15 @@ namespace Doge
 		if (!s_Instance)
 		{
 			s_Instance = this;
-			s_Running = true;
+			m_Running = true;
 			Log::Init();
 
-			Window* window = new Window(WindowProps(appName), flag);
+			WindowProps windowProps(appName);
+			Window* window = new Window(windowProps, flag);
 			window->SetEventCallbackFn(BIND_EVENT_FN(OnEvent));
 			m_ActiveWindow.reset(window);
+			Renderer::Init(windowProps, RendererAPI::OpenGL);
 
-			Renderer::Init(m_ActiveWindow->GetWindowProps());
 			SetCursorPos(m_ActiveWindow->GetWindowProps().Width / 2.0f, m_ActiveWindow->GetWindowProps().Height / 2.0f);
 
 			Log::Trace("Application started running!");
@@ -34,9 +35,9 @@ namespace Doge
 
 	void Application::Run()
 	{
-		while (s_Running)
+		while (m_Running)
 		{
-			Time::GetInstance().OnTick();
+			Time::OnTick();
 
 			m_LayerStack.OnUpdate();
 
@@ -46,7 +47,7 @@ namespace Doge
 
 	void Application::Shutdown()
 	{
-		s_Instance->s_Running = false;
+		m_Running = false;
 	}
 
 	void Application::PushLayer(Layer* layer)
@@ -94,14 +95,14 @@ namespace Doge
 
 	bool Application::OnWindowClose(WindowCloseEvent& e)
 	{
-		s_Running = false;
+		m_Running = false;
 		return true;
 	}
 
 	bool Application::OnWindowResize(WindowResizeEvent& e)
 	{
 		m_ActiveWindow->OnWindowResize(e);
-		Renderer::OnWindowResize(e);
+		Renderer::Resize(e.GetWidth(), e.GetHeight());
 		return true;
 	}
 

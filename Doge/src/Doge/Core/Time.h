@@ -6,24 +6,16 @@ namespace Doge
 	class Time
 	{
 	public:
-		inline void OnTick()
+		static void OnTick()
 		{
 			float time = static_cast<float>(glfwGetTime());
-			m_DeltaTime = (time - m_LastFrameTime) * 1000.0f;
-			m_LastFrameTime = time;
+			s_Instance->m_DeltaTime = (time - s_Instance->m_LastFrameTime) * 1000.0f;
+			s_Instance->m_LastFrameTime = time;
 		}
 
-		static inline float DeltaTime()
+		static float DeltaTime()
 		{
 			return s_Instance->m_DeltaTime;
-		}
-
-		static inline Time& GetInstance()
-		{
-			if (!s_Instance)
-				s_Instance = new Time;
-
-			return *s_Instance;
 		}
 
 		Time(const Time& other) = delete;
