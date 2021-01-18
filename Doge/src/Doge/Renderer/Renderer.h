@@ -1,66 +1,62 @@
 #pragma once
-#include "RenderDataManager.h"
 
 namespace Doge
 {
 	struct Mesh;
+	struct Shader;
 	struct WindowProps;
 	struct CubemapTexture;
 
 	class Camera;
+	class Material;
+	class Renderer;
 	class MaterialInstance;
-	class WindowResizeEvent;
 	
-	enum class RendererAPI
+	class RendererAPI
 	{
-		None = 0,
-		OpenGL,
-		Vulkan
+	public:
+		friend class Renderer;
+		enum {
+			None = 0,
+			OpenGL,
+			Vulkan
+		};
+	protected:
+		std::function<void(const Camera&)> BeginScene;
+		std::vector<std::function<void()>> RenderPasses;
+		std::function<void()> EndScene;
+
+		std::function<void(CubemapTexture skybox)> SetSkybox;
+		std::function<void()> ClearSkybox;
+
+		std::function<void(uint32_t, uint32_t)> ResizeFramebuffers;
+
+		struct RenderQueue
+		{
+			std::unordered_map<Ref<Material>, std::unordered_map<Ref<MaterialInstance>, std::queue<Mesh>>> MeshQueue;
+		} s_RenderQueue;
 	};
 
 	class Renderer
 	{
 	public:
-		virtual ~Renderer() = default;
-		static void Init(const WindowProps& props);
+		static void Init(const WindowProps& props, decltype(RendererAPI::None) api);
+		static void Shutdown();
 
-		static void RenderIndexed(const Camera& camera);
+		static void Submit(const std::function<void()>& renderPass);
+		static void DrawMesh(const Mesh& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform);
 
-		static void Submit(const Mesh& mesh, const Ref<MaterialInstance>& material, const glm::mat4& transform, bool isSelected = false);
-		static void Submit(const std::vector<Mesh>& meshes, const Ref<MaterialInstance>& material, const glm::mat4& transform, bool isSelected = false);
+		static decltype(RendererAPI::None) GetAPI() { return s_GraphicsAPI; }
+
+		static void BeginScene(const Camera& camera);
+		static void EndScene();
 
 		static void SetSkybox(CubemapTexture skybox);
 		static void ClearSkybox();
 
-		static void FlushRenderer();
-
-		static void SetRendererAPI(RendererAPI api) { s_RendererAPI = api; }
-		static RendererAPI GetRendererAPI() { return s_RendererAPI; }
-		
-		static void OnWindowResize(WindowResizeEvent& e);
-	protected:
-		virtual void BeginRender(const Camera& camera) = 0;
-		virtual void EndRender() = 0;
-
-		virtual void RenderObjectsIndexed() = 0;
-		virtual void RenderOutlinedObjectsIndexed() = 0;
-		virtual void RenderLightObjectsIndexed() = 0;
-		virtual void RenderSkybox() = 0;
-
-		virtual void FlushImpl() = 0;
-		virtual void SetSkyboxImpl(CubemapTexture skybox) = 0;
-		virtual void ClearSkyboxImpl() = 0;
-
-		virtual void ResizeFramebuffer(uint32_t width, uint32_t height) = 0;
-	protected:
-		std::vector<RenderData> m_LightObjectsQueue;
-		std::vector<RenderData> m_OutlinedObjectsQueue;
-		std::unordered_map<Ref<Material>, std::vector<RenderData>> m_RenderQueue;
-		std::unordered_set<uint64_t> m_ResidentTextureHandles;
+		static void Resize(uint32_t width, uint32_t height);
 	private:
-		static Renderer* s_Instance;
-		static RendererAPI s_RendererAPI;
+		static decltype(RendererAPI::None) s_GraphicsAPI;
+		static RendererAPI* s_Instance;
 	};
-
-	static Mesh BatchMeshes(const std::vector<Mesh>& meshes);
 }

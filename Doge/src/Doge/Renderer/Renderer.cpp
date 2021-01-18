@@ -8,13 +8,13 @@
 #include "Doge/Core/Window.h"
 #include "Doge/Utility/Mesh.h"
 #include "Doge/Utility/Camera.h"
-#include "Doge/Utility/Material.h"
 
 namespace Doge
 {
-	Renderer* Renderer::s_Instance = nullptr;
+	decltype(RendererAPI::None) Renderer::s_GraphicsAPI = RendererAPI::None;
+	RendererAPI* Renderer::s_Instance = nullptr;
 
-	void Renderer::Init(const WindowProps& props)
+	void Renderer::Init(const WindowProps& props, decltype(RendererAPI::None) api)
 	{
 		if (s_Instance)
 		{
@@ -22,7 +22,8 @@ namespace Doge
 			return;
 		}
 
-		switch (s_RendererAPI)
+		s_GraphicsAPI = api;
+		switch (api)
 		{
 			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); break;
 			case RendererAPI::OpenGL: s_Instance = new OpenGLRenderer(props); break;
@@ -31,55 +32,47 @@ namespace Doge
 		Log::Info("Renderer has initialized successfully!");
 	}
 
-	void Renderer::Submit(const Mesh& mesh, const Ref<MaterialInstance>& material, const glm::mat4& transform, bool isSelected)
+	void Renderer::Shutdown()
 	{
-		
+		if(s_Instance)
+			delete s_Instance;
 	}
 
-	void Renderer::Submit(const std::vector<Mesh>& meshes, const Ref<MaterialInstance>& material, const glm::mat4& transform, bool isSelected)
+	void Renderer::Submit(const std::function<void()>& renderPass)
 	{
-		Submit(Mesh::BatchMeshes(meshes), material, transform, isSelected);
+		s_Instance->RenderPasses.push_back(renderPass);
+	}
+
+	void Renderer::DrawMesh(const Mesh& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform)
+	{
+
+	}
+
+	void Renderer::BeginScene(const Camera& camera)
+	{
+		s_Instance->BeginScene(camera);
+	}
+
+	void Renderer::EndScene()
+	{
+		for (const auto& renderPass : s_Instance->RenderPasses)
+			renderPass();
+
+		s_Instance->EndScene();
 	}
 
 	void Renderer::SetSkybox(CubemapTexture skybox)
 	{
-		s_Instance->SetSkyboxImpl(skybox);
+		s_Instance->SetSkybox(skybox);
 	}
 
 	void Renderer::ClearSkybox()
 	{
-		s_Instance->ClearSkyboxImpl();
+		s_Instance->ClearSkybox();
 	}
 
-	void Renderer::FlushRenderer()
+	void Renderer::Resize(uint32_t width, uint32_t height)
 	{
-		s_Instance->FlushImpl();
-	}
-
-	void Renderer::RenderIndexed(const Camera& camera)
-	{
-		// Render in between Begin and End calls
-		s_Instance->BeginRender(camera);
-		{
-			// Render objects normally
-			s_Instance->RenderObjectsIndexed();
-
-			// Render objects in single color with vertices expanded along their normal
-			s_Instance->RenderOutlinedObjectsIndexed();
-
-			// Render Light objects in white color
-			// Make sure Lights are rendered right after Object Outlining
-			// So, We don't have to bind the same shader again
-			s_Instance->RenderLightObjectsIndexed();
-
-			// Render Skybox last for optimization
-			s_Instance->RenderSkybox();
-		}
-		s_Instance->EndRender();
-	}
-
-	void Renderer::OnWindowResize(WindowResizeEvent& e)
-	{
-		s_Instance->ResizeFramebuffer(e.GetWidth(), e.GetHeight());
+		s_Instance->ResizeFramebuffers(width, height);
 	}
 }
