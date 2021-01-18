@@ -1,15 +1,15 @@
 #type vertex
 #version 450 core
 
-layout(location = 0) in vec2  a_Position;
-layout(location = 1) in vec2  a_TexCoord;
-
-out vec2 v_TexCoord;
+layout(location = 0) out vec2 v_TexCoord;
 
 void main()
 {
-    v_TexCoord = a_TexCoord;
-    gl_Position = vec4(a_Position, 0.0, 1.0);
+    float x = -1.0 + float((gl_VertexID & 1) << 2);
+    float y = -1.0 + float((gl_VertexID & 2) << 1);
+
+    gl_Position = vec4(-1.0f + x*2.0f, -1.0f+y*2.0f, 0.0f, 1.0f);
+    v_TexCoord = vec2(x, y);
 }
 
 #type fragment
@@ -17,7 +17,7 @@ void main()
 
 layout(location = 0) out vec4 color;
 
-in vec2 v_TexCoord;
+layout(location = 0) in vec2 v_TexCoord;
 
 uniform sampler2D u_Texture;
 

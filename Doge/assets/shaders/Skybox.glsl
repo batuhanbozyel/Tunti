@@ -1,9 +1,7 @@
 #type vertex
 #version 450 core
 
-layout(location = 0) in vec3 a_Position;
-
-layout(std140, binding = 1) uniform ViewProjectionUniform
+layout(std140, binding = 0) uniform ViewProjectionUniform
 {
     mat4 u_View;
     mat4 u_Projection;
@@ -13,10 +11,12 @@ out vec3 v_TexCoord;
 
 void main()
 {
-    v_TexCoord = a_Position;
+    float x = -1.0 + float((gl_VertexID & 1) << 2);
+    float y = -1.0 + float((gl_VertexID & 2) << 1);
     mat4 view = mat4(mat3(u_View));
-    vec4 pos = u_Projection * view * vec4(a_Position, 1.0);
+    vec4 pos = u_Projection * view * vec4(-1.0f + x*2.0f, -1.0f+y*2.0f, 0.0f, 1.0);
     gl_Position = pos.xyww;
+    v_TexCoord = vec2(x, y);
 }
 
 #type fragment
