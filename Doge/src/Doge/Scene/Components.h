@@ -1,5 +1,9 @@
 #pragma once
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
 
 namespace Doge
 {
@@ -18,24 +22,62 @@ namespace Doge
 
 	struct TransformComponent
 	{
-		glm::mat4 Transform{ 1.0f };
+		glm::vec3 Translation = { 0.0f, 0.0f, 0.0f };
+		glm::vec3 Rotation = { 0.0f, 0.0f, 0.0f };
+		glm::vec3 Scale = { 1.0f, 1.0f, 1.0f };
 
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent&) = default;
-		TransformComponent(const glm::mat4& transform)
-			: Transform(transform) {}
+		TransformComponent(const glm::vec3 & translation)
+			: Translation(translation) {}
 
-		operator glm::mat4& () { return Transform; }
-		operator const glm::mat4& () const { return Transform; }
+		operator glm::mat4 () const
+		{
+			return glm::translate(glm::mat4(1.0f), Translation)
+				* glm::toMat4(glm::quat(Rotation))
+				* glm::scale(glm::mat4(1.0f), Scale);
+		}
 	};
 
 	struct MeshRendererComponent
 	{
-		MeshRendererData MeshData;
+		Mesh MeshData ;
 		Ref<MaterialInstance> MaterialInstanceRef;
 
-		MeshRendererComponent() = default;
-		MeshRendererComponent(const std::vector<Mesh>& meshes, const Ref<MaterialInstance>& materialInstance)
-			: MeshData(meshes), MaterialInstanceRef(materialInstance) {}
+		MeshRendererComponent(const Mesh& mesh, const Ref<MaterialInstance>& materialInstance)
+			: MeshData(mesh), MaterialInstanceRef(materialInstance) {}
+	};
+
+	struct CameraComponent
+	{
+		bool Primary = false;
+		Scope<Camera> SceneCamera;
+
+		operator const Camera* () const { return SceneCamera.get(); }
+	};
+
+	struct PointLightComponent
+	{
+		glm::vec3 Position;
+		glm::vec3 Color;
+
+		float Linear;
+		float Quadratic;
+	};
+
+	struct DirectionalLightComponent
+	{
+		/**
+		 * TODO:
+		 * 
+		 */
+	};
+
+	struct SpotLightComponent
+	{
+		/**
+		 * TODO:
+		 * 
+		 */
 	};
 }

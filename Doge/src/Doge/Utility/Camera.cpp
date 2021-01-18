@@ -30,9 +30,15 @@ namespace Doge
 	// Perspective Camera
 
 	PerspectiveCamera::PerspectiveCamera(float fov, float width, float height, const glm::vec3& position)
-		:
-		Camera(glm::perspective(glm::radians(fov), width / height, 0.01f, 100.0f), glm::lookAt(position, position + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f)), position),
-		m_Fov(fov),	m_Up(glm::vec3(0.0f, 1.0f, 0.0f)), m_Front(glm::vec3(0.0f, 0.0f, 1.0f)), m_AspectRatio(width / height)
+		: Camera(glm::perspective(
+			glm::radians(fov), width / height, 0.01f, 100.0f),
+			glm::lookAt(position, position + glm::vec3(0.0f, 0.0f, 1.0f),
+			glm::vec3(0.0f, 1.0f, 0.0f)),
+			position),
+		m_Fov(fov),
+		m_Up(glm::vec3(0.0f, 1.0f, 0.0f)),
+		m_Front(glm::vec3(0.0f, 0.0f, 1.0f)),
+		m_AspectRatio(width / height)
 	{
 
 	}
@@ -44,7 +50,9 @@ namespace Doge
 
 	void PerspectiveCamera::SetProjection(float width, float height)
 	{
-		if (height == 0.0f) height = 0.0001f;
+		if (height == 0.0f)
+			height = 0.0001f;
+
 		m_AspectRatio = width / height;
 		m_ProjectionMatrix = glm::perspective(glm::radians(m_Fov), m_AspectRatio, 0.01f, 100.0f);
 	}

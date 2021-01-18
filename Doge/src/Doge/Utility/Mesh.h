@@ -1,4 +1,5 @@
 #pragma once
+#include "Doge/Renderer/Buffer.h"
 
 namespace Doge
 {
@@ -35,6 +36,14 @@ namespace Doge
 
 		Vertex() = default;
 
+		Vertex& operator=(const Vertex& other)
+		{
+			Position = other.Position;
+			Normal   = other.Normal;
+			TexCoord = other.TexCoord;
+			TexIndex = other.TexIndex;
+		}
+
 		Vertex(const Vertex&& other)
 			: Position(std::move(other.Position)), Normal(std::move(other.Normal)), TexCoord(std::move(other.TexCoord)), TexIndex(std::move(TexIndex)) {}
 
@@ -46,60 +55,16 @@ namespace Doge
 	};
 #pragma pack(pop)
 
-	class Mesh
+	struct Mesh
 	{
-	public:
-		Mesh() = default;
-
-		Mesh(const Mesh&& other)
-			: m_Vertices(std::move(other.m_Vertices)), m_Indices(std::move(other.m_Indices)) {}
-
-		Mesh(const std::vector<Vertex>&& vertices, const std::vector<uint32_t>&& indices)
-			: m_Vertices(vertices), m_Indices(indices) {}
+		Buffer<BufferType::Vertex> VertexBuffer;
+		Buffer<BufferType::Index> IndexBuffer;
 
 		Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices)
-			: m_Vertices(vertices), m_Indices(indices) {}
-
-		static Mesh BatchMeshes(const std::vector<Mesh>& meshes)
+			: VertexBuffer(BufferManager::AllocateBuffer<BufferType::Vertex>(vertices.data(), sizeof(Vertex) * vertices.size())),
+			IndexBuffer(BufferManager::AllocateBuffer<BufferType::Index>(indices.data(), indices.size()))
 		{
-			if (meshes.size() == 1)
-				return Mesh(std::move(meshes[0]));
-
-			size_t vertexCount{ 0 };
-			size_t indexCount{ 0 };
-			for (const Mesh& mesh : meshes)
-			{
-				vertexCount += mesh.GetVertices().size();
-				indexCount += mesh.GetIndices().size();
-			}
-
-			uint32_t offset{ 0 };
-			std::vector<Vertex> vertices(vertexCount);
-			std::vector<uint32_t> indices(indexCount);
-			for (const Mesh& mesh : meshes)
-			{
-				auto& meshVertices = mesh.GetVertices();
-				std::move(meshVertices.begin(), meshVertices.end(), std::back_inserter(vertices));
-
-				auto& meshIndices = mesh.GetIndices();
-				std::for_each(meshIndices.begin(), meshIndices.end(), [&offset = std::as_const(offset)](uint32_t& indice)
-				{
-					indice += offset;
-				});
-				std::move(meshIndices.begin(), meshIndices.end(), std::back_inserter(indices));
-
-				offset += static_cast<uint32_t>(meshVertices.size());
-			}
-			return Mesh(std::move(vertices), std::move(indices));
+			
 		}
-
-		void SetVertices(const std::vector<Vertex>& vertices) { m_Vertices = vertices; }
-		void SetIndices(const std::vector<uint32_t>& indices) { m_Indices = indices; }
-
-		const std::vector<Vertex>& GetVertices() const { return m_Vertices; }
-		const std::vector<uint32_t>& GetIndices() const { return m_Indices; }
-	private:
-		std::vector<Vertex> m_Vertices;
-		std::vector<uint32_t> m_Indices;
 	};
 }

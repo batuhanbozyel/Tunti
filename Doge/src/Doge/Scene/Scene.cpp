@@ -14,12 +14,36 @@ namespace Doge
 
 	void Scene::OnUpdate()
 	{
-		auto group = m_Registry.group<TransformComponent>(entt::get<MeshRendererComponent>);
-		for (auto entity : group)
+		const Camera* mainCamera = nullptr;
+		glm::mat4 cameraTransform;
 		{
-			auto& [transform, meshRenderer] = group.get<TransformComponent, MeshRendererComponent>(entity);
+			auto group = m_Registry.group<TransformComponent, CameraComponent>();
+			for (auto entity : group)
+			{
+				auto [transform, camera] = group.get<TransformComponent, CameraComponent>(entity);
 
-			Renderer::Submit(meshRenderer.MeshData, meshRenderer.MaterialInstanceRef, transform);
+				if (camera.Primary)
+				{
+					mainCamera = camera;
+					cameraTransform = transform;
+					break;
+				}
+			}
+		}
+
+		if (mainCamera)
+		{
+			Renderer::BeginScene(*mainCamera);
+
+			auto group = m_Registry.group<MeshRendererComponent, TransformComponent>();
+			for (auto entity : group)
+			{
+				auto& [meshRenderer, transform] = group.get<MeshRendererComponent, TransformComponent>(entity);
+
+				Renderer::DrawMesh(meshRenderer.MeshData, meshRenderer.MaterialInstanceRef, transform);
+			}
+
+			Renderer::EndScene();
 		}
 	}
 }
