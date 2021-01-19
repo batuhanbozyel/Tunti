@@ -14,12 +14,13 @@ namespace Doge
 			s_Instance = this;
 			m_Running = true;
 			Log::Init();
+			m_Timer = CreateScope<Time>();
 
 			WindowProps windowProps(appName);
 			Window* window = new Window(windowProps, flag);
 			window->SetEventCallbackFn(BIND_EVENT_FN(OnEvent));
 			m_ActiveWindow.reset(window);
-			Renderer::Init(windowProps, RendererAPI::OpenGL);
+			Renderer::Init(RendererAPI::OpenGL);
 
 			SetCursorPos(m_ActiveWindow->GetWindowProps().Width / 2.0f, m_ActiveWindow->GetWindowProps().Height / 2.0f);
 
@@ -102,7 +103,6 @@ namespace Doge
 	bool Application::OnWindowResize(WindowResizeEvent& e)
 	{
 		m_ActiveWindow->OnWindowResize(e);
-		Renderer::Resize(e.GetWidth(), e.GetHeight());
 		return true;
 	}
 

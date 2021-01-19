@@ -39,6 +39,7 @@ namespace Doge
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
 	private:
+		Scope<Time> m_Timer;
 		Scope<Window> m_ActiveWindow;
 		LayerStack m_LayerStack;
 		bool m_Running = false;
