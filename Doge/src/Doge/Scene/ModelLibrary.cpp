@@ -2,7 +2,6 @@
 #include "ModelLibrary.h"
 
 #include "Doge/Utility/Material.h"
-#include "Doge/Renderer/Texture.h"
 #include "Doge/Utility/Mesh.h"
 
 namespace Doge
@@ -19,7 +18,7 @@ namespace Doge
 		aiProcess_OptimizeGraph |
 		aiProcess_FlipUVs;
 
-	const Ref<Model>& ModelLibrary::Load(const std::string& filePath)
+	Ref<Model> ModelLibrary::Load(const std::string& filePath)
 	{
 		const auto& modelCacheIt = s_ModelCache.find(filePath);
 
@@ -75,11 +74,14 @@ namespace Doge
 		// Process Material
 		if (mesh->mMaterialIndex >= 0)
 		{
-			std::vector<std::tuple<std::string, TextureType>> texturePaths;
+			std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)> texturePaths;
 			aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-			AddTexturePath(directory, texturePaths, material, aiTextureType_DIFFUSE, TextureType::Diffuse);
-			AddTexturePath(directory, texturePaths, material, aiTextureType_SPECULAR, TextureType::Specular);
+			AddTexturePath(directory, texturePaths, material, aiTextureType_BASE_COLOR, TextureType::Albedo);
+			AddTexturePath(directory, texturePaths, material, aiTextureType_NORMAL_CAMERA, TextureType::Normal);
+			AddTexturePath(directory, texturePaths, material, aiTextureType_METALNESS, TextureType::Metallic);
+			AddTexturePath(directory, texturePaths, material, aiTextureType_DIFFUSE_ROUGHNESS, TextureType::Roughness);
+			AddTexturePath(directory, texturePaths, material, aiTextureType_AMBIENT_OCCLUSION, TextureType::AmbientOcclusion);
 
 			index = TextureLibrary::LoadTextureMap(texturePaths);
 		}
@@ -121,14 +123,14 @@ namespace Doge
 	}
 
 	void ModelLibrary::AddTexturePath(const std::string& directory,
-		std::vector<std::tuple<std::string, TextureType>>& texturePaths,
+		std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)>& texturePaths,
 		aiMaterial* material, aiTextureType type, TextureType textureType)
 	{
 		if (material->GetTextureCount(type))
 		{
 			aiString path;
 			material->GetTexture(type, 0, &path);
-			texturePaths.push_back(std::make_pair((directory + path.C_Str()), textureType));
+			texturePaths[static_cast<uint16_t>(textureType)] = directory + path.C_Str();
 		}
 	}
 }

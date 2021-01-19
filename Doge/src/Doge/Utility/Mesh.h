@@ -1,5 +1,4 @@
 #pragma once
-#include "Doge/Renderer/Buffer.h"
 
 namespace Doge
 {
@@ -44,7 +43,7 @@ namespace Doge
 			TexIndex = other.TexIndex;
 		}
 
-		Vertex(const Vertex&& other)
+		Vertex(Vertex&& other) noexcept
 			: Position(std::move(other.Position)), Normal(std::move(other.Normal)), TexCoord(std::move(other.TexCoord)), TexIndex(std::move(TexIndex)) {}
 
 		Vertex(const glm::vec3& pos, const glm::vec3& normal, const glm::vec2& tex, uint32_t index = 0)
@@ -57,14 +56,23 @@ namespace Doge
 
 	struct Mesh
 	{
-		Buffer<BufferType::Vertex> VertexBuffer;
-		Buffer<BufferType::Index> IndexBuffer;
+		std::vector<glm::vec4> Position;
+		std::vector<glm::vec3> Normal;
+		std::vector<glm::vec2> TexCoord;
+		std::vector<uint32_t> TexIndex;
+
+		std::vector<uint32_t> Indices;
 
 		Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices)
-			: VertexBuffer(BufferManager::AllocateBuffer<BufferType::Vertex>(vertices.data(), sizeof(Vertex) * vertices.size())),
-			IndexBuffer(BufferManager::AllocateBuffer<BufferType::Index>(indices.data(), indices.size()))
+			: Indices(indices)
 		{
-			
+			for (const Vertex& vertex : vertices)
+			{
+				Position.push_back(vertex.Position);
+				Normal.push_back(vertex.Normal);
+				TexCoord.push_back(vertex.TexCoord);
+				TexIndex.push_back(vertex.TexIndex);
+			}
 		}
 	};
 }

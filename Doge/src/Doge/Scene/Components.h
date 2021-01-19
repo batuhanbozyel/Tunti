@@ -5,6 +5,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
+#include "Doge/Renderer/BufferManager.h"
+
 namespace Doge
 {
 	struct TagComponent
@@ -41,11 +43,12 @@ namespace Doge
 
 	struct MeshRendererComponent
 	{
-		Mesh MeshData ;
+		GraphicsBuffer MeshBuffer;
 		Ref<MaterialInstance> MaterialInstanceRef;
 
 		MeshRendererComponent(const Mesh& mesh, const Ref<MaterialInstance>& materialInstance)
-			: MeshData(mesh), MaterialInstanceRef(materialInstance) {}
+			: MeshBuffer(BufferManager::AllocateGraphicsBuffer(mesh, std::hash<Ref<MaterialInstance>>{}(materialInstance))),
+			MaterialInstanceRef(materialInstance) {}
 	};
 
 	struct CameraComponent

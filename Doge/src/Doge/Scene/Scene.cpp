@@ -40,7 +40,7 @@ namespace Doge
 			{
 				auto& [meshRenderer, transform] = group.get<MeshRendererComponent, TransformComponent>(entity);
 
-				Renderer::DrawMesh(meshRenderer.MeshData, meshRenderer.MaterialInstanceRef, transform);
+				Renderer::DrawMesh(meshRenderer.MeshBuffer, meshRenderer.MaterialInstanceRef, transform);
 			}
 
 			Renderer::EndScene();
