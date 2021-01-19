@@ -7,24 +7,12 @@
 
 namespace Doge
 {
-	Texture2D TextureLibrary::LoadTexture2D(const std::string& textureFile)
+	Texture2D TextureLibrary::LoadTextureMap(const std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)>& textureFiles)
 	{
 		switch (Renderer::GetAPI())
 		{
 			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return Texture2D();
-			case RendererAPI::OpenGL: return OpenGLTextureCache::GetInstance()->AddTexture2D(textureFile);
-		}
-
-		LOG_ASSERT(false, "RendererAPI initialization failed!");
-		return Texture2D();
-	}
-
-	Texture2D TextureLibrary::LoadTextureMap(const std::vector<std::tuple<std::string, TextureType>>& textureFiles)
-	{
-		switch (Renderer::GetAPI())
-		{
-			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return Texture2D();
-			case RendererAPI::OpenGL: return OpenGLTextureCache::GetInstance()->AddTexture2D(textureFiles);
+			case RendererAPI::OpenGL: return OpenGLTextureCache::GetInstance()->AddTextureMap(textureFiles);
 		}
 
 		LOG_ASSERT(false, "RendererAPI initialization failed!");

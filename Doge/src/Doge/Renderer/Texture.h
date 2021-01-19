@@ -3,12 +3,13 @@
 
 namespace Doge
 {
-	class TextureLibrary;
-
 	enum class TextureType : uint16_t
 	{
-		Diffuse,
-		Specular,
+		Albedo,
+		Normal,
+		Metallic,
+		Roughness,
+		AmbientOcclusion,
 		COUNT
 	};
 
@@ -45,9 +46,7 @@ namespace Doge
 	public:
 		static constexpr Texture2D DefaultTexture = Texture2D();
 	public:
-		static Texture2D LoadTexture2D(const std::string& textureFile);
-		static Texture2D LoadTextureMap(const std::vector<std::tuple<std::string, TextureType>>& textureFiles);
-
+		static Texture2D LoadTextureMap(const std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)>& textureFiles);
 		static CubemapTexture LoadCubemap(const std::string& folderPath,
 			const std::string& rightFace,
 			const std::string& leftFace,

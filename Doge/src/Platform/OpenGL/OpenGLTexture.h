@@ -33,10 +33,9 @@ namespace Doge
 	class OpenGLTextureCache final
 	{
 	public:
-		~OpenGLTextureCache() = default;
+		~OpenGLTextureCache();
 
-		Texture2D AddTexture2D(const std::string& textureFile);
-		Texture2D AddTexture2D(const std::vector<std::tuple<std::string, TextureType>>& textureFiles);
+		Texture2D AddTextureMap(const std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)>& textureFiles);
 		CubemapTexture AddCubemap(const std::array<std::string, 6>& cubemapTextures);
 
 		void Flush();
@@ -56,7 +55,7 @@ namespace Doge
 	private:
 		// Constructing with a default white texture
 		uint32_t m_TextureCount = 1;
-		Scope<OpenGLShaderStorageBuffer> m_SSBO;
+		GLuint m_TextureMapSSBO;
 
 		Scope<OpenGLTexture2D> m_DefaultTexture;
 		std::unordered_map<std::string, Scope<OpenGLTexture2D>> m_Textures;

@@ -1,6 +1,5 @@
 #include "pch.h"
 #include <glad/glad.h>
-#include "OpenGLBuffer.h"
 #include "OpenGLTexture.h"
 #include "Doge/Renderer/RendererBindingTable.h"
 
@@ -83,59 +82,45 @@ namespace Doge
 	OpenGLTextureCache::OpenGLTextureCache()
 	{
 		m_DefaultTexture = CreateScope<OpenGLTexture2D>();
-
-		m_SSBO = CreateScope<OpenGLShaderStorageBuffer>(SizeofTextureMap * MaxTextures);
-
-		// Create default white texture
-		m_SSBO->Bind(RendererBindingTable::TextureMapsShaderStorageBuffer);
-		m_SSBO->SetData(&m_DefaultTexture->m_TextureHandle, SizeofTextureMap * 0 + OffsetofTextureType(TextureType::Diffuse), sizeof(GLuint64));
-		m_SSBO->SetData(&m_DefaultTexture->m_TextureHandle, SizeofTextureMap * 0 + OffsetofTextureType(TextureType::Specular), sizeof(GLuint64));
+		glCreateBuffers(1, &m_TextureMapSSBO);
+		glNamedBufferStorage(m_TextureMapSSBO, SizeofTextureMap * MaxTextures, nullptr, GL_DYNAMIC_STORAGE_BIT);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, RendererBindingTable::TextureMapsShaderStorageBuffer, m_TextureMapSSBO);
 	}
 
-	Texture2D OpenGLTextureCache::AddTexture2D(const std::string& textureFile)
+	OpenGLTextureCache::~OpenGLTextureCache()
+	{
+		glDeleteBuffers(1, &m_TextureMapSSBO);
+	}
+
+	Texture2D OpenGLTextureCache::AddTextureMap(const std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)>& textureFiles)
 	{
 		Texture2D texture;
-		GLuint64 handle = 0;
-		const auto& textureIt = m_Textures.find(textureFile);
-
-		// if texture already exists
-		if (textureIt != m_Textures.end())
-			handle = textureIt->second->m_TextureHandle;
-		else
+		TextureType type = TextureType::Albedo;
+		for (const auto& textureFile : textureFiles)
 		{
-			stbi_set_flip_vertically_on_load(1);
-
-			TextureData data;
-			data.buffer = stbi_load(textureFile.c_str(), &data.width, &data.height, &data.channel, 4);
-			if (data.buffer)
+			if (textureFile.empty())
 			{
-				const auto& insertedPairIt = m_Textures.insert(m_Textures.end(), { textureFile, CreateScope<OpenGLTexture2D>(data) });
-				handle = insertedPairIt->second->m_TextureHandle;
-				stbi_image_free(data.buffer);
+				GLuint64 handle = 0;
+				glNamedBufferSubData(
+					m_TextureMapSSBO,
+					SizeofTextureMap * m_TextureCount + OffsetofTextureType(type),
+					sizeof(GLuint64),
+					&handle
+				);
+				uint16_t type_id = static_cast<uint16_t>(type);
+				type = static_cast<TextureType>(++type_id);
+				continue;
 			}
-		}
 
-		m_SSBO->SetData(&handle, SizeofTextureMap * m_TextureCount + OffsetofTextureType(TextureType::Diffuse), sizeof(GLuint64));
-		m_SSBO->SetData(&handle, SizeofTextureMap * m_TextureCount + OffsetofTextureType(TextureType::Specular), sizeof(GLuint64));
-
-		texture.Index = m_TextureCount++;
-		return texture;
-	}
-
-	Texture2D OpenGLTextureCache::AddTexture2D(const std::vector<std::tuple<std::string, TextureType>>& textureFiles)
-	{
-		Texture2D texture;
-
-		for (const auto& [textureFile, textureType] : textureFiles)
-		{
 			const auto& textureIt = m_Textures.find(textureFile);
-
 			// if texture already exists
 			if (textureIt != m_Textures.end())
-				m_SSBO->SetData(
-					&textureIt->second->m_TextureHandle,
-					SizeofTextureMap * m_TextureCount + OffsetofTextureType(textureType),
-					sizeof(GLuint64));
+				glNamedBufferSubData(
+					m_TextureMapSSBO,
+					SizeofTextureMap * m_TextureCount + OffsetofTextureType(type),
+					sizeof(GLuint64),
+					&textureIt->second->m_TextureHandle
+				);
 			else
 			{
 				stbi_set_flip_vertically_on_load(1);
@@ -151,15 +136,18 @@ namespace Doge
 				if (data.buffer)
 				{
 					const auto& insertedPairIt = m_Textures.insert(m_Textures.end(), { textureFile, CreateScope<OpenGLTexture2D>(data) });
-
-					m_SSBO->SetData(
-						&insertedPairIt->second->m_TextureHandle,
-						SizeofTextureMap * m_TextureCount + OffsetofTextureType(textureType),
-						sizeof(GLuint64));
+					glNamedBufferSubData(
+						m_TextureMapSSBO,
+						SizeofTextureMap * m_TextureCount + OffsetofTextureType(type),
+						sizeof(GLuint64),
+						&insertedPairIt->second->m_TextureHandle
+					);
 
 					stbi_image_free(data.buffer);
 				}
 			}
+			uint16_t type_id = static_cast<uint16_t>(type);
+			type = static_cast<TextureType>(++type_id);
 		}
 
 		texture.Index = m_TextureCount++;
@@ -216,15 +204,12 @@ namespace Doge
 
 	void OpenGLTextureCache::Flush()
 	{
-		// Clear
-		uint64_t handle = 0;
-		m_SSBO->SetData(
-			&handle,
-			static_cast<uint16_t>(TextureType::COUNT) * sizeof(GLuint64),
-			static_cast<uint16_t>(TextureType::COUNT) * sizeof(GLuint64) * (m_TextureCount - 1));
+		void* ssboPtr = glMapNamedBuffer(m_TextureMapSSBO, GL_WRITE_ONLY);
+		memset(ssboPtr, 0, static_cast<uint16_t>(TextureType::COUNT) * sizeof(GLuint64) * m_TextureCount);
+		glUnmapNamedBuffer(m_TextureMapSSBO);
 
 		m_Textures.clear();
 		m_Cubemaps.clear();
-		m_TextureCount = 1;
+		m_TextureCount = 0;
 	}
 }
