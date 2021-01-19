@@ -314,26 +314,26 @@ namespace Doge
 
 		// GBuffer Position Pass
 		glCreateTextures(GL_TEXTURE_2D, 1, &s_Data.GBuffer.PositionAttachment);
-		glBindTexture(GL_TEXTURE_2D, s_Data.GBuffer.PositionAttachment);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureStorage2D(s_Data.GBuffer.PositionAttachment, 1, GL_RGBA16F, width, height);
+		glTextureParameteri(s_Data.GBuffer.PositionAttachment, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTextureParameteri(s_Data.GBuffer.PositionAttachment, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
 		glNamedFramebufferTexture(s_Data.GBuffer.Framebuffer, GL_COLOR_ATTACHMENT0, s_Data.GBuffer.PositionAttachment, 0);
 
 		// GBuffer Normal Pass
 		glCreateTextures(GL_TEXTURE_2D, 1, &s_Data.GBuffer.NormalAttachment);
-		glBindTexture(GL_TEXTURE_2D, s_Data.GBuffer.NormalAttachment);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureStorage2D(s_Data.GBuffer.NormalAttachment, 1, GL_RGBA16F, width, height);
+		glTextureParameteri(s_Data.GBuffer.NormalAttachment, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTextureParameteri(s_Data.GBuffer.NormalAttachment, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
 		glNamedFramebufferTexture(s_Data.GBuffer.Framebuffer, GL_COLOR_ATTACHMENT1,	s_Data.GBuffer.NormalAttachment, 0);
 
 		// GBuffer Albedo - Specular Pass
 		glCreateTextures(GL_TEXTURE_2D, 1, &s_Data.GBuffer.AlbedoSpecularAttachment);
-		glBindTexture(GL_TEXTURE_2D, s_Data.GBuffer.AlbedoSpecularAttachment);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureStorage2D(s_Data.GBuffer.AlbedoSpecularAttachment, 1, GL_RGBA8, width, height);
+		glTextureParameteri(s_Data.GBuffer.AlbedoSpecularAttachment, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTextureParameteri(s_Data.GBuffer.AlbedoSpecularAttachment, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
 		glNamedFramebufferTexture(s_Data.GBuffer.Framebuffer, GL_COLOR_ATTACHMENT2,	s_Data.GBuffer.AlbedoSpecularAttachment, 0);
 
 		static const GLenum attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
