@@ -14,6 +14,7 @@
 
 // Utility
 #include "Doge/Utility/Mesh.h"
+#include "Doge/Utility/Light.h"
 #include "Doge/Utility/Material.h"
 
 // Scene

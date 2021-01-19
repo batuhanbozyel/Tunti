@@ -6,7 +6,7 @@ namespace Doge
 	class OpenGLRenderer final : public RendererAPI
 	{
 	public:
-		OpenGLRenderer(const WindowProps& props);
+		OpenGLRenderer();
 		~OpenGLRenderer();
 	private:
 		static void ConstructGBuffer(uint32_t width, uint32_t height);

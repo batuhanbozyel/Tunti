@@ -2,6 +2,7 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Renderer.h"
+#include "BufferManager.h"
 
 #include "Platform/OpenGL/OpenGLRenderer.h"
 
@@ -14,7 +15,7 @@ namespace Doge
 	decltype(RendererAPI::None) Renderer::s_GraphicsAPI = RendererAPI::None;
 	RendererAPI* Renderer::s_Instance = nullptr;
 
-	void Renderer::Init(const WindowProps& props, decltype(RendererAPI::None) api)
+	void Renderer::Init(decltype(RendererAPI::None) api)
 	{
 		if (s_Instance)
 		{
@@ -26,7 +27,7 @@ namespace Doge
 		switch (api)
 		{
 			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); break;
-			case RendererAPI::OpenGL: s_Instance = new OpenGLRenderer(props); break;
+			case RendererAPI::OpenGL: s_Instance = new OpenGLRenderer(); break;
 		}
 
 		Log::Info("Renderer has initialized successfully!");
@@ -43,22 +44,22 @@ namespace Doge
 		s_Instance->RenderPasses.push_back(renderPass);
 	}
 
-	void Renderer::DrawMesh(const Mesh& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform)
+	void Renderer::DrawMesh(const GraphicsBuffer& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform)
 	{
 
 	}
 
 	void Renderer::BeginScene(const Camera& camera)
 	{
-		s_Instance->BeginScene(camera);
+//		s_Instance->BeginScene(camera);
 	}
 
 	void Renderer::EndScene()
 	{
-		for (const auto& renderPass : s_Instance->RenderPasses)
-			renderPass();
-
-		s_Instance->EndScene();
+// 		for (const auto& renderPass : s_Instance->RenderPasses)
+// 			renderPass();
+// 
+// 		s_Instance->EndScene();
 	}
 
 	void Renderer::SetSkybox(CubemapTexture skybox)

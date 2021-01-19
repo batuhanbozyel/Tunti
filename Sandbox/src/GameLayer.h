@@ -12,6 +12,8 @@ namespace Sandbox
 		virtual void OnUpdate() override;
 		virtual void OnEvent(Doge::Event& e) override;
 	private:
+		void ConstructDummyScene();
+
 		bool OnKeyPress(Doge::KeyPressedEvent& e);
 		bool OnMouseButtonPress(Doge::MouseButtonPressedEvent& e);
 	private:

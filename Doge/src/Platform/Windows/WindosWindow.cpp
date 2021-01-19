@@ -40,6 +40,11 @@ namespace Doge
 		glfwSetWindowUserPointer(windowContext, &m_Props);
 		glfwSwapInterval(static_cast<int>(props.VSync));
 
+		glfwSetFramebufferSizeCallback(windowContext, [](GLFWwindow* window, int width, int height)
+		{
+			Renderer::Resize(width, height);
+		});
+
 		// KeyPressed, KeyReleased Events
 		glfwSetKeyCallback(windowContext, [](GLFWwindow* window, int key, int scancode, int action, int mods)
 		{

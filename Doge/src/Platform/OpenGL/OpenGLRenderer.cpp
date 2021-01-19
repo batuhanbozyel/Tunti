@@ -1,7 +1,6 @@
 #include "pch.h"
 #include <glad/glad.h>
 
-#include "OpenGLBuffer.h"
 #include "OpenGLShader.h"
 #include "OpenGLTexture.h"
 #include "OpenGLRenderer.h"
@@ -77,7 +76,7 @@ namespace Doge
 		const OpenGLShader* LastShaderState = nullptr;
 	} static s_Data;
 
-	OpenGLRenderer::OpenGLRenderer(const WindowProps& props)
+	OpenGLRenderer::OpenGLRenderer()
 	{
 		GLFWwindow* window = static_cast<GLFWwindow*>(Application::GetActiveWindow()->GetNativeWindow());
 		LOG_ASSERT(window, "Window could not found!");
@@ -120,9 +119,6 @@ namespace Doge
 				return;
 			}
 
-			s_Data.GBuffer.Width = width;
-			s_Data.GBuffer.Height = height;
-
 			ConstructGBuffer(width, height);
 		};
 
@@ -145,6 +141,13 @@ namespace Doge
 			glCullFace(GL_BACK);
 
 			s_Data.GeometryPassShader->Bind();
+
+/*
+// 			glDrawElementsBaseVertex(
+// 				GL_TRIANGLES,
+// 
+// 			)
+*/
 		});
 
 		// Lighting Pass
@@ -205,6 +208,7 @@ namespace Doge
 		glCreateVertexArrays(1, &s_Data.VertexArray);
 		glBindVertexArray(s_Data.VertexArray);
 
+		const WindowProps& props = Application::GetActiveWindow()->GetWindowProps();
 		ConstructGBuffer(props.Width, props.Height);
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -293,6 +297,9 @@ namespace Doge
 
 	void OpenGLRenderer::ConstructGBuffer(uint32_t width, uint32_t height)
 	{
+		s_Data.GBuffer.Width = width;
+		s_Data.GBuffer.Height = height;
+
 		if (s_Data.GBuffer.Framebuffer)
 		{
 			glDeleteFramebuffers(1, &s_Data.GBuffer.Framebuffer);
@@ -303,154 +310,44 @@ namespace Doge
 		}
 
 		glCreateFramebuffers(1, &s_Data.GBuffer.Framebuffer);
+		glBindFramebuffer(GL_FRAMEBUFFER, s_Data.GBuffer.Framebuffer);
 
 		// GBuffer Position Pass
 		glCreateTextures(GL_TEXTURE_2D, 1, &s_Data.GBuffer.PositionAttachment);
-		glTextureStorage2D(
-			s_Data.GBuffer.PositionAttachment,
-			1, GL_RGBA16F,
-			s_Data.GBuffer.Width,
-			s_Data.GBuffer.Height);
-		glTextureSubImage2D(
-			s_Data.GBuffer.PositionAttachment,
-			0, 0, 0,
-			s_Data.GBuffer.Width,
-			s_Data.GBuffer.Height,
-			GL_RGBA, GL_FLOAT, nullptr);
-		glNamedFramebufferTexture(
-			s_Data.GBuffer.Framebuffer,
-			GL_COLOR_ATTACHMENT0,
-			s_Data.GBuffer.PositionAttachment, 0);
+		glBindTexture(GL_TEXTURE_2D, s_Data.GBuffer.PositionAttachment);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glNamedFramebufferTexture(s_Data.GBuffer.Framebuffer, GL_COLOR_ATTACHMENT0, s_Data.GBuffer.PositionAttachment, 0);
 
 		// GBuffer Normal Pass
 		glCreateTextures(GL_TEXTURE_2D, 1, &s_Data.GBuffer.NormalAttachment);
-		glTextureStorage2D(
-			s_Data.GBuffer.NormalAttachment,
-			1, GL_RGBA16F,
-			s_Data.GBuffer.Width,
-			s_Data.GBuffer.Height);
-		glTextureSubImage2D(
-			s_Data.GBuffer.NormalAttachment,
-			0, 0, 0,
-			s_Data.GBuffer.Width,
-			s_Data.GBuffer.Height,
-			GL_RGBA, GL_FLOAT, nullptr);
-		glNamedFramebufferTexture(
-			s_Data.GBuffer.Framebuffer,
-			GL_COLOR_ATTACHMENT1,
-			s_Data.GBuffer.NormalAttachment, 0);
+		glBindTexture(GL_TEXTURE_2D, s_Data.GBuffer.NormalAttachment);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glNamedFramebufferTexture(s_Data.GBuffer.Framebuffer, GL_COLOR_ATTACHMENT1,	s_Data.GBuffer.NormalAttachment, 0);
 
 		// GBuffer Albedo - Specular Pass
 		glCreateTextures(GL_TEXTURE_2D, 1, &s_Data.GBuffer.AlbedoSpecularAttachment);
-		glTextureStorage2D(
-			s_Data.GBuffer.AlbedoSpecularAttachment,
-			1, GL_RGBA,
-			s_Data.GBuffer.Width,
-			s_Data.GBuffer.Height);
-		glTextureSubImage2D(
-			s_Data.GBuffer.AlbedoSpecularAttachment,
-			0, 0, 0,
-			s_Data.GBuffer.Width,
-			s_Data.GBuffer.Height,
-			GL_RGBA, GL_FLOAT, nullptr);
-		glNamedFramebufferTexture(
-			s_Data.GBuffer.Framebuffer,
-			GL_COLOR_ATTACHMENT2,
-			s_Data.GBuffer.AlbedoSpecularAttachment, 0);
+		glBindTexture(GL_TEXTURE_2D, s_Data.GBuffer.AlbedoSpecularAttachment);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glNamedFramebufferTexture(s_Data.GBuffer.Framebuffer, GL_COLOR_ATTACHMENT2,	s_Data.GBuffer.AlbedoSpecularAttachment, 0);
 
 		static const GLenum attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
 		glNamedFramebufferDrawBuffers(s_Data.GBuffer.Framebuffer, 3, attachments);
 
 		glCreateRenderbuffers(1, &s_Data.GBuffer.DepthAttachment);
-		glNamedRenderbufferStorage(
-			s_Data.GBuffer.DepthAttachment,
-			GL_DEPTH24_STENCIL8,
-			s_Data.GBuffer.Width,
-			s_Data.GBuffer.Height);
+		glNamedRenderbufferStorage(s_Data.GBuffer.DepthAttachment, GL_DEPTH_COMPONENT, width, height);
+		glNamedFramebufferRenderbuffer(s_Data.GBuffer.Framebuffer, GL_DEPTH_ATTACHMENT,	GL_RENDERBUFFER, s_Data.GBuffer.DepthAttachment);
 
-		glNamedFramebufferRenderbuffer(
-			s_Data.GBuffer.Framebuffer,
-			GL_DEPTH_STENCIL_ATTACHMENT,
-			GL_RENDERBUFFER,
-			s_Data.GBuffer.DepthAttachment);
+		LOG_ASSERT(glCheckNamedFramebufferStatus(s_Data.GBuffer.Framebuffer, GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer does not meet the requirements!");
 
-		LOG_ASSERT(glCheckNamedFramebufferStatus(GL_FRAMEBUFFER, s_Data.GBuffer.Framebuffer) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer does not meet the requirements!");
-
+		glBindTextureUnit(RendererBindingTable::GBufferPositionTextureUnit, s_Data.GBuffer.PositionAttachment);
+		glBindTextureUnit(RendererBindingTable::GBufferNormalTextureUnit, s_Data.GBuffer.NormalAttachment);
+		glBindTextureUnit(RendererBindingTable::GBufferAlbedoSpecularTextureUnit, s_Data.GBuffer.AlbedoSpecularAttachment);
 		glViewport(0, 0, s_Data.GBuffer.Width, s_Data.GBuffer.Height);
-
-		glBindTextureUnit(s_Data.GBuffer.PositionAttachment, RendererBindingTable::GBufferPositionTextureUnit);
-		glBindTextureUnit(s_Data.GBuffer.NormalAttachment, RendererBindingTable::GBufferNormalTextureUnit);
-		glBindTextureUnit(s_Data.GBuffer.AlbedoSpecularAttachment, RendererBindingTable::GBufferAlbedoSpecularTextureUnit);
 	}
-
-
-#if 0
-	void OpenGLRenderer::RenderIndexed()
-	{
-		glCullFace(GL_BACK);
-
-		for (const auto& [shader, materialLayer] : m_RenderQueue)
-		{
-			const OpenGLShader& materialShader = (*OpenGLShaderCache::GetInstance())[shader];
-			if (s_Data.m_LastShaderState == nullptr || *s_Data.m_LastShaderState != materialShader)
-			{
-				materialShader.Bind();
-				s_Data.m_LastShaderState = &materialShader;
-			}
-
-			for (const auto& [material, materialInstanceLayer] : materialLayer)
-			{
-				SetCommonUniformProperties(material);
-
-				for (const auto& [materialInstance, renderable] : materialInstanceLayer)
-				{
-					const OpenGLBufferManager* bufferManager = OpenGLBufferManager::GetInstance();
-					const OpenGLVertexBuffer& vertexBuffer = (*bufferManager)[renderable.VertexBuffer];
-					const OpenGLIndexBuffer& indexBuffer = (*bufferManager)[renderable.IndexBuffer];
-					const OpenGLUniformBuffer& uniformBuffer = (*bufferManager)[renderable.UniformBuffer];
-
-					s_Data.m_MainVertexArray->BindVertexBuffer(vertexBuffer, 0);
-					s_Data.m_MainVertexArray->BindIndexBuffer(indexBuffer);
-					uniformBuffer.Bind(RendererBindingTable::TransformMatrixUniformBuffer);
-
-					SetUniqueUniformProperties(materialInstance);
-
-					glMultiDrawElementsBaseVertex(GL_TRIANGLES,
-						renderable.ElementCounts.data(),
-						GL_UNSIGNED_SHORT,
-						nullptr,
-						renderable.ElementCounts.size(),
-						renderable.VertexOffsets.data()); // this may require the first index to be 0
-				}
-			}
-		}
-	}
-
-	void OpenGLRenderer::RenderOutlinedObjectsIndexed()
-	{
-		glCullFace(GL_FRONT);
-
-		s_Data.m_ObjectOutliningShader->Bind();
-		s_Data.m_ObjectOutliningShader->SetUniformFloat3("u_OutlineColor", { 0.8f, 0.5f, 0.2f });
-
-		for (auto renderData : m_OutlinedObjectsQueue)
-		{
-			renderData.Transform = glm::scale(renderData.Transform, glm::vec3(1.03f));
-			s_Data.m_ObjectOutliningShader->SetUniformMat4("u_Model", renderData.Transform);
-			//DrawIndexed(renderData);
-		}
-	}
-
-	void OpenGLRenderer::RenderLightObjectsIndexed()
-	{
-		s_Data.m_ObjectOutliningShader->SetUniformFloat3("u_OutlineColor", { 1.0f, 1.0f, 1.0f });
-		s_Data.m_ObjectOutliningShader->SetUniformMat4("u_Model", m_PointLight->Transform);
-		//DrawIndexed(*m_PointLight);
-	}
-
-	void OpenGLRenderer::RenderSkybox()
-	{
-		
-	}
-#endif
 }

@@ -6,6 +6,7 @@ namespace Doge
 	struct Shader;
 	struct WindowProps;
 	struct CubemapTexture;
+	struct GraphicsBuffer;
 
 	class Camera;
 	class Material;
@@ -40,11 +41,11 @@ namespace Doge
 	class Renderer
 	{
 	public:
-		static void Init(const WindowProps& props, decltype(RendererAPI::None) api);
+		static void Init(decltype(RendererAPI::None) api);
 		static void Shutdown();
 
 		static void Submit(const std::function<void()>& renderPass);
-		static void DrawMesh(const Mesh& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform);
+		static void DrawMesh(const GraphicsBuffer& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform);
 
 		static decltype(RendererAPI::None) GetAPI() { return s_GraphicsAPI; }
 
