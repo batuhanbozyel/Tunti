@@ -86,6 +86,17 @@ namespace Doge
 		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		LOG_ASSERT(status, "Glad initialization failed");
 
+		glfwSetFramebufferSizeCallback(window, [](GLFWwindow*, int width, int height)
+		{
+			if (width == 0 || height == 0 || (s_Data.GBuffer.Width == width && s_Data.GBuffer.Height == height))
+			{
+				Log::Warn("Attempted to rezize framebuffer to {0}, {1}", width, height);
+				return;
+			}
+
+			ConstructGBuffer(width, height);
+		});
+
 #ifdef DEBUG_ENABLED
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -110,18 +121,7 @@ namespace Doge
 		s_Data.LightingPassShader->SetUniformInt("u_PositionAttachment", RendererBindingTable::GBufferPositionTextureUnit);
 		s_Data.LightingPassShader->SetUniformInt("u_NormalAttachment", RendererBindingTable::GBufferNormalTextureUnit);
 		s_Data.LightingPassShader->SetUniformInt("u_AlbedoSpecularAttachment", RendererBindingTable::GBufferAlbedoSpecularTextureUnit);
-
-		ResizeFramebuffers = [&](uint32_t width, uint32_t height)
-		{
-			if (width == 0 || height == 0 || (s_Data.GBuffer.Width == width && s_Data.GBuffer.Height == height))
-			{
-				Log::Warn("Attempted to rezize framebuffer to {0}, {1}", width, height);
-				return;
-			}
-
-			ConstructGBuffer(width, height);
-		};
-
+		
 		BeginScene = [&](const Camera& camera)
 		{
 			// Update Uniform Buffers' contents

@@ -71,9 +71,4 @@ namespace Doge
 	{
 		s_Instance->ClearSkybox();
 	}
-
-	void Renderer::Resize(uint32_t width, uint32_t height)
-	{
-		s_Instance->ResizeFramebuffers(width, height);
-	}
 }

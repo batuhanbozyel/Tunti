@@ -30,8 +30,6 @@ namespace Doge
 		std::function<void(CubemapTexture skybox)> SetSkybox;
 		std::function<void()> ClearSkybox;
 
-		std::function<void(uint32_t, uint32_t)> ResizeFramebuffers;
-
 		struct RenderQueue
 		{
 			std::unordered_map<Ref<Material>, std::unordered_map<Ref<MaterialInstance>, std::queue<Mesh>>> MeshQueue;
@@ -54,8 +52,6 @@ namespace Doge
 
 		static void SetSkybox(CubemapTexture skybox);
 		static void ClearSkybox();
-
-		static void Resize(uint32_t width, uint32_t height);
 	private:
 		static decltype(RendererAPI::None) s_GraphicsAPI;
 		static RendererAPI* s_Instance;
