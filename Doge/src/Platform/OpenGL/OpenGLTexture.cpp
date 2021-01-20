@@ -83,6 +83,7 @@ namespace Doge
 		glCreateBuffers(1, &m_TextureMapSSBO);
 		glNamedBufferStorage(m_TextureMapSSBO, SizeofTextureMap * MaxTextures, nullptr, GL_DYNAMIC_STORAGE_BIT);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, RendererBindingTable::TextureMapsShaderStorageBuffer, m_TextureMapSSBO);
+		glNamedBufferSubData(m_TextureMapSSBO, 0, static_cast<uint16_t>(TextureType::COUNT) * sizeof(GLuint64), &m_DefaultTexture->m_TextureHandle);
 	}
 
 	OpenGLTextureCache::~OpenGLTextureCache()
@@ -202,9 +203,12 @@ namespace Doge
 
 	void OpenGLTextureCache::Flush()
 	{
-		void* ssboPtr = glMapNamedBuffer(m_TextureMapSSBO, GL_WRITE_ONLY);
-		memset(ssboPtr, 0, static_cast<uint16_t>(TextureType::COUNT) * sizeof(GLuint64) * m_TextureCount);
-		glUnmapNamedBuffer(m_TextureMapSSBO);
+		GLuint64 zero = 0;
+		glNamedBufferSubData(
+			m_TextureMapSSBO,
+			static_cast<uint16_t>(TextureType::COUNT) * sizeof(GLuint64),
+			(static_cast<uint16_t>(TextureType::COUNT) - 1) * sizeof(GLuint64) * m_TextureCount,
+			&zero);
 
 		m_Textures.clear();
 		m_Cubemaps.clear();

@@ -66,7 +66,7 @@ namespace Doge
 		GeometryBuffer GBuffer;
 
 		GLuint ViewProjectionUniformBuffer;
-		GLuint TransformMatrixUniformBuffer;
+		GLuint LightsUniformBuffer;
 
 		Ref<OpenGLShader> GeometryPassShader;
 		Ref<OpenGLShader> LightingPassShader;
@@ -166,10 +166,16 @@ namespace Doge
 		});
 
 		// Lighting Pass
-		RenderPasses.push_back([]()
+		RenderPasses.push_back([&]()
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			void* lightBuffPtr = glMapNamedBuffer(s_Data.LightsUniformBuffer, GL_WRITE_ONLY);
+			memcpy(lightBuffPtr, LightQueue.data(), LightQueue.size() * sizeof(Light));
+			lightBuffPtr = ((Light*)lightBuffPtr) + LightQueue.size();
+			*(int*)lightBuffPtr = LightQueue.size();
+			glUnmapNamedBuffer(s_Data.LightsUniformBuffer);
 
 			s_Data.LightingPassShader->Bind();
 
@@ -206,8 +212,8 @@ namespace Doge
 		{
 			if (!s_Data.SkyboxShader)
 			{
-				Shader skyboxShaderHandle = ShaderLibrary::LoadShader(OpenGLRendererShaders::Skybox);
-				s_Data.SkyboxShader = (*OpenGLShaderCache::GetInstance())[skyboxShaderHandle];
+				OpenGLShaderCache* shaderCache = OpenGLShaderCache::GetInstance();
+				s_Data.SkyboxShader = shaderCache->LoadShader(OpenGLRendererShaders::Skybox);
 			}
 
 			glBindTextureUnit(RendererBindingTable::SkyboxTextureUnit, skybox);
@@ -222,6 +228,14 @@ namespace Doge
 
 		glCreateVertexArrays(1, &s_Data.VertexArray);
 		glBindVertexArray(s_Data.VertexArray);
+
+		glCreateBuffers(1, &s_Data.LightsUniformBuffer);
+		glNamedBufferStorage(s_Data.LightsUniformBuffer, sizeof(Light)* Light::MaxLightsPerType, nullptr, GL_DYNAMIC_STORAGE_BIT);
+		glBindBufferBase(GL_UNIFORM_BUFFER, RendererBindingTable::LightsUniformBuffer, s_Data.LightsUniformBuffer);
+
+		glCreateBuffers(1, &s_Data.ViewProjectionUniformBuffer);
+		glNamedBufferStorage(s_Data.ViewProjectionUniformBuffer, 2 * sizeof(glm::mat4) + sizeof(glm::vec3), nullptr, GL_DYNAMIC_STORAGE_BIT);
+		glBindBufferBase(GL_UNIFORM_BUFFER, RendererBindingTable::ViewProjectionUniformBuffer, s_Data.ViewProjectionUniformBuffer);
 
 		const WindowProps& props = Application::GetActiveWindow()->GetWindowProps();
 		ConstructGBuffer(props.Width, props.Height);
@@ -238,6 +252,8 @@ namespace Doge
 		glDeleteRenderbuffers(1, &s_Data.GBuffer.DepthAttachment);
 
 		glDeleteVertexArrays(1, &s_Data.VertexArray);
+		glDeleteBuffers(1, &s_Data.LightsUniformBuffer);
+		glDeleteBuffers(1, &s_Data.ViewProjectionUniformBuffer);
 	}
 
 	void OpenGLRenderer::SetCommonUniformProperties(const Ref<Material>& material)
