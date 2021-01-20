@@ -315,8 +315,6 @@ namespace Doge
 
 	// OpenGLShaderCache
 
-	OpenGLShaderCache* OpenGLShaderCache::s_Instance = nullptr;
-
 	Shader OpenGLShaderCache::LoadShader(const std::string& filePath, const std::string& source)
 	{
 		Shader shader;

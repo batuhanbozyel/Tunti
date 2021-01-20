@@ -5,8 +5,6 @@
 
 namespace Doge
 {
-	Application* Application::s_Instance = nullptr;
-
 	Application::Application(const std::string& appName, const WindowFlag& flag)
 	{
 		if (!s_Instance)

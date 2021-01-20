@@ -6,8 +6,6 @@
 
 namespace Doge
 {
-	std::unordered_map<std::string, Ref<Model>> ModelLibrary::s_ModelCache;
-
 	static constexpr unsigned int assimpFlags =
 		aiProcess_Triangulate |
 		aiProcess_JoinIdenticalVertices |

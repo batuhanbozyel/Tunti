@@ -61,6 +61,6 @@ namespace Doge
 		std::unordered_map<std::string, Scope<OpenGLTexture2D>> m_Textures;
 		std::unordered_map<std::string, Scope<OpenGLCubemapTexture>> m_Cubemaps;
 
-		static OpenGLTextureCache* s_Instance;
+		static inline OpenGLTextureCache* s_Instance = nullptr;
 	};
 }

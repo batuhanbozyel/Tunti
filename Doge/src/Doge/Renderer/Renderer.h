@@ -30,16 +30,8 @@ namespace Doge
 		std::function<void(CubemapTexture skybox)> SetSkybox;
 		std::function<void()> ClearSkybox;
 
-		struct RenderQueue
-		{
-			std::vector<Light> LightQueue;
-
-			// MeshQueue
-			std::unordered_map<Ref<Material>,
-			std::unordered_map<Ref<MaterialInstance>,
-				std::vector<std::tuple<GraphicsBuffer, glm::mat4>>>> MeshQueue;
-
-		} s_RenderQueue;
+		std::vector<Light> LightQueue;
+		std::unordered_map<Ref<Material>, std::unordered_map<Ref<MaterialInstance>, std::vector<std::tuple<MeshData, glm::mat4>>>> MeshQueue;
 	};
 
 	class Renderer final
@@ -49,7 +41,7 @@ namespace Doge
 		static void Shutdown();
 
 		static void Submit(const std::function<void()>& renderPass);
-		static void DrawMesh(const GraphicsBuffer& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform);
+		static void DrawMesh(const MeshData& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform);
 
 		static decltype(RendererAPI::None) GetAPI() { return s_GraphicsAPI; }
 
@@ -59,7 +51,7 @@ namespace Doge
 		static void SetSkybox(CubemapTexture skybox);
 		static void ClearSkybox();
 	private:
-		static decltype(RendererAPI::None) s_GraphicsAPI;
-		static RendererAPI* s_Instance;
+		static inline decltype(RendererAPI::None) s_GraphicsAPI = RendererAPI::None;
+		static inline RendererAPI* s_Instance = nullptr;
 	};
 }

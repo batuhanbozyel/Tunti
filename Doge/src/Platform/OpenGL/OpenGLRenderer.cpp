@@ -4,6 +4,7 @@
 #include "OpenGLShader.h"
 #include "OpenGLTexture.h"
 #include "OpenGLRenderer.h"
+#include "OpenGLBufferManager.h"
 
 #include "Doge/Core/Window.h"
 #include "Doge/Core/Application.h"
@@ -141,21 +142,19 @@ namespace Doge
 			glCullFace(GL_BACK);
 
 			s_Data.GeometryPassShader->Bind();
-			for (const auto& [material, materialInstanceMap] : s_RenderQueue.MeshQueue)
+			for (const auto& [material, materialInstanceMap] : MeshQueue)
 			{
 				SetCommonUniformProperties(material);
-				for (const auto& [materialInstance, meshQueue] : materialInstanceMap)
+				for (const auto& [materialInstance, meshArray] : materialInstanceMap)
 				{
 					SetUniqueUniformProperties(materialInstance);
-					if (meshQueue.size())
-					{
-						const auto& [baseMesh, baseTransform] = meshQueue[0];
-						glBindBufferBase(GL_SHADER_STORAGE_BUFFER, RendererBindingTable::VertexBufferShaderStorageBuffer, *baseMesh.VertexBuffer);
-						glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *baseMesh.IndexBuffer);
-						s_Data.GeometryPassShader->SetUniformInt("u_PrimitiveCount", meshQueue.size());
-					}
+					const OpenGLGraphicsBuffer& buffer = (*OpenGLBufferManager::GetInstance())[std::hash<Ref<MaterialInstance>>{}(materialInstance)];
+					glBindBufferBase(GL_SHADER_STORAGE_BUFFER, RendererBindingTable::VertexBufferShaderStorageBuffer, buffer.VertexBuffer);
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.IndexBuffer);
+					s_Data.GeometryPassShader->SetUniformInt("u_PrimitiveCount", buffer.VertexSize);
+
 					int id = 0;
-					for (const auto& [mesh, transform] : meshQueue)
+					for (const auto& [mesh, transform] : meshArray)
 					{
 						s_Data.GeometryPassShader->SetUniformMat4("u_Model", transform);
 						s_Data.GeometryPassShader->SetUniformInt("u_PrimitiveID", id);

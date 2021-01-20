@@ -28,6 +28,6 @@ namespace Doge
 			std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)>& texturePaths,
 			aiMaterial* material, aiTextureType type, TextureType textureType);
 	private:
-		static std::unordered_map<std::string, Ref<Model>> s_ModelCache;
+		static inline std::unordered_map<std::string, Ref<Model>> s_ModelCache;
 	};
 }

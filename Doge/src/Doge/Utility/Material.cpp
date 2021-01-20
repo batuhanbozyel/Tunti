@@ -5,12 +5,9 @@
 
 namespace Doge
 {
-	uint32_t Material::s_MaterialCount = 0;
-
 	// Material
 
 	Material::Material(const Shader& shader)
-		: ShaderHandle(shader), MaterialIndex(s_MaterialCount)
 	{
 		const auto& uniforms = ShaderLibrary::GetMaterialInfo(shader);
 		for (const auto& [name, uniform] : uniforms)
@@ -39,8 +36,6 @@ namespace Doge
 				}	
 			}
 		}
-			
-		s_MaterialCount++;
 	}
 
 	template<typename T>
@@ -66,7 +61,7 @@ namespace Doge
 	// MaterialInstance
 
 	MaterialInstance::MaterialInstance(const Ref<Material>& parentMaterial, uint32_t index)
-		: m_ParentMaterial(parentMaterial), MaterialInstanceIndex(index)
+		: m_ParentMaterial(parentMaterial)
 	{
 
 	}

@@ -10,16 +10,16 @@
 namespace Doge
 {
 
-	GraphicsBuffer BufferManager::AllocateGraphicsBuffer(const Mesh& mesh, size_t key)
+	MeshData BufferManager::AllocateGraphicsBuffer(const Mesh& mesh, size_t key)
 	{
 		switch (Renderer::GetAPI())
 		{
-			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return GraphicsBuffer();
+			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return MeshData();
 			case RendererAPI::OpenGL: return OpenGLBufferManager::GetInstance()->AllocateGraphicsBuffer(mesh, key);
 		}
 
 		LOG_ASSERT(false, "RendererAPI is not specified!");
-		return GraphicsBuffer();
+		return MeshData();
 	}
 
 }

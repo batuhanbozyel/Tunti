@@ -11,8 +11,6 @@
 namespace Doge
 {
 #ifdef PLATFORM_WINDOWS
-	uint8_t Window::s_WindowCount = 0;
-
 	static void GLFWErrorCallback(int error, const char* description)
 	{
 		Log::Error("Error: {0}", description);

@@ -4,18 +4,15 @@ namespace Doge
 {
 	struct Mesh;
 
-	struct GraphicsBuffer
+	struct MeshData
 	{
-		uint64_t* VertexBuffer = nullptr;
 		uint32_t BaseVertex = 0;
-
-		uint64_t* IndexBuffer = nullptr;
 		uint32_t Count = 0;
 	};
 	
 	class BufferManager
 	{
 	public:
-		static GraphicsBuffer AllocateGraphicsBuffer(const Mesh& mesh, size_t key);
+		static MeshData AllocateGraphicsBuffer(const Mesh& mesh, size_t key);
 	};
 }

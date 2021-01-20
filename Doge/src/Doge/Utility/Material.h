@@ -8,11 +8,8 @@ namespace Doge
 
 	using MaterialProperty = std::variant<float, glm::vec2, glm::vec3, glm::vec4>;
 
-	class Material
+	class Material final
 	{
-	public:
-		const uint32_t MaterialIndex;
-		const Shader ShaderHandle;
 	public:
 		explicit Material(const Shader& shader);
 
@@ -25,15 +22,10 @@ namespace Doge
 	private:
 		std::unordered_map<std::string, MaterialProperty> m_Properties;
 		std::vector<Ref<MaterialInstance>> m_ChildInstances;
-		
-	private:
-		static uint32_t s_MaterialCount;
 	};
 
-	class MaterialInstance
+	class MaterialInstance final
 	{
-	public:
-		const uint32_t MaterialInstanceIndex;
 	public:
 		explicit MaterialInstance(const Ref<Material>& parentMaterial, uint32_t index);
 

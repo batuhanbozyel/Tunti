@@ -5,8 +5,8 @@ namespace Doge
 {
 	struct OpenGLGraphicsBuffer
 	{
-		GLuint* VertexBuffer;
-		GLuint* IndexBuffer;
+		GLuint VertexBuffer;
+		GLuint IndexBuffer;
 		uint32_t VertexSize = 0;
 		uint32_t IndexCount = 0;
 	};
@@ -16,7 +16,7 @@ namespace Doge
 	public:
 		~OpenGLBufferManager() = default;
 
-		GraphicsBuffer AllocateGraphicsBuffer(const Mesh& mesh, size_t key);
+		MeshData AllocateGraphicsBuffer(const Mesh& mesh, size_t key);
 
 		void Flush();
 
@@ -28,6 +28,13 @@ namespace Doge
 			return s_Instance;
 		}
 
+		const OpenGLGraphicsBuffer& operator[](size_t key) const
+		{
+			const auto& cacheIt = m_GraphicBuffersCache.find(key);
+			LOG_ASSERT(cacheIt != m_GraphicBuffersCache.end(), "Buffer does not exist in the cache");
+			return cacheIt->second;
+		}
+
 		OpenGLBufferManager(const OpenGLBufferManager& other) = delete;
 		OpenGLBufferManager& operator=(const OpenGLBufferManager& other) = delete;
 	private:
@@ -35,6 +42,6 @@ namespace Doge
 	private:
 		std::unordered_map<size_t, OpenGLGraphicsBuffer> m_GraphicBuffersCache;
 
-		static OpenGLBufferManager* s_Instance;
+		static inline OpenGLBufferManager* s_Instance = nullptr;
 	};
 }

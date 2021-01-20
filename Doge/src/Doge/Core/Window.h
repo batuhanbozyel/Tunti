@@ -47,17 +47,17 @@ namespace Doge
 		void ShowCursor();
 		void SetCursorPos(float x, float y);
 
-		inline void SetEventCallbackFn(std::function<void(Event&)> callback) { m_Props.EventCallback = callback; }
-		inline bool VSync() const { return m_Props.VSync; }
+		void SetEventCallbackFn(std::function<void(Event&)> callback) { m_Props.EventCallback = callback; }
+		bool VSync() const { return m_Props.VSync; }
 
-		inline void* GetNativeWindow() const { return m_Window; }
-		inline const WindowProps& GetWindowProps() const { return m_Props; }
+		void* GetNativeWindow() const { return m_Window; }
+		const WindowProps& GetWindowProps() const { return m_Props; }
 	private:
 		void* CreateNativeWindow(const WindowFlag& flag);
 	private:
 		WindowProps m_Props;
 		void* m_Window;
 
-		static uint8_t s_WindowCount;
+		static inline uint8_t s_WindowCount = 0;
 	};
 }

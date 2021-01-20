@@ -12,9 +12,6 @@
 
 namespace Doge
 {
-	decltype(RendererAPI::None) Renderer::s_GraphicsAPI = RendererAPI::None;
-	RendererAPI* Renderer::s_Instance = nullptr;
-
 	void Renderer::Init(decltype(RendererAPI::None) api)
 	{
 		if (s_Instance)
@@ -44,9 +41,9 @@ namespace Doge
 		s_Instance->RenderPasses.push_back(renderPass);
 	}
 
-	void Renderer::DrawMesh(const GraphicsBuffer& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform)
+	void Renderer::DrawMesh(const MeshData& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform)
 	{
-		auto& meshQueue = s_Instance->s_RenderQueue.MeshQueue;
+		auto& meshQueue = s_Instance->MeshQueue;
 		const Ref<Material>& material = materialInstance->GetParentMaterial();
 
 		((meshQueue[material])[materialInstance]).push_back({ mesh, transform });
@@ -63,7 +60,7 @@ namespace Doge
 			renderPass();
 
  		s_Instance->EndScene();
-		s_Instance->s_RenderQueue.MeshQueue.clear();
+		s_Instance->MeshQueue.clear();
 	}
 
 	void Renderer::SetSkybox(CubemapTexture skybox)

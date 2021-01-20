@@ -104,6 +104,6 @@ namespace Doge
 		std::unordered_map<std::string, Shader> m_ShaderFiles;
 		std::unordered_map<uint64_t, Ref<OpenGLShader>> m_Shaders;
 
-		static OpenGLShaderCache* s_Instance;
+		static inline OpenGLShaderCache* s_Instance = nullptr;
 	};
 }

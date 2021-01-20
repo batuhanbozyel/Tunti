@@ -77,8 +77,6 @@ namespace Doge
 
 	// OpenGLTextureCache
 
-	OpenGLTextureCache* OpenGLTextureCache::s_Instance = nullptr;
-
 	OpenGLTextureCache::OpenGLTextureCache()
 	{
 		m_DefaultTexture = CreateScope<OpenGLTexture2D>();

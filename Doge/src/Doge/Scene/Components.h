@@ -43,7 +43,7 @@ namespace Doge
 
 	struct MeshRendererComponent
 	{
-		GraphicsBuffer MeshBuffer;
+		MeshData MeshBuffer;
 		Ref<MaterialInstance> MaterialInstanceRef;
 
 		MeshRendererComponent(const Mesh& mesh, const Ref<MaterialInstance>& materialInstance)
@@ -59,28 +59,12 @@ namespace Doge
 		operator const Camera* () const { return SceneCamera.get(); }
 	};
 
-	struct PointLightComponent
+	struct LightComponent
 	{
-		glm::vec3 Position;
-		glm::vec3 Color;
+		Light LightObject;
 
-		float Linear;
-		float Quadratic;
-	};
-
-	struct DirectionalLightComponent
-	{
-		/**
-		 * TODO:
-		 * 
-		 */
-	};
-
-	struct SpotLightComponent
-	{
-		/**
-		 * TODO:
-		 * 
-		 */
-	};
+		LightComponent() = default;
+		LightComponent(const glm::vec3& position)
+			: LightObject(position) {}
+ 	};
 }
