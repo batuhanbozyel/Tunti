@@ -1,12 +1,12 @@
 #pragma once
+#include "BufferManager.h"
+#include "Doge/Utility/Light.h"
 
 namespace Doge
 {
-	struct Mesh;
 	struct Shader;
 	struct WindowProps;
 	struct CubemapTexture;
-	struct GraphicsBuffer;
 
 	class Camera;
 	class Material;
@@ -32,11 +32,17 @@ namespace Doge
 
 		struct RenderQueue
 		{
-			std::unordered_map<Ref<Material>, std::unordered_map<Ref<MaterialInstance>, std::queue<Mesh>>> MeshQueue;
+			std::vector<Light> LightQueue;
+
+			// MeshQueue
+			std::unordered_map<Ref<Material>,
+			std::unordered_map<Ref<MaterialInstance>,
+				std::vector<std::tuple<GraphicsBuffer, glm::mat4>>>> MeshQueue;
+
 		} s_RenderQueue;
 	};
 
-	class Renderer
+	class Renderer final
 	{
 	public:
 		static void Init(decltype(RendererAPI::None) api);

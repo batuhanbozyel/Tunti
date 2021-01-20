@@ -33,10 +33,8 @@ struct PointLight
 {
     vec3 Position;
     vec3 Color;
-
     float Linear;
     float Quadratic;
-
     float Radius;
 };
 

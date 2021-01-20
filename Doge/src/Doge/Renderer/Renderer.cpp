@@ -2,13 +2,13 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Renderer.h"
-#include "BufferManager.h"
 
 #include "Platform/OpenGL/OpenGLRenderer.h"
 
 #include "Doge/Core/Window.h"
 #include "Doge/Utility/Mesh.h"
 #include "Doge/Utility/Camera.h"
+#include "Doge/Utility/Material.h"
 
 namespace Doge
 {
@@ -30,7 +30,7 @@ namespace Doge
 			case RendererAPI::OpenGL: s_Instance = new OpenGLRenderer(); break;
 		}
 
-		Log::Info("Renderer has initialized successfully!");
+		Log::Trace("Renderer has initialized successfully!");
 	}
 
 	void Renderer::Shutdown()
@@ -46,20 +46,24 @@ namespace Doge
 
 	void Renderer::DrawMesh(const GraphicsBuffer& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform)
 	{
+		auto& meshQueue = s_Instance->s_RenderQueue.MeshQueue;
+		const Ref<Material>& material = materialInstance->GetParentMaterial();
 
+		((meshQueue[material])[materialInstance]).push_back({ mesh, transform });
 	}
 
 	void Renderer::BeginScene(const Camera& camera)
 	{
-//		s_Instance->BeginScene(camera);
+		s_Instance->BeginScene(camera);
 	}
 
 	void Renderer::EndScene()
 	{
-// 		for (const auto& renderPass : s_Instance->RenderPasses)
-// 			renderPass();
-// 
-// 		s_Instance->EndScene();
+		for (const auto& renderPass : s_Instance->RenderPasses)
+			renderPass();
+
+ 		s_Instance->EndScene();
+		s_Instance->s_RenderQueue.MeshQueue.clear();
 	}
 
 	void Renderer::SetSkybox(CubemapTexture skybox)

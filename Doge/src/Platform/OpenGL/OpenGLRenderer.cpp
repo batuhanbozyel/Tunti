@@ -131,7 +131,7 @@ namespace Doge
 		};
 
 		// Geometry Pass
-		RenderPasses.push_back([]()
+		RenderPasses.push_back([&]()
 		{
 			glEnable(GL_CULL_FACE);
 			glEnable(GL_DEPTH_TEST);
@@ -141,13 +141,29 @@ namespace Doge
 			glCullFace(GL_BACK);
 
 			s_Data.GeometryPassShader->Bind();
-
-/*
-// 			glDrawElementsBaseVertex(
-// 				GL_TRIANGLES,
-// 
-// 			)
-*/
+			for (const auto& [material, materialInstanceMap] : s_RenderQueue.MeshQueue)
+			{
+				SetCommonUniformProperties(material);
+				for (const auto& [materialInstance, meshQueue] : materialInstanceMap)
+				{
+					SetUniqueUniformProperties(materialInstance);
+					if (meshQueue.size())
+					{
+						const auto& [baseMesh, baseTransform] = meshQueue[0];
+						glBindBufferBase(GL_SHADER_STORAGE_BUFFER, RendererBindingTable::VertexBufferShaderStorageBuffer, *baseMesh.VertexBuffer);
+						glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *baseMesh.IndexBuffer);
+						s_Data.GeometryPassShader->SetUniformInt("u_PrimitiveCount", meshQueue.size());
+					}
+					int id = 0;
+					for (const auto& [mesh, transform] : meshQueue)
+					{
+						s_Data.GeometryPassShader->SetUniformMat4("u_Model", transform);
+						s_Data.GeometryPassShader->SetUniformInt("u_PrimitiveID", id);
+						glDrawElementsBaseVertex(GL_TRIANGLES, mesh.Count, GL_UNSIGNED_INT, nullptr, mesh.BaseVertex);
+						id++;
+					}
+				}
+			}
 		});
 
 		// Lighting Pass
@@ -212,8 +228,6 @@ namespace Doge
 		ConstructGBuffer(props.Width, props.Height);
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-		Log::Trace("Renderer initialized successfully!");
 	}
 
 	OpenGLRenderer::~OpenGLRenderer()

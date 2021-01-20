@@ -1,11 +1,6 @@
 #type vertex
 #version 450 core
 
-layout(location = 0) in vec4  a_Position;
-layout(location = 1) in vec3  a_Normal;
-layout(location = 2) in vec2  a_TexCoord;
-layout(location = 3) in uint  a_TexIndex;
-
 out vec3 v_FragPos;
 out vec3 v_Normal;
 out vec2 v_TexCoord;
@@ -18,15 +13,36 @@ layout(std140, binding = 0) uniform ViewProjectionUniform
     vec3 u_Position;
 };
 
+layout(std430, binding = 1) readonly buffer VertexBuffer
+{
+	float data[];
+} vertexBuffer;
+
 uniform mat4 u_Model;
+uniform int u_PrimitiveID;
+uniform int u_PrimitiveCount;
 
 void main()
 {
-	vec4 modelPosition = u_Model * a_Position;
+	vec4 modelPosition = u_Model * vec4(
+		vertexBuffer.data[u_PrimitiveID * gl_VertexID * 4], 
+		vertexBuffer.data[u_PrimitiveID * gl_VertexID * 4 + 1], 
+		vertexBuffer.data[u_PrimitiveID * gl_VertexID * 4 + 2], 
+		vertexBuffer.data[u_PrimitiveID * gl_VertexID * 4 + 3]);
+
 	v_FragPos = vec3(modelPosition);
-	v_Normal = a_Normal;
-	v_TexCoord = a_TexCoord;
-	v_TexIndex = a_TexIndex;
+
+	v_Normal = vec3(
+		vertexBuffer.data[u_PrimitiveID * gl_VertexID * 3 + u_PrimitiveCount * 4], 
+		vertexBuffer.data[u_PrimitiveID * gl_VertexID * 3 + u_PrimitiveCount * 4 + 1], 
+		vertexBuffer.data[u_PrimitiveID * gl_VertexID * 3 + u_PrimitiveCount * 4 + 2]);
+
+	v_TexCoord = vec2(
+		vertexBuffer.data[u_PrimitiveID * gl_VertexID * 2 + u_PrimitiveCount * 7], 
+		vertexBuffer.data[u_PrimitiveID * gl_VertexID * 2 + u_PrimitiveCount * 7 + 1]);
+
+	v_TexIndex = int(vertexBuffer.data[u_PrimitiveID * gl_VertexID + u_PrimitiveCount * 9]);
+
 	gl_Position = u_Projection * u_View * modelPosition;
 }
 
