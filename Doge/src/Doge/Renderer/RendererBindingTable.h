@@ -19,7 +19,7 @@ namespace Doge
 		static constexpr uint8_t LightsUniformBuffer = 3;
 	}
 
-	namespace OpenGLRendererShaders
+	namespace RendererShaders
 	{
 		static constexpr char* GeometryPass = "../Doge/assets/shaders/GeometryPass.glsl";
 		static constexpr char* LightingPass = "../Doge/assets/shaders/LightingPass.glsl";

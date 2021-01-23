@@ -1,13 +1,15 @@
 #include "pch.h"
 #include "Doge/Renderer/Shader.h"
 #include "Doge/Renderer/Texture.h"
+#include "Doge/Renderer/RendererBindingTable.h"
 #include "Material.h"
 
 namespace Doge
 {
 	// Material
 
-	Material::Material(const Shader& shader)
+	Material::Material(const Shader& shader, const Ref<TextureMap>& textureMap = TextureLibrary::DefaultTextureMap())
+		: m_TextureMap(textureMap)
 	{
 		const auto& uniforms = ShaderLibrary::GetMaterialInfo(shader);
 		for (const auto& [name, uniform] : uniforms)
@@ -37,6 +39,14 @@ namespace Doge
 			}
 		}
 	}
+	
+	Ref<Material> Material::DefaultMaterial()
+	{
+		if (!s_DefaultMaterial)
+			s_DefaultMaterial = CreateRef<Material>(ShaderLibrary::LoadShader(RendererShaders::LightingPass));
+
+		return s_DefaultMaterial;
+	}
 
 	template<typename T>
 	void Material::ModifyProperty(const std::string& name, const T& value)
@@ -50,18 +60,18 @@ namespace Doge
 		}
 		Log::Warn("Property does not exist: {0}", name);
 	}
-
+	
 	Ref<MaterialInstance> Material::CreateInstanceFrom(const Ref<Material>& material)
 	{
-		Ref<MaterialInstance> childInstance = CreateRef<MaterialInstance>(material, material->m_ChildInstances.size());
+		Ref<MaterialInstance> childInstance = CreateRef<MaterialInstance>(material);
 		material->m_ChildInstances.push_back(childInstance);
 		return childInstance;
 	}
 
 	// MaterialInstance
 
-	MaterialInstance::MaterialInstance(const Ref<Material>& parentMaterial, uint32_t index)
-		: m_ParentMaterial(parentMaterial)
+	MaterialInstance::MaterialInstance(const Ref<Material>& parentMaterial)
+		: m_ParentMaterial(parentMaterial), m_TextureMap(parentMaterial->GetTextureMap())
 	{
 
 	}
@@ -85,5 +95,10 @@ namespace Doge
 		}
 
 		Log::Warn("Property does not exist: {0}", name);
+	}
+
+	void MaterialInstance::SetTexture(Texture2D texture, TextureType type)
+	{
+
 	}
 }

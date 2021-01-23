@@ -24,7 +24,11 @@ namespace Sandbox
 
 	void GameLayer::ConstructDummyScene()
 	{
-		
+		Doge::Entity backpackEntity = m_Scene.CreateEntity("Backpack");
+		Doge::Ref<Doge::Model> backpackModel = Doge::ModelLibrary::Load("assets/models/backpack/backpack.obj");
+
+		for(uint32_t i = 0; i < backpackModel->Meshes.size(); i++)
+			backpackEntity.AddComponent<Doge::MeshRendererComponent>(backpackModel->Meshes[i], backpackModel->MaterialInstances[i]);
 	}
 
 	bool GameLayer::OnKeyPress(Doge::KeyPressedEvent& e)

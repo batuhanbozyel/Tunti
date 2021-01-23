@@ -33,7 +33,7 @@ namespace Doge
 			std::string directory = filePath.substr(0, filePath.find_last_of('/') + 1);
 
 			Ref<Model> model = CreateRef<Model>();
-			ProcessNode(directory, scene->mRootNode, scene, model->Meshes);
+			ProcessNode(directory, scene->mRootNode, scene, model);
 
 			const auto& insertLocationIt = s_ModelCache.insert(s_ModelCache.end(), { filePath, model });
 
@@ -48,26 +48,26 @@ namespace Doge
 		s_ModelCache.clear();
 	}
 
-	void ModelLibrary::ProcessNode(const std::string& directory, aiNode* node, const aiScene* scene, std::vector<Mesh>& meshes)
+	void ModelLibrary::ProcessNode(const std::string& directory, aiNode* node, const aiScene* scene, Ref<Model> model)
 	{
 		for (uint32_t i = 0; i < node->mNumMeshes; i++)
 		{
 			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 
-			meshes.push_back(ProcessMesh(directory, mesh, scene));
+			ProcessModel(directory, mesh, scene, model);
 		}
 
 		for (uint32_t i = 0; i < node->mNumChildren; i++)
 		{
-			ProcessNode(directory, node->mChildren[i], scene, meshes);
+			ProcessNode(directory, node->mChildren[i], scene, model);
 		}
 	}
 
-	Mesh ModelLibrary::ProcessMesh(const std::string& directory, aiMesh* mesh, const aiScene* scene)
+	void ModelLibrary::ProcessModel(const std::string& directory, aiMesh* mesh, const aiScene* scene, Ref<Model> model)
 	{
 		std::vector<Vertex> vertices;
 		std::vector<uint32_t> indices;
-		uint32_t index = 0;
+		Ref<TextureMap> textureMap;
 
 		// Process Material
 		if (mesh->mMaterialIndex >= 0)
@@ -81,7 +81,10 @@ namespace Doge
 			AddTexturePath(directory, texturePaths, material, aiTextureType_DIFFUSE_ROUGHNESS, TextureType::Roughness);
 			AddTexturePath(directory, texturePaths, material, aiTextureType_AMBIENT_OCCLUSION, TextureType::AmbientOcclusion);
 
-			index = TextureLibrary::LoadTextureMap(texturePaths);
+			textureMap = TextureLibrary::LoadTextureMap(texturePaths);
+			Ref<MaterialInstance> materialInstance = Material::CreateInstanceFrom(Material::DefaultMaterial());
+			materialInstance->SetTextureMap(textureMap);
+			model->MaterialInstances.push_back(materialInstance);
 		}
 
 		for (uint32_t i = 0; i < mesh->mNumVertices; i++)
@@ -107,7 +110,7 @@ namespace Doge
 			{
 				texCoord = glm::vec2(0.0f);
 			}
-			vertices.push_back(Vertex(position, normal, texCoord, index));
+			vertices.push_back(Vertex(position, normal, texCoord, textureMap->Index));
 		}
 		// Process Indices
 		for (uint32_t i = 0; i < mesh->mNumFaces; i++)
@@ -117,7 +120,7 @@ namespace Doge
 				indices.push_back(face.mIndices[j]);
 		}
 
-		return Mesh(vertices, indices);
+		model->Meshes.push_back(Mesh(vertices, indices));
 	}
 
 	void ModelLibrary::AddTexturePath(const std::string& directory,

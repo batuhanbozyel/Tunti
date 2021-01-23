@@ -7,16 +7,29 @@
 
 namespace Doge
 {
-	Texture2D TextureLibrary::LoadTextureMap(const std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)>& textureFiles)
+
+	Ref<TextureMap> TextureLibrary::DefaultTextureMap()
 	{
 		switch (Renderer::GetAPI())
 		{
-			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return Texture2D();
-			case RendererAPI::OpenGL: return OpenGLTextureCache::GetInstance()->AddTextureMap(textureFiles);
+			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
+			case RendererAPI::OpenGL: return OpenGLTextureCache::GetInstance()->DefaultTextureMap();
 		}
 
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
-		return Texture2D();
+		return nullptr;
+	}
+
+	Ref<TextureMap> TextureLibrary::LoadTextureMap(const std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)>& textureFiles)
+	{
+		switch (Renderer::GetAPI())
+		{
+			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
+			case RendererAPI::OpenGL: return OpenGLTextureCache::GetInstance()->CreateTextureMap(textureFiles);
+		}
+
+		LOG_ASSERT(false, "RendererAPI initialization failed!");
+		return nullptr;
 	}
 
 	CubemapTexture TextureLibrary::LoadCubemap(const std::string& folderPath,
@@ -54,7 +67,7 @@ namespace Doge
 		switch (Renderer::GetAPI())
 		{
 			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return CubemapTexture();
-			case RendererAPI::OpenGL: return OpenGLTextureCache::GetInstance()->AddCubemap(cubemapTextures);
+			case RendererAPI::OpenGL: return OpenGLTextureCache::GetInstance()->CreateCubemap(cubemapTextures);
 		}
 
 		LOG_ASSERT(false, "RendererAPI initialization failed!");

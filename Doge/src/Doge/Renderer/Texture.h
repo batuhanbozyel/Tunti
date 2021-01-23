@@ -23,7 +23,22 @@ namespace Doge
 
 	struct Texture2D
 	{
+		uint64_t Handle = 0;
+
+		operator uint64_t () const { return Handle; }
+
+		Texture2D() = default;
+
+		Texture2D (uint64_t handle)
+			: Handle(handle) {}
+	};
+
+	struct TextureMap
+	{
 		uint32_t Index = 0;
+		std::array<Texture2D, static_cast<uint32_t>(TextureType::COUNT)> Textures{ 0 };
+
+		TextureMap() = default;
 
 		operator uint32_t() const { return Index; }
 	};
@@ -44,9 +59,8 @@ namespace Doge
 	class TextureLibrary
 	{
 	public:
-		static constexpr Texture2D DefaultTexture = Texture2D();
-	public:
-		static Texture2D LoadTextureMap(const std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)>& textureFiles);
+		static Ref<TextureMap> DefaultTextureMap();
+		static Ref<TextureMap> LoadTextureMap(const std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)>& textureFiles);
 		static CubemapTexture LoadCubemap(const std::string& folderPath,
 			const std::string& rightFace,
 			const std::string& leftFace,

@@ -78,12 +78,14 @@ namespace Doge
 	// OpenGLTextureCache
 
 	OpenGLTextureCache::OpenGLTextureCache()
+		: m_DefaultTextureMap(CreateRef<TextureMap>())
 	{
-		m_DefaultTexture = CreateScope<OpenGLTexture2D>();
+		memset(m_DefaultTextureMap->Textures.data(), m_DefaultTexture.m_TextureHandle, static_cast<uint16_t>(TextureType::COUNT) * sizeof(uint64_t));
+		glMakeTextureHandleResidentARB(m_DefaultTexture.m_TextureHandle);
 		glCreateBuffers(1, &m_TextureMapSSBO);
 		glNamedBufferStorage(m_TextureMapSSBO, SizeofTextureMap * MaxTextures, nullptr, GL_DYNAMIC_STORAGE_BIT);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, RendererBindingTable::TextureMapsShaderStorageBuffer, m_TextureMapSSBO);
-		glNamedBufferSubData(m_TextureMapSSBO, 0, static_cast<uint16_t>(TextureType::COUNT) * sizeof(GLuint64), &m_DefaultTexture->m_TextureHandle);
+		glNamedBufferSubData(m_TextureMapSSBO, 0, static_cast<uint16_t>(TextureType::COUNT) * sizeof(GLuint64), &m_DefaultTexture.m_TextureHandle);
 	}
 
 	OpenGLTextureCache::~OpenGLTextureCache()
@@ -91,69 +93,51 @@ namespace Doge
 		glDeleteBuffers(1, &m_TextureMapSSBO);
 	}
 
-	Texture2D OpenGLTextureCache::AddTextureMap(const std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)>& textureFiles)
+	Ref<TextureMap> OpenGLTextureCache::CreateTextureMap(const std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)>& textureFiles)
 	{
-		Texture2D texture;
-		TextureType type = TextureType::Albedo;
+		Ref<TextureMap> textureMap = CreateRef<TextureMap>();
+		TextureType type = static_cast<TextureType>(0);
 		for (const auto& textureFile : textureFiles)
 		{
-			if (textureFile.empty())
+			if (!textureFile.empty())
 			{
-				GLuint64 handle = 0;
-				glNamedBufferSubData(
-					m_TextureMapSSBO,
-					SizeofTextureMap * m_TextureCount + OffsetofTextureType(type),
-					sizeof(GLuint64),
-					&handle
-				);
-				uint16_t type_id = static_cast<uint16_t>(type);
-				type = static_cast<TextureType>(++type_id);
-				continue;
-			}
-
-			const auto& textureIt = m_Textures.find(textureFile);
-			// if texture already exists
-			if (textureIt != m_Textures.end())
-				glNamedBufferSubData(
-					m_TextureMapSSBO,
-					SizeofTextureMap * m_TextureCount + OffsetofTextureType(type),
-					sizeof(GLuint64),
-					&textureIt->second->m_TextureHandle
-				);
-			else
-			{
-				stbi_set_flip_vertically_on_load(1);
-
-				TextureData data;
-				data.buffer = stbi_load(
-					textureFile.c_str(),
-					&data.width,
-					&data.height,
-					&data.channel,
-					4);
-
-				if (data.buffer)
+				const auto& textureIt = m_Textures.find(textureFile);
+				// if texture already exists
+				if (textureIt != m_Textures.end())
+					textureMap->Textures[static_cast<uint16_t>(type)] = textureIt->second->m_TextureHandle;
+				else
 				{
-					const auto& insertedPairIt = m_Textures.insert(m_Textures.end(), { textureFile, CreateScope<OpenGLTexture2D>(data) });
-					glNamedBufferSubData(
-						m_TextureMapSSBO,
-						SizeofTextureMap * m_TextureCount + OffsetofTextureType(type),
-						sizeof(GLuint64),
-						&insertedPairIt->second->m_TextureHandle
-					);
+					stbi_set_flip_vertically_on_load(1);
 
-					stbi_image_free(data.buffer);
+					TextureData data;
+					data.buffer = stbi_load(
+						textureFile.c_str(),
+						&data.width,
+						&data.height,
+						&data.channel,
+						4);
+
+					if (data.buffer)
+					{
+						const auto& insertedPairIt = m_Textures.insert(m_Textures.end(), { textureFile, CreateScope<OpenGLTexture2D>(data) });
+						textureMap->Textures[static_cast<uint16_t>(type)] = insertedPairIt->second->m_TextureHandle;
+						stbi_image_free(data.buffer);
+					}
 				}
 			}
-			uint16_t type_id = static_cast<uint16_t>(type);
-			type = static_cast<TextureType>(++type_id);
-		}
+			glNamedBufferSubData(
+				m_TextureMapSSBO,
+				SizeofTextureMap * m_TextureMapCount + OffsetofTextureType(type),
+				sizeof(GLuint64),
+				&textureMap->Textures[static_cast<uint16_t>(type)]);
 
-		texture.Index = m_TextureCount++;
-		return texture;
+			type = static_cast<TextureType>(static_cast<uint16_t>(type) + 1);
+		}
+		textureMap->Index = m_TextureMapCount++;
+		return textureMap;
 	}
 
-	CubemapTexture OpenGLTextureCache::AddCubemap(const std::array<std::string, 6>& cubemapTextures)
+	CubemapTexture OpenGLTextureCache::CreateCubemap(const std::array<std::string, 6>& cubemapTextures)
 	{
 		CubemapTexture cubemap;
 		const auto& cubemapIt = m_Cubemaps.find(cubemapTextures[0]);
@@ -207,11 +191,11 @@ namespace Doge
 		glNamedBufferSubData(
 			m_TextureMapSSBO,
 			static_cast<uint16_t>(TextureType::COUNT) * sizeof(GLuint64),
-			(static_cast<uint16_t>(TextureType::COUNT) - 1) * sizeof(GLuint64) * m_TextureCount,
+			static_cast<uint16_t>(TextureType::COUNT) * sizeof(GLuint64) * (m_TextureMapCount - 1),
 			&zero);
 
 		m_Textures.clear();
 		m_Cubemaps.clear();
-		m_TextureCount = 0;
+		m_TextureMapCount = 1;
 	}
 }

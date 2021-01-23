@@ -14,6 +14,11 @@ namespace Doge
 	{
 		std::vector<Mesh> Meshes;
 		std::vector<Ref<MaterialInstance>> MaterialInstances;
+
+		Model() = default;
+
+		Model(const std::vector<Mesh>& meshes, const std::vector<Ref<MaterialInstance>> materialInstances)
+			: Meshes(meshes), MaterialInstances(materialInstances) {}
 	};
 	
 	class ModelLibrary
@@ -22,8 +27,8 @@ namespace Doge
 		static Ref<Model> Load(const std::string& filePath);
 		static void Flush();
 	private:
-		static void ProcessNode(const std::string& directory, aiNode* node, const aiScene* scene, std::vector<Mesh>& meshes);
-		static Mesh ProcessMesh(const std::string& directory, aiMesh* mesh, const aiScene* scene);
+		static void ProcessNode(const std::string& directory, aiNode* node, const aiScene* scene, Ref<Model> model);
+		static void ProcessModel(const std::string& directory, aiMesh* mesh, const aiScene* scene, Ref<Model> model);
 		static void AddTexturePath(const std::string& directory,
 			std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)>& texturePaths,
 			aiMaterial* material, aiTextureType type, TextureType textureType);

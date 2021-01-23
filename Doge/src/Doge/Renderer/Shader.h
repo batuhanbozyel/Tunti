@@ -33,8 +33,6 @@ namespace Doge
 	class ShaderLibrary
 	{
 	public:
-		static const Shader PhongLighting;
-	public:
 		static Shader LoadShader(const std::string& filePath);
 		static Shader LoadShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
 
