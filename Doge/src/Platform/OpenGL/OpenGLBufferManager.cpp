@@ -28,7 +28,7 @@ namespace Doge
 			buffer.Count = mesh.Indices.size();
 
 			glCreateBuffers(1, &openGLBuffer.VertexBuffer);
-			glNamedBufferStorage(openGLBuffer.VertexBuffer, openGLBuffer.VertexSize, nullptr, GL_DYNAMIC_STORAGE_BIT);
+			glNamedBufferStorage(openGLBuffer.VertexBuffer, openGLBuffer.VertexSize, nullptr, GL_DYNAMIC_STORAGE_BIT | GL_MAP_WRITE_BIT | GL_MAP_READ_BIT);
 
 			// Copy Vertex Data into the Buffer
 			void* buffPtr = glMapNamedBuffer(openGLBuffer.VertexBuffer, GL_WRITE_ONLY);
@@ -67,7 +67,7 @@ namespace Doge
 			GLuint indexBuffer;
 
 			glCreateBuffers(1, &vertexBuffer);
-			glNamedBufferStorage(vertexBuffer, vertexSize, nullptr, GL_DYNAMIC_STORAGE_BIT);
+			glNamedBufferStorage(vertexBuffer, vertexSize, nullptr, GL_DYNAMIC_STORAGE_BIT | GL_MAP_WRITE_BIT | GL_MAP_READ_BIT);
 
 			// Copy Vertex Data into the Buffer
 			void* oldBuffPtr = glMapNamedBuffer(vertexBuffer, GL_READ_ONLY);

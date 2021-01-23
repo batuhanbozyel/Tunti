@@ -113,11 +113,11 @@ namespace Doge
 		Log::Trace("Context creation succeed!");
 
 		OpenGLShaderCache* shaderCache = OpenGLShaderCache::GetInstance();
-		s_Data.TexturedQuadShader = shaderCache->LoadShader(OpenGLRendererShaders::TexturedQuad);
+		s_Data.TexturedQuadShader = shaderCache->LoadShader(RendererShaders::TexturedQuad);
 
-		s_Data.GeometryPassShader = shaderCache->LoadShader(OpenGLRendererShaders::GeometryPass);
+		s_Data.GeometryPassShader = shaderCache->LoadShader(RendererShaders::GeometryPass);
 
-		s_Data.LightingPassShader = shaderCache->LoadShader(OpenGLRendererShaders::LightingPass);
+		s_Data.LightingPassShader = shaderCache->LoadShader(RendererShaders::LightingPass);
 		s_Data.LightingPassShader->Bind();
 		s_Data.LightingPassShader->SetUniformInt("u_PositionAttachment", RendererBindingTable::GBufferPositionTextureUnit);
 		s_Data.LightingPassShader->SetUniformInt("u_NormalAttachment", RendererBindingTable::GBufferNormalTextureUnit);
@@ -213,7 +213,7 @@ namespace Doge
 			if (!s_Data.SkyboxShader)
 			{
 				OpenGLShaderCache* shaderCache = OpenGLShaderCache::GetInstance();
-				s_Data.SkyboxShader = shaderCache->LoadShader(OpenGLRendererShaders::Skybox);
+				s_Data.SkyboxShader = shaderCache->LoadShader(RendererShaders::Skybox);
 			}
 
 			glBindTextureUnit(RendererBindingTable::SkyboxTextureUnit, skybox);
@@ -230,7 +230,7 @@ namespace Doge
 		glBindVertexArray(s_Data.VertexArray);
 
 		glCreateBuffers(1, &s_Data.LightsUniformBuffer);
-		glNamedBufferStorage(s_Data.LightsUniformBuffer, sizeof(Light)* Light::MaxLightsPerType, nullptr, GL_DYNAMIC_STORAGE_BIT);
+		glNamedBufferStorage(s_Data.LightsUniformBuffer, sizeof(Light)* Light::MaxLightsPerType, nullptr, GL_DYNAMIC_STORAGE_BIT | GL_MAP_WRITE_BIT);
 		glBindBufferBase(GL_UNIFORM_BUFFER, RendererBindingTable::LightsUniformBuffer, s_Data.LightsUniformBuffer);
 
 		glCreateBuffers(1, &s_Data.ViewProjectionUniformBuffer);
