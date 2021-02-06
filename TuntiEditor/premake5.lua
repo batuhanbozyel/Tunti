@@ -38,6 +38,11 @@ project "TuntiEditor"
 		runtime "Debug"
 		symbols "on"
 
+	filter "configurations:RelWithDebugInfo"
+		defines "DEBUG_ENABLED"
+		runtime "Release"
+		optimize "on"
+
 	filter "configurations:Release"
 		runtime "Release"
 		optimize "on"

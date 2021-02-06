@@ -118,4 +118,6 @@ namespace Doge
 	{
 		s_Instance->m_ActiveWindow->SetCursorPos(x, y);
 	}
+
+	Application* Application::s_Instance = nullptr;
 }

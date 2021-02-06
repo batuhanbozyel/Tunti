@@ -5,6 +5,7 @@ workspace "Tunti"
 	configurations
 	{
 		"Debug",
+		"RelWithDebugInfo",
 		"Release"
 	}
 

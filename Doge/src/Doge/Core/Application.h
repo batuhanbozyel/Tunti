@@ -44,7 +44,7 @@ namespace Doge
 		LayerStack m_LayerStack;
 		bool m_Running = false;
 	private:
-		static inline Application* s_Instance = nullptr;
+		static Application* s_Instance;
 		friend int ::main(int argc, char** argv);
 	};
 

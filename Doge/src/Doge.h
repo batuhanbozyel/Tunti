@@ -3,7 +3,6 @@
 // Core
 #include "Doge/Core/Platform.h"
 #include "Doge/Core/Application.h"
-#include "Doge/Core/Time.h"
 #include "Doge/Core/Input.h"
 #include "Doge/Core/Log.h"
 
@@ -15,6 +14,7 @@
 // Utility
 #include "Doge/Utility/Mesh.h"
 #include "Doge/Utility/Light.h"
+#include "Doge/Utility/Camera.h"
 #include "Doge/Utility/Material.h"
 
 // Scene

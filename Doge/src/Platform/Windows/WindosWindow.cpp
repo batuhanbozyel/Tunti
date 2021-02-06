@@ -36,7 +36,6 @@ namespace Doge
 		LOG_ASSERT(windowContext, "Window creation failed");
 
 		glfwSetWindowUserPointer(windowContext, &m_Props);
-		glfwSwapInterval(static_cast<int>(props.VSync));
 
 		// KeyPressed, KeyReleased Events
 		glfwSetKeyCallback(windowContext, [](GLFWwindow* window, int key, int scancode, int action, int mods)

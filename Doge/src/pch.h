@@ -35,4 +35,4 @@
 
 #include "Doge/Core/Log.h"
 #include "Doge/Core/Base.h"
-#include "Doge/Core/Input.h"
+#include "Doge/Core/Platform.h"

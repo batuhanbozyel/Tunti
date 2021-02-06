@@ -90,9 +90,6 @@
     <ClInclude Include="src\Doge\Core\Input.h">
       <Filter>src\Doge\Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\Doge\Core\KeyCodes.h">
-      <Filter>src\Doge\Core</Filter>
-    </ClInclude>
     <ClInclude Include="src\Doge\Core\Layer.h">
       <Filter>src\Doge\Core</Filter>
     </ClInclude>
@@ -100,9 +97,6 @@
       <Filter>src\Doge\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Doge\Core\Log.h">
-      <Filter>src\Doge\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Doge\Core\MouseButtonCodes.h">
       <Filter>src\Doge\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Doge\Core\Platform.h">
@@ -128,6 +122,9 @@
     </ClInclude>
     <ClInclude Include="src\Doge\Events\WindowEvent.h">
       <Filter>src\Doge\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Doge\Renderer\BufferManager.h">
+      <Filter>src\Doge\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Doge\Renderer\Renderer.h">
       <Filter>src\Doge\Renderer</Filter>
@@ -170,6 +167,9 @@
     </ClInclude>
     <ClInclude Include="src\Doge\Utility\Mesh.h">
       <Filter>src\Doge\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLBufferManager.h">
+      <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLRenderer.h">
       <Filter>src\Platform\OpenGL</Filter>
@@ -1665,12 +1665,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Doge\Renderer\BufferManager.h">
-      <Filter>src\Doge\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Platform\OpenGL\OpenGLBufferManager.h">
-      <Filter>src\Platform\OpenGL</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Doge\Core\Application.cpp">
@@ -1681,6 +1675,9 @@
     </ClCompile>
     <ClCompile Include="src\Doge\Core\Log.cpp">
       <Filter>src\Doge\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Doge\Renderer\BufferManager.cpp">
+      <Filter>src\Doge\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Doge\Renderer\Renderer.cpp">
       <Filter>src\Doge\Renderer</Filter>
@@ -1706,6 +1703,9 @@
     <ClCompile Include="src\Doge\Utility\Material.cpp">
       <Filter>src\Doge\Utility</Filter>
     </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLBufferManager.cpp">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLRenderer.cpp">
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
@@ -1726,12 +1726,6 @@
     </ClCompile>
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Doge\Renderer\BufferManager.cpp">
-      <Filter>src\Doge\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Platform\OpenGL\OpenGLBufferManager.cpp">
-      <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
