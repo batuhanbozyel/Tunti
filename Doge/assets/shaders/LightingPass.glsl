@@ -15,33 +15,39 @@ void main()
 #type fragment
 #version 450 core
 #extension GL_ARB_bindless_texture : require
-
-#define MAX_LIGHTS_PER_TYPE 100
+#define MAX_LIGHTS 100
 
 layout(location = 0) out vec4 color;
 
 layout(location = 0) in vec2 v_TexCoord;
 
+struct Light
+{
+    vec4 LightDir;      // 0
+
+    vec3 Position;      // 16
+    vec3 Color;         // 32
+    /*
+        x: Intensity
+        y: Constant
+        z: Linear
+        w: Quadratic
+    */
+    vec4 AttenuationFactors; // 48
+    uint Type;          // 64
+};
+
 layout(std140, binding = 0) uniform ViewProjectionUniform
 {
-    mat4 u_View;
-    mat4 u_Projection;
-    vec3 u_Position;
+    mat4 View;
+    mat4 Projection;
+	vec3 CameraPosition;
 };
 
-struct PointLight
+layout(std140, binding = 4) uniform LightsUniform
 {
-    vec3 Position;
-    vec3 Color;
-    float Linear;
-    float Quadratic;
-    float Radius;
-};
-
-layout(std140, binding = 3) uniform LightsUniform
-{
-    PointLight u_PointLights[MAX_LIGHTS_PER_TYPE];
-    int u_NumLights;
+    Light Lights[MAX_LIGHTS];
+    int NumLights;
 };
 
 uniform sampler2D u_PositionAttachment;
@@ -55,28 +61,7 @@ void main()
     vec3 Albedo = texture(u_AlbedoSpecularAttachment, v_TexCoord).rgb;
     float Specular = texture(u_AlbedoSpecularAttachment, v_TexCoord).a;
 
-    vec3 lighting = Albedo * 0.1;
-    vec3 viewDir = normalize(u_Position - FragPos);
-    for(int i = 0; i < u_NumLights; i++)
-    {
-        float distance = length(u_PointLights[i].Position - FragPos);
-        if(distance < u_PointLights[i].Radius)
-        {
-            // Albedo
-            vec3 lightDir = normalize(u_PointLights[i].Position - FragPos);
-            vec3 albedo = max(dot(Normal, lightDir), 0.0) * Albedo * u_PointLights[i].Color;
+    vec3 dummy = normalize(FragPos + Normal + Albedo + Specular);
 
-            // Specular
-            vec3 halfwayDir = normalize(lightDir + viewDir);
-            float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
-            vec3 specular = u_PointLights[i].Color * spec * Specular;
-
-            // Attenuation
-            float attenuation = 1.0 / (1.0 + u_PointLights[i].Linear * distance + u_PointLights[i].Quadratic * distance * distance);
-            albedo *= attenuation;
-            specular *= attenuation;
-            lighting += albedo + specular;
-        }
-    }
-    color = vec4(lighting, 1.0);
+    color = vec4(dummy, 1.0);
 }

@@ -57,14 +57,31 @@ namespace Doge
 		Scope<Camera> SceneCamera;
 
 		operator const Camera* () const { return SceneCamera.get(); }
+
+		CameraComponent(const PerspectiveCamera& camera)
+			: SceneCamera(CreateScope<PerspectiveCamera>(camera)) {}
 	};
 
 	struct LightComponent
 	{
-		Light LightObject;
+		enum
+		{
+			DirectionLight = 0,
+			PointLight = 1,
+			SpotLight = 2,
+			AreaLight = 3
+		};
+		glm::vec3 Color{ 1.0f };
+
+		float Intensity = 1.0f;
+		float Constant = 1.0f;
+		float Linear = 0.09f;
+		float Quadratic = 0.032f;
+
+		decltype(DirectionLight) Type = DirectionLight;
 
 		LightComponent() = default;
-		LightComponent(const glm::vec3& position)
-			: LightObject(position) {}
+		LightComponent(decltype(DirectionLight) type)
+			: Type(type) {}
  	};
 }

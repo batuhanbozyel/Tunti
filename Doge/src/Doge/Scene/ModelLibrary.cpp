@@ -10,7 +10,6 @@ namespace Doge
 		aiProcess_Triangulate |
 		aiProcess_JoinIdenticalVertices |
 		aiProcess_GenSmoothNormals |
-		aiProcess_ValidateDataStructure |
 		aiProcess_ImproveCacheLocality |
 		aiProcess_OptimizeMeshes |
 		aiProcess_OptimizeGraph |
@@ -53,7 +52,6 @@ namespace Doge
 		for (uint32_t i = 0; i < node->mNumMeshes; i++)
 		{
 			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-
 			ProcessModel(directory, mesh, scene, model);
 		}
 
@@ -75,16 +73,21 @@ namespace Doge
 			std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)> texturePaths;
 			aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-			AddTexturePath(directory, texturePaths, material, aiTextureType_BASE_COLOR, TextureType::Albedo);
-			AddTexturePath(directory, texturePaths, material, aiTextureType_NORMAL_CAMERA, TextureType::Normal);
-			AddTexturePath(directory, texturePaths, material, aiTextureType_METALNESS, TextureType::Metallic);
-			AddTexturePath(directory, texturePaths, material, aiTextureType_DIFFUSE_ROUGHNESS, TextureType::Roughness);
-			AddTexturePath(directory, texturePaths, material, aiTextureType_AMBIENT_OCCLUSION, TextureType::AmbientOcclusion);
+			AddTexturePath(directory, texturePaths, material, aiTextureType_DIFFUSE, TextureType::Albedo);
+			AddTexturePath(directory, texturePaths, material, aiTextureType_NORMALS, TextureType::Normal);
+			if (texturePaths[static_cast<uint16_t>(TextureType::Normal)].empty())
+			{
+				AddTexturePath(directory, texturePaths, material, aiTextureType_HEIGHT, TextureType::Normal);
+				if (texturePaths[static_cast<uint16_t>(TextureType::Normal)].empty())
+					AddTexturePath(directory, texturePaths, material, aiTextureType_DISPLACEMENT, TextureType::Normal);
+			}
+			AddTexturePath(directory, texturePaths, material, aiTextureType_SPECULAR, TextureType::Metallic);
+			AddTexturePath(directory, texturePaths, material, aiTextureType_SHININESS, TextureType::Roughness);
+			AddTexturePath(directory, texturePaths, material, aiTextureType_LIGHTMAP, TextureType::AmbientOcclusion);
 
 			textureMap = TextureLibrary::LoadTextureMap(texturePaths);
-			Ref<MaterialInstance> materialInstance = Material::CreateInstanceFrom(Material::DefaultMaterial());
-			materialInstance->SetTextureMap(textureMap);
-			model->MaterialInstances.push_back(materialInstance);
+			model->TextureMaps.push_back(textureMap);
+			model->MaterialInstances.push_back(Material::DefaulMaterialInstance());
 		}
 
 		for (uint32_t i = 0; i < mesh->mNumVertices; i++)
@@ -134,4 +137,6 @@ namespace Doge
 			texturePaths[static_cast<uint16_t>(textureType)] = directory + path.C_Str();
 		}
 	}
+
+	std::unordered_map<std::string, Ref<Model>> ModelLibrary::s_ModelCache;
 }

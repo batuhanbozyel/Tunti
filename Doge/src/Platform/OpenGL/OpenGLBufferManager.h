@@ -7,7 +7,7 @@ namespace Doge
 	{
 		GLuint VertexBuffer;
 		GLuint IndexBuffer;
-		uint32_t VertexSize = 0;
+		uint32_t VertexCount = 0;
 		uint32_t IndexCount = 0;
 	};
 

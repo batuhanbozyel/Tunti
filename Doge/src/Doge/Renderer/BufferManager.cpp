@@ -5,7 +5,6 @@
 
 #include "Renderer.h"
 #include "BufferManager.h"
-#include "Doge/Utility/Mesh.h"
 
 namespace Doge
 {

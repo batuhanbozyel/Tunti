@@ -8,8 +8,7 @@ namespace Doge
 {
 	// Material
 
-	Material::Material(const Shader& shader, const Ref<TextureMap>& textureMap = TextureLibrary::DefaultTextureMap())
-		: m_TextureMap(textureMap)
+	Material::Material(const Shader& shader)
 	{
 		const auto& uniforms = ShaderLibrary::GetMaterialInfo(shader);
 		for (const auto& [name, uniform] : uniforms)
@@ -39,13 +38,16 @@ namespace Doge
 			}
 		}
 	}
-	
-	Ref<Material> Material::DefaultMaterial()
+
+	Ref<MaterialInstance> Material::DefaulMaterialInstance()
 	{
 		if (!s_DefaultMaterial)
 			s_DefaultMaterial = CreateRef<Material>(ShaderLibrary::LoadShader(RendererShaders::LightingPass));
 
-		return s_DefaultMaterial;
+		if (!s_DefaultMaterialInstance)
+			s_DefaultMaterialInstance = CreateInstanceFrom(s_DefaultMaterial);
+
+		return s_DefaultMaterialInstance;
 	}
 
 	template<typename T>
@@ -60,7 +62,7 @@ namespace Doge
 		}
 		Log::Warn("Property does not exist: {0}", name);
 	}
-	
+
 	Ref<MaterialInstance> Material::CreateInstanceFrom(const Ref<Material>& material)
 	{
 		Ref<MaterialInstance> childInstance = CreateRef<MaterialInstance>(material);
@@ -71,7 +73,7 @@ namespace Doge
 	// MaterialInstance
 
 	MaterialInstance::MaterialInstance(const Ref<Material>& parentMaterial)
-		: m_ParentMaterial(parentMaterial), m_TextureMap(parentMaterial->GetTextureMap())
+		: m_ParentMaterial(parentMaterial)
 	{
 
 	}
@@ -101,4 +103,7 @@ namespace Doge
 	{
 
 	}
+
+	Ref<Material> Material::s_DefaultMaterial = nullptr;
+	Ref<MaterialInstance> Material::s_DefaultMaterialInstance = nullptr;
 }

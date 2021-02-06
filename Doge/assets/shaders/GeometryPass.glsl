@@ -1,16 +1,16 @@
 #type vertex
 #version 450 core
 
-out vec3 v_FragPos;
+out vec3 v_WorldPosition;
 out vec3 v_Normal;
 out vec2 v_TexCoord;
 flat out uint v_TexIndex;
 
 layout(std140, binding = 0) uniform ViewProjectionUniform
 {
-    mat4 u_View;
-    mat4 u_Projection;
-    vec3 u_Position;
+    mat4 View;
+    mat4 Projection;
+	vec3 CameraPosition;
 };
 
 layout(std430, binding = 1) readonly buffer VertexBuffer
@@ -18,32 +18,44 @@ layout(std430, binding = 1) readonly buffer VertexBuffer
 	float data[];
 } vertexBuffer;
 
+layout(std430, binding = 2) readonly buffer IndexBuffer
+{
+	uint data[];
+} indexBuffer;
+
+uniform uint u_VertexCount;
+
 uniform mat4 u_Model;
-uniform int u_PrimitiveID;
-uniform int u_PrimitiveCount;
+uniform uint u_BaseVertex;
 
 void main()
 {
-	vec4 modelPosition = u_Model * vec4(
-		vertexBuffer.data[u_PrimitiveID * gl_VertexID * 4], 
-		vertexBuffer.data[u_PrimitiveID * gl_VertexID * 4 + 1], 
-		vertexBuffer.data[u_PrimitiveID * gl_VertexID * 4 + 2], 
-		vertexBuffer.data[u_PrimitiveID * gl_VertexID * 4 + 3]);
+	uint index = indexBuffer.data[gl_VertexID] + u_BaseVertex;
 
-	v_FragPos = vec3(modelPosition);
+	uint posIndex = index * 4;
+	vec4 worldPosition = u_Model * vec4(
+		vertexBuffer.data[posIndex], 
+		vertexBuffer.data[posIndex + 1], 
+		vertexBuffer.data[posIndex + 2], 
+		vertexBuffer.data[posIndex + 3]);
+	v_WorldPosition = vec3(worldPosition);
 
-	v_Normal = vec3(
-		vertexBuffer.data[u_PrimitiveID * gl_VertexID * 3 + u_PrimitiveCount * 4], 
-		vertexBuffer.data[u_PrimitiveID * gl_VertexID * 3 + u_PrimitiveCount * 4 + 1], 
-		vertexBuffer.data[u_PrimitiveID * gl_VertexID * 3 + u_PrimitiveCount * 4 + 2]);
 
+	uint normalIndex = u_VertexCount * 4 + index * 3;
+	mat3 normalMatrix = transpose(inverse(mat3(u_Model)));
+	v_Normal = normalMatrix * vec3(
+		vertexBuffer.data[normalIndex], 
+		vertexBuffer.data[normalIndex + 1], 
+		vertexBuffer.data[normalIndex + 2]);
+
+	uint texCoordIndex = u_VertexCount * 7 + index * 2;
 	v_TexCoord = vec2(
-		vertexBuffer.data[u_PrimitiveID * gl_VertexID * 2 + u_PrimitiveCount * 7], 
-		vertexBuffer.data[u_PrimitiveID * gl_VertexID * 2 + u_PrimitiveCount * 7 + 1]);
+		vertexBuffer.data[texCoordIndex], 
+		vertexBuffer.data[texCoordIndex+ 1]);
 
-	v_TexIndex = int(vertexBuffer.data[u_PrimitiveID * gl_VertexID + u_PrimitiveCount * 9]);
+	v_TexIndex = uint(vertexBuffer.data[u_VertexCount * 9 + index]);
 
-	gl_Position = u_Projection * u_View * modelPosition;
+	gl_Position = Projection * View * worldPosition;
 }
 
 #type fragment
@@ -57,23 +69,26 @@ layout(location = 2) out vec4 g_AlbedoSpec;
 struct TextureMap
 {
 	uvec2 Albedo;
-	uvec2 Specular;
+	uvec2 Normal;
+	uvec2 Metallic;
+	uvec2 Roughness;
+	uvec2 AmbientOcclusion;
 };
 
-layout(std430, binding = 2) readonly buffer TextureMaps
+layout(std430, binding = 3) readonly buffer TextureMaps
 {
 	TextureMap textures[];
 } textureArray;
 
-in vec3 v_FragPos;
+in vec3 v_WorldPosition;
 in vec3 v_Normal;
 in vec2 v_TexCoord;
 flat in uint v_TexIndex;
 
 void main()
 {
-	g_Position = v_FragPos;
+	g_Position = v_WorldPosition;
 	g_Normal = normalize(v_Normal);
 	g_AlbedoSpec.rgb = texture(sampler2D(textureArray.textures[v_TexIndex].Albedo), v_TexCoord).rgb;
-	g_AlbedoSpec.a = texture(sampler2D(textureArray.textures[v_TexIndex].Specular), v_TexCoord).a;
+	g_AlbedoSpec.a = texture(sampler2D(textureArray.textures[v_TexIndex].Metallic), v_TexCoord).r;
 }

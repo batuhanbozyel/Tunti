@@ -18,7 +18,6 @@ namespace Sandbox
 		bool OnMouseButtonPress(Doge::MouseButtonPressedEvent& e);
 	private:
 		Doge::Scene m_Scene;
-		Doge::PerspectiveCameraController m_CameraController;
 		bool m_IsMouseVisible = false;
 	};
 }

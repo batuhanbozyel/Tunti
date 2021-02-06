@@ -15,8 +15,9 @@ namespace Doge
 
 		static constexpr uint8_t ViewProjectionUniformBuffer = 0;
 		static constexpr uint8_t VertexBufferShaderStorageBuffer = 1;
-		static constexpr uint8_t TextureMapsShaderStorageBuffer = 2;
-		static constexpr uint8_t LightsUniformBuffer = 3;
+		static constexpr uint8_t IndexBufferShaderStorageBuffer = 2;
+		static constexpr uint8_t TextureMapsShaderStorageBuffer = 3;
+		static constexpr uint8_t LightsUniformBuffer = 4;
 	}
 
 	namespace RendererShaders

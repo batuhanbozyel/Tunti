@@ -5,7 +5,7 @@ namespace Doge
 {
 	enum class TextureType : uint16_t
 	{
-		Albedo,
+		Albedo = 0,
 		Normal,
 		Metallic,
 		Roughness,

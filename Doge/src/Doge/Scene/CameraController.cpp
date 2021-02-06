@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "CameraController.h"
+#include "Doge/Core/Input.h"
 
 namespace Doge
 {
@@ -45,16 +46,16 @@ namespace Doge
 	void PerspectiveCameraController::OnUpdate()
 	{
 		// Camera movement
-		if (Input::IsKeyPressed(Key::W))
+		if (Input::IsKeyPressed(Input::Key::W))
 			m_Camera.SetPosition(m_Camera.GetPosition() + (Time::DeltaTime() * m_Speed * m_Camera.GetFrontVector()));
 			
-		if (Input::IsKeyPressed(Key::S))
+		if (Input::IsKeyPressed(Input::Key::S))
 			m_Camera.SetPosition(m_Camera.GetPosition() - (Time::DeltaTime() * m_Speed * m_Camera.GetFrontVector()));
 
-		if (Input::IsKeyPressed(Key::A))
+		if (Input::IsKeyPressed(Input::Key::A))
 			m_Camera.SetPosition(m_Camera.GetPosition() - (Time::DeltaTime() * m_Speed * glm::normalize(glm::cross(m_Camera.GetFrontVector(), m_Camera.GetUpVector()))));
 
-		if (Input::IsKeyPressed(Key::D))
+		if (Input::IsKeyPressed(Input::Key::D))
 			m_Camera.SetPosition(m_Camera.GetPosition() + (Time::DeltaTime() * m_Speed * glm::normalize(glm::cross(m_Camera.GetFrontVector(), m_Camera.GetUpVector()))));
 
 		// Camera rotation

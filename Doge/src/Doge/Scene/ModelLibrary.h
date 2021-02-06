@@ -13,6 +13,7 @@ namespace Doge
 	struct Model
 	{
 		std::vector<Mesh> Meshes;
+		std::vector<Ref<TextureMap>> TextureMaps;
 		std::vector<Ref<MaterialInstance>> MaterialInstances;
 
 		Model() = default;
@@ -20,8 +21,8 @@ namespace Doge
 		Model(const std::vector<Mesh>& meshes, const std::vector<Ref<MaterialInstance>> materialInstances)
 			: Meshes(meshes), MaterialInstances(materialInstances) {}
 	};
-	
-	class ModelLibrary
+
+	class ModelLibrary final
 	{
 	public:
 		static Ref<Model> Load(const std::string& filePath);
@@ -33,6 +34,6 @@ namespace Doge
 			std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)>& texturePaths,
 			aiMaterial* material, aiTextureType type, TextureType textureType);
 	private:
-		static inline std::unordered_map<std::string, Ref<Model>> s_ModelCache;
+		static std::unordered_map<std::string, Ref<Model>> s_ModelCache;
 	};
 }

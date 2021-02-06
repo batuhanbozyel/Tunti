@@ -26,13 +26,13 @@ namespace Doge
 			}
 			else
 			{
-				LOG_ASSERT(false, "Could not read from file!");
+				LOG_ASSERT(false, "Could not read from shader file!");
 			}
 		}
 		else
 		{
 			// Could not open file
-			LOG_ASSERT(false, "Could not open file!");
+			LOG_ASSERT(false, "Could not open shader file!");
 		}
 		return source;
 	}

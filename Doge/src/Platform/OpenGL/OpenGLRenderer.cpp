@@ -28,7 +28,14 @@ namespace Doge
 	{
 		switch (severity)
 		{
-			case GL_DEBUG_SEVERITY_HIGH:         Log::Critical(message); return;
+			case GL_DEBUG_SEVERITY_HIGH:
+			{
+				Log::Critical(message);
+#if DEBUG_ENABLED
+				__debugbreak();
+#endif
+				return;
+			}
 			case GL_DEBUG_SEVERITY_MEDIUM:       Log::Error(message); return;
 			case GL_DEBUG_SEVERITY_LOW:          Log::Warn(message); return;
 			case GL_DEBUG_SEVERITY_NOTIFICATION: Log::Trace(message); return;
@@ -47,7 +54,7 @@ namespace Doge
 		{
 
 		}
-	} static const indirectCmd(6, 2, 0, 0);
+	};
 
 	struct GeometryBuffer
 	{
@@ -74,6 +81,7 @@ namespace Doge
 		Ref<OpenGLShader> SkyboxShader;
 		Ref<OpenGLShader> TexturedQuadShader;
 
+		const DrawArraysIndirectCommand QuadIndirectCommand = DrawArraysIndirectCommand(3, 1, 0, 0);
 		const OpenGLShader* LastShaderState = nullptr;
 	} static s_Data;
 
@@ -83,6 +91,7 @@ namespace Doge
 		LOG_ASSERT(window, "Window could not found!");
 
 		glfwMakeContextCurrent(window);
+		glfwSwapInterval(static_cast<int>(Application::GetActiveWindow()->GetWindowProps().VSync));
 
 		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		LOG_ASSERT(status, "Glad initialization failed");
@@ -112,10 +121,27 @@ namespace Doge
 
 		Log::Trace("Context creation succeed!");
 
+		glCreateVertexArrays(1, &s_Data.VertexArray);
+		glBindVertexArray(s_Data.VertexArray);
+
+		glCreateBuffers(1, &s_Data.LightsUniformBuffer);
+		glNamedBufferStorage(s_Data.LightsUniformBuffer, (sizeof(glm::vec4) * 4 + sizeof(uint32_t)) * 100, nullptr, GL_DYNAMIC_STORAGE_BIT | GL_MAP_WRITE_BIT);
+		glBindBufferBase(GL_UNIFORM_BUFFER, RendererBindingTable::LightsUniformBuffer, s_Data.LightsUniformBuffer);
+
+		glCreateBuffers(1, &s_Data.ViewProjectionUniformBuffer);
+		glNamedBufferStorage(s_Data.ViewProjectionUniformBuffer, 2 * sizeof(glm::mat4) + sizeof(glm::vec3), nullptr, GL_DYNAMIC_STORAGE_BIT);
+		glBindBufferBase(GL_UNIFORM_BUFFER, RendererBindingTable::ViewProjectionUniformBuffer, s_Data.ViewProjectionUniformBuffer);
+
+		const WindowProps& props = Application::GetActiveWindow()->GetWindowProps();
+		ConstructGBuffer(props.Width, props.Height);
+
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
 		OpenGLShaderCache* shaderCache = OpenGLShaderCache::GetInstance();
 		s_Data.TexturedQuadShader = shaderCache->LoadShader(RendererShaders::TexturedQuad);
 
 		s_Data.GeometryPassShader = shaderCache->LoadShader(RendererShaders::GeometryPass);
+		s_Data.GeometryPassShader->Bind();
 
 		s_Data.LightingPassShader = shaderCache->LoadShader(RendererShaders::LightingPass);
 		s_Data.LightingPassShader->Bind();
@@ -134,12 +160,12 @@ namespace Doge
 		// Geometry Pass
 		RenderPasses.push_back([&]()
 		{
-			glEnable(GL_CULL_FACE);
 			glEnable(GL_DEPTH_TEST);
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_BACK);
 
 			glBindFramebuffer(GL_FRAMEBUFFER, s_Data.GBuffer.Framebuffer);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			glCullFace(GL_BACK);
 
 			s_Data.GeometryPassShader->Bind();
 			for (const auto& [material, materialInstanceMap] : MeshQueue)
@@ -150,16 +176,15 @@ namespace Doge
 					SetUniqueUniformProperties(materialInstance);
 					const OpenGLGraphicsBuffer& buffer = (*OpenGLBufferManager::GetInstance())[std::hash<Ref<MaterialInstance>>{}(materialInstance)];
 					glBindBufferBase(GL_SHADER_STORAGE_BUFFER, RendererBindingTable::VertexBufferShaderStorageBuffer, buffer.VertexBuffer);
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.IndexBuffer);
-					s_Data.GeometryPassShader->SetUniformInt("u_PrimitiveCount", buffer.VertexSize);
+					glBindBufferBase(GL_SHADER_STORAGE_BUFFER, RendererBindingTable::IndexBufferShaderStorageBuffer, buffer.IndexBuffer);
 
-					int id = 0;
+					s_Data.GeometryPassShader->SetUniformUInt("u_VertexCount", buffer.VertexCount);
 					for (const auto& [mesh, transform] : meshArray)
 					{
 						s_Data.GeometryPassShader->SetUniformMat4("u_Model", transform);
-						s_Data.GeometryPassShader->SetUniformInt("u_PrimitiveID", id);
-						glDrawElementsBaseVertex(GL_TRIANGLES, mesh.Count, GL_UNSIGNED_INT, nullptr, mesh.BaseVertex);
-						id++;
+						s_Data.GeometryPassShader->SetUniformUInt("u_BaseVertex", mesh.BaseVertex);
+						const DrawArraysIndirectCommand indirectCmd(mesh.Count, 1, mesh.BaseIndex, 0);
+						glDrawArraysIndirect(GL_TRIANGLES, &indirectCmd);
 					}
 				}
 			}
@@ -178,34 +203,12 @@ namespace Doge
 			glUnmapNamedBuffer(s_Data.LightsUniformBuffer);
 
 			s_Data.LightingPassShader->Bind();
-
-			glDrawArraysIndirect(GL_TRIANGLES, &indirectCmd);
+			glDrawArraysIndirect(GL_TRIANGLES, &s_Data.QuadIndirectCommand);
 		});
 
 		EndScene = [&]()
-		{
-			glBlitNamedFramebuffer(
-				s_Data.GBuffer.Framebuffer,
-				0, // Default Framebuffer
-				0, 0,
-				s_Data.GBuffer.Width,
-				s_Data.GBuffer.Height,
-				0, 0,
-				s_Data.GBuffer.Width,
-				s_Data.GBuffer.Height,
-				GL_COLOR_BUFFER_BIT,
-				GL_LINEAR);
-
-			// Render Framebuffer to the Screen
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		{			
 			s_Data.LastShaderState = nullptr;
-
-			glDisable(GL_DEPTH_TEST);
-			glDisable(GL_CULL_FACE);
-
-			s_Data.TexturedQuadShader->Bind();
-
-			glDrawArraysIndirect(GL_TRIANGLES, &indirectCmd);
 		};
 
 		SetSkybox = [&](CubemapTexture skybox)
@@ -225,22 +228,6 @@ namespace Doge
 			glBindTextureUnit(RendererBindingTable::SkyboxTextureUnit, 0);
 			s_Data.SkyboxShader.reset();
 		};
-
-		glCreateVertexArrays(1, &s_Data.VertexArray);
-		glBindVertexArray(s_Data.VertexArray);
-
-		glCreateBuffers(1, &s_Data.LightsUniformBuffer);
-		glNamedBufferStorage(s_Data.LightsUniformBuffer, sizeof(Light)* Light::MaxLightsPerType, nullptr, GL_DYNAMIC_STORAGE_BIT | GL_MAP_WRITE_BIT);
-		glBindBufferBase(GL_UNIFORM_BUFFER, RendererBindingTable::LightsUniformBuffer, s_Data.LightsUniformBuffer);
-
-		glCreateBuffers(1, &s_Data.ViewProjectionUniformBuffer);
-		glNamedBufferStorage(s_Data.ViewProjectionUniformBuffer, 2 * sizeof(glm::mat4) + sizeof(glm::vec3), nullptr, GL_DYNAMIC_STORAGE_BIT);
-		glBindBufferBase(GL_UNIFORM_BUFFER, RendererBindingTable::ViewProjectionUniformBuffer, s_Data.ViewProjectionUniformBuffer);
-
-		const WindowProps& props = Application::GetActiveWindow()->GetWindowProps();
-		ConstructGBuffer(props.Width, props.Height);
-
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
 	OpenGLRenderer::~OpenGLRenderer()
@@ -346,7 +333,6 @@ namespace Doge
 		glTextureStorage2D(s_Data.GBuffer.PositionAttachment, 1, GL_RGBA16F, width, height);
 		glTextureParameteri(s_Data.GBuffer.PositionAttachment, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTextureParameteri(s_Data.GBuffer.PositionAttachment, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
 		glNamedFramebufferTexture(s_Data.GBuffer.Framebuffer, GL_COLOR_ATTACHMENT0, s_Data.GBuffer.PositionAttachment, 0);
 
 		// GBuffer Normal Pass
@@ -354,7 +340,6 @@ namespace Doge
 		glTextureStorage2D(s_Data.GBuffer.NormalAttachment, 1, GL_RGBA16F, width, height);
 		glTextureParameteri(s_Data.GBuffer.NormalAttachment, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTextureParameteri(s_Data.GBuffer.NormalAttachment, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
 		glNamedFramebufferTexture(s_Data.GBuffer.Framebuffer, GL_COLOR_ATTACHMENT1,	s_Data.GBuffer.NormalAttachment, 0);
 
 		// GBuffer Albedo - Specular Pass
@@ -362,7 +347,6 @@ namespace Doge
 		glTextureStorage2D(s_Data.GBuffer.AlbedoSpecularAttachment, 1, GL_RGBA8, width, height);
 		glTextureParameteri(s_Data.GBuffer.AlbedoSpecularAttachment, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTextureParameteri(s_Data.GBuffer.AlbedoSpecularAttachment, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
 		glNamedFramebufferTexture(s_Data.GBuffer.Framebuffer, GL_COLOR_ATTACHMENT2,	s_Data.GBuffer.AlbedoSpecularAttachment, 0);
 
 		static const GLenum attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };

@@ -1,12 +1,12 @@
 #pragma once
+#include "Doge/Utility/Mesh.h"
 
 namespace Doge
 {
-	struct Mesh;
-
 	struct MeshData
 	{
 		uint32_t BaseVertex = 0;
+		uint32_t BaseIndex = 0;
 		uint32_t Count = 0;
 	};
 	

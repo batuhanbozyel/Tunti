@@ -116,7 +116,7 @@ namespace Doge
 	uint32_t OpenGLShader::GetUniformLocation(const char* name) const
 	{
 		auto& mapLocation = m_UniformCache.find(name);
-		LOG_ASSERT(mapLocation != m_UniformCache.end(), "Uniform could not found!");
+		LOG_ASSERT(mapLocation != m_UniformCache.end(), std::string(name) + ": Uniform could not found!");
 		return mapLocation->second.Location;
 	}
 
@@ -166,7 +166,8 @@ namespace Doge
 						break;
 					}
 				}
-				m_UniformCache.emplace(std::make_pair(std::string(uniform_name.get(), length), prop));
+				if(uniform_name[0] == 'u')
+					m_UniformCache.emplace(std::make_pair(std::string(uniform_name.get(), length), prop));
 			}
 		}
 	}
