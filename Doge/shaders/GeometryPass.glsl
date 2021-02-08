@@ -8,8 +8,7 @@ layout(location = 3) flat out uint v_TexIndex;
 
 layout(std140, binding = 0) uniform ViewProjectionUniform
 {
-    mat4 View;
-    mat4 Projection;
+    mat4 ViewProjection;
 	vec3 CameraPosition;
 };
 
@@ -54,7 +53,7 @@ void main()
 
 	v_TexIndex = uint(vertexBuffer.data[u_VertexCount * 9 + index]);
 	
-	gl_Position = Projection * View * worldPosition;
+	gl_Position = ViewProjection * worldPosition;
 }
 
 #type fragment

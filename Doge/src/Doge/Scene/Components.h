@@ -30,10 +30,10 @@ namespace Doge
 
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent&) = default;
-		TransformComponent(const glm::vec3 & translation)
+		TransformComponent(const glm::vec3& translation)
 			: Translation(translation) {}
 
-		operator glm::mat4 () const
+		operator glm::mat4() const
 		{
 			return glm::translate(glm::mat4(1.0f), Translation)
 				* glm::toMat4(glm::quat(Rotation))
@@ -53,19 +53,19 @@ namespace Doge
 
 	struct CameraComponent
 	{
-		bool Primary = false;
-		Scope<Camera> SceneCamera;
+		SceneCamera Camera;
+		bool Primary = true;
+		bool FixedAspectRatio = false;
 
-		operator const Camera* () const { return SceneCamera.get(); }
-
-		CameraComponent(const PerspectiveCamera& camera)
-			: SceneCamera(CreateScope<PerspectiveCamera>(camera)) {}
+		CameraComponent(uint32_t width, uint32_t height)
+			: Camera(width, height) {}
+		CameraComponent(const CameraComponent&) = default;
 	};
 
 	struct LightComponent
 	{
 		LightData Light;
-		
+
 		LightComponent() = default;
 		LightComponent(LightType type)
 			: Light(type) {}

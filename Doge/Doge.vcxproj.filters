@@ -141,9 +141,6 @@
     <ClInclude Include="src\Doge\Renderer\Texture.h">
       <Filter>src\Doge\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="src\Doge\Scene\CameraController.h">
-      <Filter>src\Doge\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="src\Doge\Scene\Components.h">
       <Filter>src\Doge\Scene</Filter>
     </ClInclude>
@@ -1665,6 +1662,7 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
+    <ClInclude Include="src\Doge\Scene\SceneCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Doge\Core\Application.cpp">
@@ -1688,17 +1686,11 @@
     <ClCompile Include="src\Doge\Renderer\Texture.cpp">
       <Filter>src\Doge\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\Doge\Scene\CameraController.cpp">
-      <Filter>src\Doge\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="src\Doge\Scene\ModelLibrary.cpp">
       <Filter>src\Doge\Scene</Filter>
     </ClCompile>
     <ClCompile Include="src\Doge\Scene\Scene.cpp">
       <Filter>src\Doge\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Doge\Utility\Camera.cpp">
-      <Filter>src\Doge\Utility</Filter>
     </ClCompile>
     <ClCompile Include="src\Doge\Utility\Material.cpp">
       <Filter>src\Doge\Utility</Filter>
@@ -1727,5 +1719,6 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\Doge\Scene\SceneCamera.cpp" />
   </ItemGroup>
 </Project>

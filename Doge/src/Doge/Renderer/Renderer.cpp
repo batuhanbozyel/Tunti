@@ -56,9 +56,9 @@ namespace Doge
 		((meshQueue[material])[materialInstance]).push_back({ mesh, transform });
 	}
 
-	void Renderer::BeginScene(const Camera& camera)
+	void Renderer::BeginScene(const Camera& camera, const glm::mat4& transform, const glm::vec3& position)
 	{
-		s_Instance->BeginScene(camera);
+		s_Instance->BeginScene(camera, transform, position);
 	}
 
 	void Renderer::EndScene()

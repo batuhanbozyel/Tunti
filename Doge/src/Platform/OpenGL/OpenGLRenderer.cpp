@@ -148,12 +148,11 @@ namespace Doge
 		s_Data.LightingPassShader->SetUniformInt("u_NormalAttachment", RendererBindingTable::GBufferNormalTextureUnit);
 		s_Data.LightingPassShader->SetUniformInt("u_AlbedoSpecularAttachment", RendererBindingTable::GBufferAlbedoSpecularTextureUnit);
 		
-		BeginScene = [&](const Camera& camera)
+		BeginScene = [&](const Camera& camera, const glm::mat4& transform, const glm::vec3& position)
 		{
 			// Update Uniform Buffers' contents
-			glNamedBufferSubData(s_Data.ViewProjectionUniformBuffer, 0, sizeof(glm::mat4), glm::value_ptr(camera.GetViewMatrix()));
-			glNamedBufferSubData(s_Data.ViewProjectionUniformBuffer, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(camera.GetProjectionMatrix()));
-			glNamedBufferSubData(s_Data.ViewProjectionUniformBuffer, 2 * sizeof(glm::mat4), sizeof(glm::vec3), glm::value_ptr(camera.GetPosition()));
+			glNamedBufferSubData(s_Data.ViewProjectionUniformBuffer, 0, sizeof(glm::mat4), glm::value_ptr(camera.GetProjection() * glm::inverse(transform)));
+			glNamedBufferSubData(s_Data.ViewProjectionUniformBuffer, sizeof(glm::mat4), sizeof(glm::vec3), glm::value_ptr(position));
 		};
 
 		// Geometry Pass

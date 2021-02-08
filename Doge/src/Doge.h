@@ -14,15 +14,14 @@
 // Utility
 #include "Doge/Utility/Mesh.h"
 #include "Doge/Utility/Light.h"
-#include "Doge/Utility/Camera.h"
 #include "Doge/Utility/Material.h"
 
 // Scene
 #include "Doge/Scene/Scene.h"
 #include "Doge/Scene/Entity.h"
+#include "Doge/Scene/SceneCamera.h"
 #include "Doge/Scene/Components.h"
 #include "Doge/Scene/ModelLibrary.h"
-#include "Doge/Scene/CameraController.h"
 
 // 3rd-Party Includes
 #include <glm/glm.hpp>

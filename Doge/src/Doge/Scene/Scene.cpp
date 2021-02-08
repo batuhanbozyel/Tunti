@@ -16,6 +16,7 @@ namespace Doge
 	{
 		const Camera* mainCamera = nullptr;
 		glm::mat4 cameraTransform;
+		glm::vec3 cameraPosition;
 		{
 			auto view = m_Registry.view<TransformComponent, CameraComponent>();
 			for (auto entity : view)
@@ -24,8 +25,9 @@ namespace Doge
 
 				if (camera.Primary)
 				{
-					mainCamera = camera;
+					mainCamera = &camera.Camera;
 					cameraTransform = transform;
+					cameraPosition = transform.Translation;
 					break;
 				}
 			}
@@ -33,7 +35,7 @@ namespace Doge
 
 		if (mainCamera)
 		{
-			Renderer::BeginScene(*mainCamera);
+			Renderer::BeginScene(*mainCamera, cameraTransform, cameraPosition);
 
 			auto group = m_Registry.group<TransformComponent>(entt::get<MeshRendererComponent>);
 			for (auto entity : group)

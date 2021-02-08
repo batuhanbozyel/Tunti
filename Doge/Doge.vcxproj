@@ -169,11 +169,11 @@
     <ClInclude Include="src\Doge\Renderer\Shader.h" />
     <ClInclude Include="src\Doge\Renderer\ShaderDataType.h" />
     <ClInclude Include="src\Doge\Renderer\Texture.h" />
-    <ClInclude Include="src\Doge\Scene\CameraController.h" />
     <ClInclude Include="src\Doge\Scene\Components.h" />
     <ClInclude Include="src\Doge\Scene\Entity.h" />
     <ClInclude Include="src\Doge\Scene\ModelLibrary.h" />
     <ClInclude Include="src\Doge\Scene\Scene.h" />
+    <ClInclude Include="src\Doge\Scene\SceneCamera.h" />
     <ClInclude Include="src\Doge\Utility\Camera.h" />
     <ClInclude Include="src\Doge\Utility\Light.h" />
     <ClInclude Include="src\Doge\Utility\Material.h" />
@@ -686,10 +686,9 @@
     <ClCompile Include="src\Doge\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Doge\Renderer\Shader.cpp" />
     <ClCompile Include="src\Doge\Renderer\Texture.cpp" />
-    <ClCompile Include="src\Doge\Scene\CameraController.cpp" />
     <ClCompile Include="src\Doge\Scene\ModelLibrary.cpp" />
     <ClCompile Include="src\Doge\Scene\Scene.cpp" />
-    <ClCompile Include="src\Doge\Utility\Camera.cpp" />
+    <ClCompile Include="src\Doge\Scene\SceneCamera.cpp" />
     <ClCompile Include="src\Doge\Utility\Material.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLBufferManager.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLRenderer.cpp" />
@@ -713,4 +712,4 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
-</Project> 
+</Project>

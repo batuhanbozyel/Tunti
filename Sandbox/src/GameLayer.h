@@ -12,12 +12,14 @@ namespace Sandbox
 		virtual void OnUpdate() override;
 		virtual void OnEvent(Doge::Event& e) override;
 	private:
-		void ConstructDummyScene();
+		void ConstructTestScene();
 
 		bool OnKeyPress(Doge::KeyPressedEvent& e);
+		bool OnWindowResize(Doge::WindowResizeEvent& e);
 		bool OnMouseButtonPress(Doge::MouseButtonPressedEvent& e);
 	private:
 		Doge::Scene m_Scene;
-		bool m_IsMouseVisible = false;
+
+		bool m_MouseVisible = true;
 	};
 }

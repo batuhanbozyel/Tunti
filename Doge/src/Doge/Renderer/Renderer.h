@@ -23,7 +23,7 @@ namespace Doge
 			Vulkan
 		};
 	protected:
-		std::function<void(const Camera&)> BeginScene;
+		std::function<void(const Camera&, const glm::mat4&, const glm::vec3&)> BeginScene;
 		std::vector<std::function<void()>> RenderPasses;
 		std::function<void()> EndScene;
 
@@ -46,7 +46,7 @@ namespace Doge
 
 		static decltype(RendererAPI::None) GetAPI() { return s_GraphicsAPI; }
 
-		static void BeginScene(const Camera& camera);
+		static void BeginScene(const Camera& camera, const glm::mat4& transform, const glm::vec3& position);
 		static void EndScene();
 
 		static void SetSkybox(CubemapTexture skybox);

@@ -4,7 +4,13 @@ namespace Sandbox
 {
 	GameLayer::GameLayer()
 	{
-		ConstructDummyScene();
+		Doge::Entity sceneCameraEntity = m_Scene.CreateEntity("Perspective Camera");
+		sceneCameraEntity.AddComponent<Doge::CameraComponent>(
+			Doge::Application::GetActiveWindow()->GetWindowProps().Width,
+			Doge::Application::GetActiveWindow()->GetWindowProps().Height).Primary = true;
+		sceneCameraEntity.GetComponent<Doge::TransformComponent>().Translation = glm::vec3(0.0f, 0.0f, 8.0f);
+
+		ConstructTestScene();
 	}
 
 	void GameLayer::OnUpdate()
@@ -19,7 +25,7 @@ namespace Sandbox
 		dispatcher.Dispatch<Doge::MouseButtonPressedEvent>(BIND_EVENT_FN(OnMouseButtonPress));
 	}
 
-	void GameLayer::ConstructDummyScene()
+	void GameLayer::ConstructTestScene()
 	{
 #if 0
 		Doge::Ref<Doge::Model> sponzaModel = Doge::ModelLibrary::Load("assets/models/sponza/sponza.obj");
@@ -83,12 +89,6 @@ namespace Sandbox
 			}
 		}
 #endif
-		Doge::Entity sceneCameraEntity = m_Scene.CreateEntity("SceneCamera");
-		sceneCameraEntity.AddComponent<Doge::CameraComponent>(
-			Doge::PerspectiveCamera(60.0f, Doge::Application::GetActiveWindow()->GetWindowProps().Width,
-										   Doge::Application::GetActiveWindow()->GetWindowProps().Height, glm::vec3(0.0f, 0.0f, -8.0f)));
-		Doge::CameraComponent& sceneCameraComponent = sceneCameraEntity.GetComponent<Doge::CameraComponent>();
-		sceneCameraComponent.Primary = true;
 
 		Doge::Log::Warn("Dummy scene constructed!");
 	}
@@ -106,14 +106,19 @@ namespace Sandbox
 		return false;
 	}
 
+	bool GameLayer::OnWindowResize(Doge::WindowResizeEvent& e)
+	{
+		return false;
+	}
+
 	bool GameLayer::OnMouseButtonPress(Doge::MouseButtonPressedEvent& e)
 	{
 		switch (e.GetMouseButton())
 		{
 			case Doge::Input::Mouse::ButtonRight:
 			{
-				m_IsMouseVisible ? Doge::Application::DisableCursor() : Doge::Application::EnableCursor();
-				m_IsMouseVisible = !m_IsMouseVisible;
+				m_MouseVisible ? Doge::Application::DisableCursor() : Doge::Application::EnableCursor();
+				m_MouseVisible = !m_MouseVisible;
 				return true;
 			}
 		}

@@ -34,8 +34,7 @@ struct Light
 
 layout(std140, binding = 0) uniform ViewProjectionUniform
 {
-    mat4 View;
-    mat4 Projection;
+    mat4 ViewProjection;
 	vec3 CameraPosition;
 };
 
@@ -98,7 +97,7 @@ void main()
         vec3 nominator = NDF * G * F;
         float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001;
         vec3 specular = nominator / denominator;
-        
+
         vec3 kS = F;
         vec3 kD = vec3(1.0) - kS;
         kD *= 1.0 - metalness;
