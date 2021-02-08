@@ -7,7 +7,7 @@ namespace Doge
 	{
 		Albedo = 0,
 		Normal,
-		Metallic,
+		Metalness,
 		Roughness,
 		AmbientOcclusion,
 		COUNT

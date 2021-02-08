@@ -81,7 +81,7 @@ namespace Doge
 				if (texturePaths[static_cast<uint16_t>(TextureType::Normal)].empty())
 					AddTexturePath(directory, texturePaths, material, aiTextureType_DISPLACEMENT, TextureType::Normal);
 			}
-			AddTexturePath(directory, texturePaths, material, aiTextureType_SPECULAR, TextureType::Metallic);
+			AddTexturePath(directory, texturePaths, material, aiTextureType_SPECULAR, TextureType::Metalness);
 			AddTexturePath(directory, texturePaths, material, aiTextureType_SHININESS, TextureType::Roughness);
 			AddTexturePath(directory, texturePaths, material, aiTextureType_LIGHTMAP, TextureType::AmbientOcclusion);
 

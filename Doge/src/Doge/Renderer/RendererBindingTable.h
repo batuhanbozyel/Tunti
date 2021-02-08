@@ -22,11 +22,11 @@ namespace Doge
 
 	namespace RendererShaders
 	{
-		static constexpr char* GeometryPass = "../Doge/assets/shaders/GeometryPass.glsl";
-		static constexpr char* LightingPass = "../Doge/assets/shaders/LightingPass.glsl";
+		static constexpr char* GeometryPass = "../Doge/shaders/GeometryPass.glsl";
+		static constexpr char* LightingPass = "../Doge/shaders/LightingPass.glsl";
 
-		static constexpr char* Skybox = "../Doge/assets/shaders/Skybox.glsl";
-		static constexpr char* TexturedQuad = "../Doge/assets/shaders/TexturedQuad.glsl";
-		static constexpr char* ObjectOutlining = "../Doge/assets/shaders/ObjectOutlining.glsl";
+		static constexpr char* Skybox = "../Doge/shaders/Skybox.glsl";
+		static constexpr char* TexturedQuad = "../Doge/shaders/TexturedQuad.glsl";
+		static constexpr char* ObjectOutlining = "../Doge/shaders/ObjectOutlining.glsl";
 	}
 }

@@ -1,10 +1,10 @@
 #pragma once
-#include "BufferManager.h"
-#include "Doge/Utility/Light.h"
 
 namespace Doge
 {
 	struct Shader;
+	struct MeshData;
+	struct LightData;
 	struct WindowProps;
 	struct CubemapTexture;
 
@@ -30,7 +30,7 @@ namespace Doge
 		std::function<void(CubemapTexture skybox)> SetSkybox;
 		std::function<void()> ClearSkybox;
 
-		std::vector<Light> LightQueue;
+		std::vector<LightData> LightQueue;
 		std::unordered_map<Ref<Material>, std::unordered_map<Ref<MaterialInstance>, std::vector<std::tuple<MeshData, glm::mat4>>>> MeshQueue;
 	};
 
@@ -41,6 +41,7 @@ namespace Doge
 		static void Shutdown();
 
 		static void Submit(const std::function<void()>& renderPass);
+		static void DrawLight(const LightData& light, const glm::mat4& transform);
 		static void DrawMesh(const MeshData& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform);
 
 		static decltype(RendererAPI::None) GetAPI() { return s_GraphicsAPI; }

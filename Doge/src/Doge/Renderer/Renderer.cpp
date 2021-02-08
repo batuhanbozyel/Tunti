@@ -2,11 +2,13 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Renderer.h"
+#include "BufferManager.h"
 
 #include "Platform/OpenGL/OpenGLRenderer.h"
 
 #include "Doge/Core/Window.h"
 #include "Doge/Utility/Mesh.h"
+#include "Doge/Utility/Light.h"
 #include "Doge/Utility/Camera.h"
 #include "Doge/Utility/Material.h"
 
@@ -39,6 +41,11 @@ namespace Doge
 	void Renderer::Submit(const std::function<void()>& renderPass)
 	{
 		s_Instance->RenderPasses.push_back(renderPass);
+	}
+
+	void Renderer::DrawLight(const LightData& light, const glm::mat4& transform)
+	{
+
 	}
 
 	void Renderer::DrawMesh(const MeshData& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform)

@@ -64,24 +64,10 @@ namespace Doge
 
 	struct LightComponent
 	{
-		enum
-		{
-			DirectionLight = 0,
-			PointLight = 1,
-			SpotLight = 2,
-			AreaLight = 3
-		};
-		glm::vec3 Color{ 1.0f };
-
-		float Intensity = 1.0f;
-		float Constant = 1.0f;
-		float Linear = 0.09f;
-		float Quadratic = 0.032f;
-
-		decltype(DirectionLight) Type = DirectionLight;
-
+		LightData Light;
+		
 		LightComponent() = default;
-		LightComponent(decltype(DirectionLight) type)
-			: Type(type) {}
- 	};
+		LightComponent(LightType type)
+			: Light(type) {}
+	};
 }

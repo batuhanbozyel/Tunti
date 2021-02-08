@@ -10,6 +10,7 @@
 #include "Doge/Core/Application.h"
 
 #include "Doge/Utility/Mesh.h"
+#include "Doge/Utility/Light.h"
 #include "Doge/Utility/Camera.h"
 #include "Doge/Utility/Material.h"
 
@@ -141,10 +142,8 @@ namespace Doge
 		s_Data.TexturedQuadShader = shaderCache->LoadShader(RendererShaders::TexturedQuad);
 
 		s_Data.GeometryPassShader = shaderCache->LoadShader(RendererShaders::GeometryPass);
-		s_Data.GeometryPassShader->Bind();
 
 		s_Data.LightingPassShader = shaderCache->LoadShader(RendererShaders::LightingPass);
-		s_Data.LightingPassShader->Bind();
 		s_Data.LightingPassShader->SetUniformInt("u_PositionAttachment", RendererBindingTable::GBufferPositionTextureUnit);
 		s_Data.LightingPassShader->SetUniformInt("u_NormalAttachment", RendererBindingTable::GBufferNormalTextureUnit);
 		s_Data.LightingPassShader->SetUniformInt("u_AlbedoSpecularAttachment", RendererBindingTable::GBufferAlbedoSpecularTextureUnit);
@@ -197,8 +196,8 @@ namespace Doge
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			void* lightBuffPtr = glMapNamedBuffer(s_Data.LightsUniformBuffer, GL_WRITE_ONLY);
-			memcpy(lightBuffPtr, LightQueue.data(), LightQueue.size() * sizeof(Light));
-			lightBuffPtr = ((Light*)lightBuffPtr) + LightQueue.size();
+			memcpy(lightBuffPtr, LightQueue.data(), LightQueue.size() * sizeof(LightData));
+			lightBuffPtr = ((LightData*)lightBuffPtr) + LightQueue.size();
 			*(int*)lightBuffPtr = LightQueue.size();
 			glUnmapNamedBuffer(s_Data.LightsUniformBuffer);
 
