@@ -39,6 +39,16 @@ namespace Doge
 			glfwGetCursorPos(static_cast<GLFWwindow*>(Application::GetActiveWindow()->GetNativeWindow()), &xpos, &ypos);
 			return { static_cast<float>(xpos), static_cast<float>(ypos) };
 		}
+
+		float GetAxis::MouseX()
+		{
+			return GetMousePos().first;
+		}
+
+		float GetAxis::MouseY()
+		{
+			return GetMousePos().second;
+		}
 	}
 #else
 #error Tunti Engine currently supports Windows only!

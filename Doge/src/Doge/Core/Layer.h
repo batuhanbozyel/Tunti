@@ -11,6 +11,7 @@ namespace Doge
 
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}
+		virtual void OnStart() {}
 		virtual void OnUpdate() {}
 		virtual void OnEvent(Event& e) {}
 	};

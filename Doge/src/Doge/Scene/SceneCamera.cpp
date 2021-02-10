@@ -12,7 +12,7 @@ namespace Doge
 	{
 		m_ProjectionType = ProjectionType::Perspective;
 
-		m_PerspectiveFOV = verticalFov;
+		m_PerspectiveFOV = glm::radians(verticalFov);
 		m_PerspectiveNear = nearClip;
 		m_PerspectiveFar = farClip;
 

@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "ModelLibrary.h"
 
-#include "Doge/Utility/Material.h"
-#include "Doge/Utility/Mesh.h"
+#include "Doge/Renderer/Material.h"
+#include "Doge/Renderer/Mesh.h"
 
 namespace Doge
 {

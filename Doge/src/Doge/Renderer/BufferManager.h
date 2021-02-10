@@ -1,5 +1,5 @@
 #pragma once
-#include "Doge/Utility/Mesh.h"
+#include "Mesh.h"
 
 namespace Doge
 {

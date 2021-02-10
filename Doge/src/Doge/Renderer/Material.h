@@ -1,5 +1,5 @@
 #pragma once
-#include "Doge/Renderer/Shader.h"
+#include "Shader.h"
 
 namespace Doge
 {

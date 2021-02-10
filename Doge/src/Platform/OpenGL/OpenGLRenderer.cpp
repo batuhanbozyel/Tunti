@@ -9,11 +9,10 @@
 #include "Doge/Core/Window.h"
 #include "Doge/Core/Application.h"
 
-#include "Doge/Utility/Mesh.h"
-#include "Doge/Utility/Light.h"
-#include "Doge/Utility/Camera.h"
-#include "Doge/Utility/Material.h"
-
+#include "Doge/Renderer/Mesh.h"
+#include "Doge/Renderer/Light.h"
+#include "Doge/Renderer/Camera.h"
+#include "Doge/Renderer/Material.h"
 #include "Doge/Renderer/RendererBindingTable.h"
 
 namespace Doge

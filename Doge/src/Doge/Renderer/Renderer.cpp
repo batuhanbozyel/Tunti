@@ -1,16 +1,17 @@
 #include "pch.h"
+#include "Mesh.h"
+#include "Light.h"
+#include "Camera.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "Material.h"
 #include "Renderer.h"
 #include "BufferManager.h"
 
 #include "Platform/OpenGL/OpenGLRenderer.h"
 
 #include "Doge/Core/Window.h"
-#include "Doge/Utility/Mesh.h"
-#include "Doge/Utility/Light.h"
-#include "Doge/Utility/Camera.h"
-#include "Doge/Utility/Material.h"
+
 
 namespace Doge
 {

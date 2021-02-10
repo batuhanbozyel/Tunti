@@ -174,10 +174,11 @@
     <ClInclude Include="src\Doge\Scene\ModelLibrary.h" />
     <ClInclude Include="src\Doge\Scene\Scene.h" />
     <ClInclude Include="src\Doge\Scene\SceneCamera.h" />
-    <ClInclude Include="src\Doge\Utility\Camera.h" />
-    <ClInclude Include="src\Doge\Utility\Light.h" />
-    <ClInclude Include="src\Doge\Utility\Material.h" />
-    <ClInclude Include="src\Doge\Utility\Mesh.h" />
+    <ClInclude Include="src\Doge\Renderer\Camera.h" />
+    <ClInclude Include="src\Doge\Renderer\Light.h" />
+    <ClInclude Include="src\Doge\Renderer\Material.h" />
+    <ClInclude Include="src\Doge\Renderer\Mesh.h" />
+    <ClInclude Include="src\Doge\Utility\CameraControllers.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLBufferManager.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLRenderer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLShader.h" />
@@ -689,7 +690,8 @@
     <ClCompile Include="src\Doge\Scene\ModelLibrary.cpp" />
     <ClCompile Include="src\Doge\Scene\Scene.cpp" />
     <ClCompile Include="src\Doge\Scene\SceneCamera.cpp" />
-    <ClCompile Include="src\Doge\Utility\Material.cpp" />
+    <ClCompile Include="src\Doge\Renderer\Material.cpp" />
+    <ClCompile Include="src\Doge\Utility\CameraControllers.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLBufferManager.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLRenderer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLShader.cpp" />

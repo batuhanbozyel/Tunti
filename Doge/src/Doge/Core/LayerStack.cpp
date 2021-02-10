@@ -52,6 +52,15 @@ namespace Doge
 		}
 	}
 
+	void LayerStack::OnStart()
+	{
+		for (Layer* layer : m_Layers)
+			layer->OnStart();
+
+		for (Layer* overlay : m_Overlays)
+			overlay->OnStart();
+	}
+
 	void LayerStack::OnUpdate()
 	{
 		for (Layer* layer : m_Layers)

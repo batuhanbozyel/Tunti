@@ -1,5 +1,5 @@
 #pragma once
-#include "Doge/Utility/Camera.h"
+#include "Doge/Renderer/Camera.h"
 
 namespace Doge
 {

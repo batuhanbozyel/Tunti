@@ -10,11 +10,12 @@
 #include "Doge/Renderer/Renderer.h"
 #include "Doge/Renderer/Texture.h"
 #include "Doge/Renderer/Shader.h"
+#include "Doge/Renderer/Mesh.h"
+#include "Doge/Renderer/Light.h"
+#include "Doge/Renderer/Material.h"
 
 // Utility
-#include "Doge/Utility/Mesh.h"
-#include "Doge/Utility/Light.h"
-#include "Doge/Utility/Material.h"
+#include "Doge/Utility/CameraControllers.h"
 
 // Scene
 #include "Doge/Scene/Scene.h"

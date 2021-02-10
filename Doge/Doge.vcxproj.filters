@@ -153,18 +153,6 @@
     <ClInclude Include="src\Doge\Scene\Scene.h">
       <Filter>src\Doge\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="src\Doge\Utility\Camera.h">
-      <Filter>src\Doge\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Doge\Utility\Light.h">
-      <Filter>src\Doge\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Doge\Utility\Material.h">
-      <Filter>src\Doge\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Doge\Utility\Mesh.h">
-      <Filter>src\Doge\Utility</Filter>
-    </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLBufferManager.h">
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
@@ -1663,6 +1651,19 @@
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
     <ClInclude Include="src\Doge\Scene\SceneCamera.h" />
+    <ClInclude Include="src\Doge\Renderer\Camera.h">
+      <Filter>src\Doge\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Doge\Renderer\Light.h">
+      <Filter>src\Doge\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Doge\Renderer\Material.h">
+      <Filter>src\Doge\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Doge\Renderer\Mesh.h">
+      <Filter>src\Doge\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Doge\Utility\CameraControllers.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Doge\Core\Application.cpp">
@@ -1692,9 +1693,6 @@
     <ClCompile Include="src\Doge\Scene\Scene.cpp">
       <Filter>src\Doge\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="src\Doge\Utility\Material.cpp">
-      <Filter>src\Doge\Utility</Filter>
-    </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLBufferManager.cpp">
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
@@ -1720,5 +1718,9 @@
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
     <ClCompile Include="src\Doge\Scene\SceneCamera.cpp" />
+    <ClCompile Include="src\Doge\Renderer\Material.cpp">
+      <Filter>src\Doge\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Doge\Utility\CameraControllers.cpp" />
   </ItemGroup>
 </Project>

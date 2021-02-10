@@ -12,6 +12,11 @@ namespace Doge
 		// Mouse Input
 		bool IsMouseButtonPressed(int button);
 		std::pair<float, float> GetMousePos();
+		namespace GetAxis
+		{
+			float MouseX();
+			float MouseY();
+		}
 
 		enum Key : uint16_t
 		{

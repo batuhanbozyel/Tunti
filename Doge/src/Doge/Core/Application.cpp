@@ -34,12 +34,11 @@ namespace Doge
 
 	void Application::Run()
 	{
+		m_LayerStack.OnStart();
 		while (m_Running)
 		{
 			Time::OnTick();
-
 			m_LayerStack.OnUpdate();
-
 			m_ActiveWindow->OnUpdate();
 		}
 	}

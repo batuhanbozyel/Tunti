@@ -39,6 +39,13 @@ namespace Doge
 				* glm::toMat4(glm::quat(Rotation))
 				* glm::scale(glm::mat4(1.0f), Scale);
 		}
+
+		glm::mat4 Transform() const
+		{
+			return glm::translate(glm::mat4(1.0f), Translation)
+				* glm::toMat4(glm::quat(Rotation))
+				* glm::scale(glm::mat4(1.0f), Scale);
+		}
 	};
 
 	struct MeshRendererComponent

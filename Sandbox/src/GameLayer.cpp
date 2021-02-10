@@ -2,19 +2,15 @@
 
 namespace Sandbox
 {
-	GameLayer::GameLayer()
+	void GameLayer::OnStart()
 	{
-		Doge::Entity sceneCameraEntity = m_Scene.CreateEntity("Perspective Camera");
-		sceneCameraEntity.AddComponent<Doge::CameraComponent>(
-			Doge::Application::GetActiveWindow()->GetWindowProps().Width,
-			Doge::Application::GetActiveWindow()->GetWindowProps().Height).Primary = true;
-		sceneCameraEntity.GetComponent<Doge::TransformComponent>().Translation = glm::vec3(0.0f, 0.0f, 8.0f);
-
 		ConstructTestScene();
+		m_FPSCameraController.OnStart(m_Scene);
 	}
 
 	void GameLayer::OnUpdate()
 	{
+		m_FPSCameraController.OnUpdate();
 		m_Scene.OnUpdate();
 	}
 
@@ -23,6 +19,7 @@ namespace Sandbox
 		Doge::EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<Doge::KeyPressedEvent>(BIND_EVENT_FN(OnKeyPress));
 		dispatcher.Dispatch<Doge::MouseButtonPressedEvent>(BIND_EVENT_FN(OnMouseButtonPress));
+		dispatcher.Dispatch<Doge::WindowResizeEvent>(BIND_EVENT_FN(OnWindowResize));
 	}
 
 	void GameLayer::ConstructTestScene()
@@ -108,20 +105,12 @@ namespace Sandbox
 
 	bool GameLayer::OnWindowResize(Doge::WindowResizeEvent& e)
 	{
+		m_FPSCameraController.SetViewportSize(e.GetWidth(), e.GetHeight());
 		return false;
 	}
 
 	bool GameLayer::OnMouseButtonPress(Doge::MouseButtonPressedEvent& e)
 	{
-		switch (e.GetMouseButton())
-		{
-			case Doge::Input::Mouse::ButtonRight:
-			{
-				m_MouseVisible ? Doge::Application::DisableCursor() : Doge::Application::EnableCursor();
-				m_MouseVisible = !m_MouseVisible;
-				return true;
-			}
-		}
 		return false;
 	}
 }

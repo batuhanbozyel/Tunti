@@ -15,6 +15,7 @@ namespace Doge
 		void PopLayer(Layer* layer);
 		void PopOverlay(Layer* overlay);
 
+		void OnStart();
 		void OnUpdate();
 
 		inline const std::list<Layer*>& GetLayers() const { return m_Layers; }
