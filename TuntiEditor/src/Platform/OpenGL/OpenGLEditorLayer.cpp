@@ -1,4 +1,4 @@
-#include "Doge.h"
+#include "Tunti.h"
 #include "OpenGLEditorLayer.h"
 
 namespace TEditor
@@ -24,7 +24,7 @@ namespace TEditor
 		}
 
 		// Setup Platform/Renderer bindings
-		void* window = Doge::Application::GetActiveWindow()->GetNativeWindow();
+		void* window = Tunti::Application::GetActiveWindow()->GetNativeWindow();
 		ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow*>(window), true);
 		ImGui_ImplOpenGL3_Init("#version 450");
 	}
@@ -94,7 +94,7 @@ namespace TEditor
 		ImGui::End();
 
 		ImGuiIO& io = ImGui::GetIO();
-		io.DisplaySize = ImVec2((float)Doge::Application::GetActiveWindow()->GetWindowProps().Width, (float)Doge::Application::GetActiveWindow()->GetWindowProps().Height);
+		io.DisplaySize = ImVec2((float)Tunti::Application::GetActiveWindow()->GetWindowProps().Width, (float)Tunti::Application::GetActiveWindow()->GetWindowProps().Height);
 
 		// Rendering
 		ImGui::Render();

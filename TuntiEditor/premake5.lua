@@ -16,8 +16,8 @@ project "TuntiEditor"
 	includedirs
 	{
 		"src",
-		"%{wks.location}/Doge/src",
-		"%{wks.location}/Doge/vendor",
+		"%{wks.location}/Tunti/src",
+		"%{wks.location}/Tunti/vendor",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.glm}",
@@ -29,7 +29,7 @@ project "TuntiEditor"
 
 	links
 	{
-		"Doge",
+		"Tunti",
 		"ImGui"
 	}
 

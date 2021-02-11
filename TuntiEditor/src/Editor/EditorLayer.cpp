@@ -1,4 +1,4 @@
-#include "Doge.h"
+#include "Tunti.h"
 #include "EditorLayer.h"
 
 #include "Platform/OpenGL/OpenGLEditorLayer.h"
@@ -8,18 +8,18 @@ namespace TEditor
 	EditorLayer* EditorLayer::s_EditorAPI = nullptr;
 
 	EditorLayer::EditorLayer()
-		: m_Scene(Doge::Application::GetActiveWindow()->GetWindowProps().Width,
-			Doge::Application::GetActiveWindow()->GetWindowProps().Height)
+		: m_Scene(Tunti::Application::GetActiveWindow()->GetWindowProps().Width,
+			Tunti::Application::GetActiveWindow()->GetWindowProps().Height)
 	{
 		
 	}
 
 	EditorLayer* EditorLayer::Create()
 	{
-		switch (Doge::Renderer::GetAPI())
+		switch (Tunti::Renderer::GetAPI())
 		{
-		case Doge::RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
-		case Doge::RendererAPI::OpenGL: return s_EditorAPI = new OpenGLEditorLayer;
+			case Tunti::RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
+			case Tunti::RendererAPI::OpenGL: return s_EditorAPI = new OpenGLEditorLayer;
 		}
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
 		return nullptr;
@@ -36,19 +36,19 @@ namespace TEditor
 		delete s_EditorAPI;
 	}
 
-	void EditorLayer::OnEvent(Doge::Event& e)
+	void EditorLayer::OnEvent(Tunti::Event& e)
 	{
 		if (!m_ScenePlay)
 		{
 			ImGuiIO& io = ImGui::GetIO();
-			e.Handled |= e.IsInCategory(Doge::EventCategoryMouse) & io.WantCaptureMouse;
-			e.Handled |= e.IsInCategory(Doge::EventCategoryKeyboard) & io.WantCaptureKeyboard;
+			e.Handled |= e.IsInCategory(Tunti::EventCategoryMouse) & io.WantCaptureMouse;
+			e.Handled |= e.IsInCategory(Tunti::EventCategoryKeyboard) & io.WantCaptureKeyboard;
 		}
-		Doge::EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<Doge::KeyPressedEvent>(BIND_EVENT_FN(OnKeyPress));
+		Tunti::EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<Tunti::KeyPressedEvent>(BIND_EVENT_FN(OnKeyPress));
 	}
 
-	void EditorLayer::OnUpdate(float dt)
+	void EditorLayer::OnUpdate()
 	{
 		m_Scene.Render();
 
@@ -62,7 +62,7 @@ namespace TEditor
 
 		if (m_ScenePlay)
 		{
-			m_Scene.OnUpdate(dt);
+			m_Scene.OnUpdate();
 		}
 	}
 
@@ -71,9 +71,9 @@ namespace TEditor
 		if (m_ScenePlay == true)
 		{
 			m_ScenePlay = false;
-			m_Scene = SceneFrame(Doge::Application::GetActiveWindow()->GetWindowProps().Width,
-								 Doge::Application::GetActiveWindow()->GetWindowProps().Height);
-			Doge::Application::EnableCursor();
+			m_Scene = SceneFrame(Tunti::Application::GetActiveWindow()->GetWindowProps().Width,
+								 Tunti::Application::GetActiveWindow()->GetWindowProps().Height);
+			Tunti::Application::EnableCursor();
 
 			ImGuiIO& io = ImGui::GetIO(); (void)io;
 			ImGui::StyleColorsLight();
@@ -85,7 +85,6 @@ namespace TEditor
 				style.WindowRounding = 0.0f;
 				style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 			}
-
 		}
 	}
 
@@ -94,9 +93,9 @@ namespace TEditor
 		if (m_ScenePlay == false)
 		{
 			m_ScenePlay = true;
-			Doge::Application::SetCursorPos(Doge::Application::GetActiveWindow()->GetWindowProps().Width / 2.0f,
-											Doge::Application::GetActiveWindow()->GetWindowProps().Height / 2.0f);
-			Doge::Application::DisableCursor();
+			Tunti::Application::SetCursorPos(Tunti::Application::GetActiveWindow()->GetWindowProps().Width / 2.0f,
+											Tunti::Application::GetActiveWindow()->GetWindowProps().Height / 2.0f);
+			Tunti::Application::DisableCursor();
 
 			ImGuiIO& io = ImGui::GetIO(); (void)io;
 			ImGui::StyleColorsClassic();
@@ -118,7 +117,7 @@ namespace TEditor
 		{
 			if (ImGui::BeginMenu("File"))
 			{
-				if (ImGui::MenuItem("Exit")) Doge::Application::Shutdown();
+				if (ImGui::MenuItem("Exit")) Tunti::Application::GetInstance()->Shutdown();
 				ImGui::EndMenu();
 			}
 			ImGui::EndMenuBar();
@@ -139,7 +138,7 @@ namespace TEditor
 		}
 		m_Scene.Resize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
 
-		ImGui::Image(reinterpret_cast<void*>(m_Scene.GetSceneTexture()), viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+		//ImGui::Image(reinterpret_cast<void*>(m_Scene.GetSceneTexture()), viewportSize, ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::End();
 		ImGui::PopStyleVar();
 	}
@@ -162,9 +161,9 @@ namespace TEditor
 		s_EditorAPI->ImGuiEndRender();
 	}
 
-	bool EditorLayer::OnKeyPress(Doge::KeyPressedEvent& e)
+	bool EditorLayer::OnKeyPress(Tunti::KeyPressedEvent& e)
 	{
-		if (e.GetKeyCode() == Doge::Key::Escape)
+		if (e.GetKeyCode() == Tunti::Input::Key::Escape)
 		{
 			StopScenePlay();
 			return true;

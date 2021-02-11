@@ -6,6 +6,9 @@ bin-int/
 # Engine generated files
 *.log
 
+# Sandbox App for testing
+Sandbox/
+
 # Visual Studio files and folder
 .vs/
 **.sln

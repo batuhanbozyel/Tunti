@@ -77,10 +77,10 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="..\..\Doge\premake5.lua" />
-    <None Include="..\..\Doge\vendor\GLAD\premake5.lua" />
-    <None Include="..\..\Doge\vendor\GLFW\premake5.lua" />
     <None Include="..\..\Sandbox\premake5.lua" />
+    <None Include="..\..\Tunti\premake5.lua" />
+    <None Include="..\..\Tunti\vendor\GLAD\premake5.lua" />
+    <None Include="..\..\Tunti\vendor\GLFW\premake5.lua" />
     <None Include="..\..\TuntiEditor\premake5.lua" />
     <None Include="..\..\TuntiEditor\vendor\imgui\premake5.lua" />
     <None Include="..\..\premake5.lua" />

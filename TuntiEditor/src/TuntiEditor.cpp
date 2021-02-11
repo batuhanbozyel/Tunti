@@ -1,10 +1,10 @@
 #include "TuntiEditor.h"
-#include "Doge/Core/EntryPoint.h"
+#include "Tunti/Core/EntryPoint.h"
 
 namespace TEditor
 {
 	TuntiEditor::TuntiEditor()
-		: Application("Tunti Editor", Doge::WindowFlag::MaximizedWindow), m_EditorLayer(EditorLayer::Create())
+		: Application("Tunti Editor", Tunti::WindowFlag::MaximizedWindow), m_EditorLayer(EditorLayer::Create())
 	{
 		PushOverlay(m_EditorLayer);
 	}
@@ -15,7 +15,7 @@ namespace TEditor
 	}
 }
 
-Doge::Application* CreateApplication()
+Tunti::Application* CreateApplication()
 {
 	return new TEditor::TuntiEditor;
 }

@@ -1,10 +1,10 @@
 #pragma once
-#include "Doge.h"
+#include "Tunti.h"
 #include "Editor/EditorLayer.h"
 
 namespace TEditor
 {
-	class TuntiEditor : public Doge::Application
+	class TuntiEditor : public Tunti::Application
 	{
 	public:
 		TuntiEditor();

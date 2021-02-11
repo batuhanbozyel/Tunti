@@ -1,10 +1,10 @@
 #pragma once
-#include "Doge/Core/Layer.h"
+#include "Tunti/Core/Layer.h"
 #include "SceneFrame.h"
 
 namespace TEditor
 {
-	class EditorLayer : public Doge::Layer
+	class EditorLayer : public Tunti::Layer
 	{
 	public:
 		static EditorLayer* Create();
@@ -13,8 +13,8 @@ namespace TEditor
 		virtual void OnAttach();
 		virtual void OnDetach();
 
-		virtual void OnEvent(Doge::Event& e) override;
-		virtual void OnUpdate(float dt) override;
+		virtual void OnEvent(Tunti::Event& e) override;
+		virtual void OnUpdate() override;
 
 		void StopScenePlay();
 		void StartScenePlay();
@@ -28,7 +28,7 @@ namespace TEditor
 		void StatsView();
 		void SceneView();
 
-		bool OnKeyPress(Doge::KeyPressedEvent& e);
+		bool OnKeyPress(Tunti::KeyPressedEvent& e);
 	private:
 		bool m_ScenePlay = false;
 		SceneFrame m_Scene;
