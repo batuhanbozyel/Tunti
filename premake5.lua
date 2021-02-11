@@ -38,4 +38,4 @@ group ""
 
 include "Tunti"
 include "TuntiEditor"
-include "Sandbox"
+if os.isdir("Sandbox") then include "Sandbox" end -- Test program that only exists in local
