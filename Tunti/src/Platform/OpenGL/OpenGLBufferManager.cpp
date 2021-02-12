@@ -31,18 +31,19 @@ namespace Tunti
 			// Copy Vertex Data into the Buffer
 			{
 				void* buffPtr = glMapNamedBuffer(openGLBuffer.VertexBuffer, GL_WRITE_ONLY);
-				memcpy(buffPtr, mesh.Position.data(), mesh.Position.size() * sizeof(glm::vec4));
-				buffPtr = static_cast<int*>(buffPtr) + mesh.Position.size() * 4;
+				memcpy(buffPtr, mesh.Position.data(), mesh.Position.size() * sizeof(glm::vec3));
+				buffPtr = static_cast<int*>(buffPtr) + mesh.Position.size() * 3;
 
 				memcpy(buffPtr, mesh.Normal.data(), mesh.Normal.size() * sizeof(glm::vec3));
 				buffPtr = static_cast<int*>(buffPtr) + mesh.Normal.size() * 3;
 
 				memcpy(buffPtr, mesh.TexCoord.data(), mesh.TexCoord.size() * sizeof(glm::vec2));
-				buffPtr = static_cast<int*>(buffPtr) + mesh.TexCoord.size() * 2;
-
-				memcpy(buffPtr, mesh.TexIndex.data(), mesh.TexIndex.size() * sizeof(uint32_t));
 				glUnmapNamedBuffer(openGLBuffer.VertexBuffer);
 			}
+
+			// Create Texture Map Index Buffer
+			glCreateBuffers(1, &openGLBuffer.TextureMapIndexBuffer);
+			glNamedBufferStorage(openGLBuffer.TextureMapIndexBuffer, vertexCount * sizeof(uint32_t), mesh.TexIndex.data(), GL_DYNAMIC_STORAGE_BIT);
 
 			// Create Index Buffer
 			glCreateBuffers(1, &openGLBuffer.IndexBuffer);
@@ -65,6 +66,7 @@ namespace Tunti
 			meshData.BaseIndex = openGLBufferRef.IndexCount;
 
 			// Reallocation buffers
+			GLuint textureMapIndexBuffer;
 			GLuint vertexBuffer;
 			GLuint indexBuffer;
 
@@ -77,11 +79,11 @@ namespace Tunti
 				void* buffPtr = glMapNamedBuffer(vertexBuffer, GL_WRITE_ONLY);
 
 				// Copy Position data
-				memcpy(buffPtr, oldBuffPtr, openGLBufferRef.VertexCount * sizeof(glm::vec4));
-				oldBuffPtr = static_cast<int*>(oldBuffPtr) + openGLBufferRef.VertexCount * 4;
-				buffPtr = static_cast<int*>(buffPtr) + openGLBufferRef.VertexCount * 4;
-				memcpy(buffPtr, mesh.Position.data(), mesh.Position.size() * sizeof(glm::vec4));
-				buffPtr = static_cast<int*>(buffPtr) + mesh.Position.size() * 4;
+				memcpy(buffPtr, oldBuffPtr, openGLBufferRef.VertexCount * sizeof(glm::vec3));
+				oldBuffPtr = static_cast<int*>(oldBuffPtr) + openGLBufferRef.VertexCount * 3;
+				buffPtr = static_cast<int*>(buffPtr) + openGLBufferRef.VertexCount * 3;
+				memcpy(buffPtr, mesh.Position.data(), mesh.Position.size() * sizeof(glm::vec3));
+				buffPtr = static_cast<int*>(buffPtr) + mesh.Position.size() * 3;
 
 				// Copy Normal data
 				memcpy(buffPtr, oldBuffPtr, openGLBufferRef.VertexCount * sizeof(glm::vec3));
@@ -95,17 +97,16 @@ namespace Tunti
 				oldBuffPtr = static_cast<int*>(oldBuffPtr) + openGLBufferRef.VertexCount * 2;
 				buffPtr = static_cast<int*>(buffPtr) + openGLBufferRef.VertexCount * 2;
 				memcpy(buffPtr, mesh.TexCoord.data(), mesh.TexCoord.size() * sizeof(glm::vec2));
-				buffPtr = static_cast<int*>(buffPtr) + mesh.TexCoord.size() * 2;
-
-				// Copy TexIndex data
-				memcpy(buffPtr, oldBuffPtr, openGLBufferRef.VertexCount * sizeof(uint32_t));
-				oldBuffPtr = static_cast<int*>(oldBuffPtr) + openGLBufferRef.VertexCount;
-				buffPtr = static_cast<int*>(buffPtr) + openGLBufferRef.VertexCount;
-				memcpy(buffPtr, mesh.TexIndex.data(), mesh.TexIndex.size() * sizeof(uint32_t));
 
 				glUnmapNamedBuffer(vertexBuffer);
 				glUnmapNamedBuffer(openGLBufferRef.VertexBuffer);
 			}
+
+			// Create Texture Map Index Buffer
+			glCreateBuffers(1, &textureMapIndexBuffer);
+			glNamedBufferStorage(textureMapIndexBuffer, vertexCount * sizeof(uint32_t), nullptr, GL_DYNAMIC_STORAGE_BIT);
+			glCopyNamedBufferSubData(openGLBufferRef.TextureMapIndexBuffer, textureMapIndexBuffer, 0, 0, openGLBufferRef.VertexCount * sizeof(uint32_t));
+			glNamedBufferSubData(textureMapIndexBuffer, openGLBufferRef.TextureMapIndexBuffer * sizeof(uint32_t), mesh.TexIndex.size() * sizeof(uint32_t), mesh.TexIndex.data());
 
 			// Create Index Buffer
 			glCreateBuffers(1, &indexBuffer);
@@ -115,9 +116,11 @@ namespace Tunti
 
 			// Delete old Buffers
 			glDeleteBuffers(1, &openGLBufferRef.VertexBuffer);
+			glDeleteBuffers(1, &openGLBufferRef.TextureMapIndexBuffer);
 			glDeleteBuffers(1, &openGLBufferRef.IndexBuffer);
 
 			// Update Buffers and necessary data
+			openGLBufferRef.TextureMapIndexBuffer = textureMapIndexBuffer;
 			openGLBufferRef.VertexBuffer = vertexBuffer;
 			openGLBufferRef.IndexBuffer = indexBuffer;
 			openGLBufferRef.VertexCount = vertexCount;

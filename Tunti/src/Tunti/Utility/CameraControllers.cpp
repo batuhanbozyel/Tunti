@@ -25,8 +25,8 @@ namespace Tunti
 		/* Camera Rotation */
 		auto[mouseX, mouseY] = Input::GetMousePos();
 
-		m_Yaw += (m_MouseLastX - mouseX) * m_MouseSensitivity * Time::DeltaTime();
-		m_Pitch += (m_MouseLastY - mouseY) * m_MouseSensitivity * Time::DeltaTime();
+		m_Yaw += (m_MouseLastX - mouseX) * m_MouseSensitivity;
+		m_Pitch += (m_MouseLastY - mouseY) * m_MouseSensitivity;
 
 		m_MouseLastX = mouseX;
 		m_MouseLastY = mouseY;
@@ -42,6 +42,10 @@ namespace Tunti
 		glm::vec3 right = glm::rotate(orientation, glm::vec3(1.0f, 0.0f, 0.0f));
 
 		float velocity = Time::DeltaTime() * m_MovementSpeed;
+
+		if (Input::IsKeyPressed(Input::Key::LeftShift))
+			velocity *= 2.5f;
+
 		if (Input::IsKeyPressed(Input::Key::W))
 			m_Transform->Translation += forward * velocity;
 

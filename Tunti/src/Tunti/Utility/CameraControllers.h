@@ -16,8 +16,8 @@ namespace Tunti
 
 		void SetViewportSize(uint32_t width, uint32_t height);
 	private:
-		float m_MovementSpeed = 0.05f;
-		float m_MouseSensitivity = 0.01f;
+		float m_MovementSpeed = 0.01f;
+		float m_MouseSensitivity = 0.1f;
 		float m_Pitch = 0.0f, m_Yaw = 0.0f;
 		float m_MouseLastX = 0.0f, m_MouseLastY = 0.0f;
 

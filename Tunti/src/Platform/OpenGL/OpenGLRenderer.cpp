@@ -56,6 +56,21 @@ namespace Tunti
 		}
 	};
 
+	struct DrawElementsIndirectCommand
+	{
+		GLuint Count;
+		GLuint PrimCount;
+		GLuint FirstIndex;
+		GLuint BaseVertex;
+		GLuint BaseInstance;
+
+		DrawElementsIndirectCommand(GLuint count, GLuint primCount, GLuint firstIndex, GLuint baseVertex, GLuint baseInstance)
+			: Count(count), PrimCount(primCount), FirstIndex(firstIndex), BaseVertex(baseVertex), BaseInstance(baseInstance)
+		{
+
+		}
+	};
+
 	struct GeometryBuffer
 	{
 		GLuint Framebuffer;
@@ -172,16 +187,16 @@ namespace Tunti
 				{
 					SetUniqueUniformProperties(materialInstance);
 					const OpenGLGraphicsBuffer& buffer = (*OpenGLBufferManager::GetInstance())[std::hash<Ref<MaterialInstance>>{}(materialInstance)];
-					glBindBufferBase(GL_SHADER_STORAGE_BUFFER, RendererBindingTable::VertexBufferShaderStorageBuffer, buffer.VertexBuffer);
-					glBindBufferBase(GL_SHADER_STORAGE_BUFFER, RendererBindingTable::IndexBufferShaderStorageBuffer, buffer.IndexBuffer);
+					GLuint buffers[2] = { buffer.TextureMapIndexBuffer, buffer.VertexBuffer };
+					glBindBuffersBase(GL_SHADER_STORAGE_BUFFER, RendererBindingTable::TextureMapIndexShaderStorageBuffer, 2, buffers);
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.IndexBuffer);
 
 					s_Data.GeometryPassShader->SetUniformUInt("u_VertexCount", buffer.VertexCount);
 					for (const auto& [mesh, transform] : meshArray)
 					{
 						s_Data.GeometryPassShader->SetUniformMat4("u_Model", transform);
-						s_Data.GeometryPassShader->SetUniformUInt("u_BaseVertex", mesh.BaseVertex);
-						const DrawArraysIndirectCommand indirectCmd(mesh.Count, 1, mesh.BaseIndex, 0);
-						glDrawArraysIndirect(GL_TRIANGLES, &indirectCmd);
+						DrawElementsIndirectCommand indirectCmd(mesh.Count, 1, mesh.BaseIndex, mesh.BaseVertex, 0);
+						glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, &indirectCmd);
 					}
 				}
 			}

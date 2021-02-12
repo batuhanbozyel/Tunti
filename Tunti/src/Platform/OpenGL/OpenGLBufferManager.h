@@ -5,6 +5,7 @@ namespace Tunti
 {
 	struct OpenGLGraphicsBuffer
 	{
+		GLuint TextureMapIndexBuffer;
 		GLuint VertexBuffer;
 		GLuint IndexBuffer;
 		uint32_t VertexCount = 0;

@@ -63,8 +63,7 @@ namespace Tunti
 
 	void ModelLibrary::ProcessModel(const std::string& directory, aiMesh* mesh, const aiScene* scene, Ref<Model> model)
 	{
-		std::vector<Vertex> vertices;
-		std::vector<uint32_t> indices;
+		Mesh subMesh;
 		Ref<TextureMap> textureMap;
 
 		// Process Material
@@ -113,17 +112,20 @@ namespace Tunti
 			{
 				texCoord = glm::vec2(0.0f);
 			}
-			vertices.push_back(Vertex(position, normal, texCoord, textureMap->Index));
+			subMesh.Position.push_back(position);
+			subMesh.Normal.push_back(normal);
+			subMesh.TexCoord.push_back(texCoord);
+			subMesh.TexIndex.push_back(textureMap->Index);
 		}
 		// Process Indices
 		for (uint32_t i = 0; i < mesh->mNumFaces; i++)
 		{
 			aiFace face = mesh->mFaces[i];
 			for (uint32_t j = 0; j < face.mNumIndices; j++)
-				indices.push_back(face.mIndices[j]);
+				subMesh.Indices.push_back(face.mIndices[j]);
 		}
 
-		model->Meshes.push_back(Mesh(vertices, indices));
+		model->Meshes.push_back(subMesh);
 	}
 
 	void ModelLibrary::AddTexturePath(const std::string& directory,

@@ -12,15 +12,15 @@ layout(std140, binding = 0) uniform ViewProjectionUniform
 	vec3 CameraPosition;
 };
 
-layout(std430, binding = 1) readonly buffer VertexBuffer
+layout(std430, binding = 1) readonly buffer TextureMapIndexBuffer
+{
+	uint indices[];
+} textureMapIndexArray;
+
+layout(std430, binding = 2) readonly buffer VertexBuffer
 {
 	float data[];
 } vertexBuffer;
-
-layout(std430, binding = 2) readonly buffer IndexBuffer
-{
-	uint data[];
-} indexBuffer;
 
 uniform uint u_VertexCount;
 
@@ -29,30 +29,27 @@ uniform uint u_BaseVertex;
 
 void main()
 {
-	uint index = indexBuffer.data[gl_VertexID] + u_BaseVertex;
-
-	uint posIndex = index * 4;
+	uint posIndex = gl_VertexID * 3;
 	vec4 worldPosition = u_Model * vec4(
 		vertexBuffer.data[posIndex], 
 		vertexBuffer.data[posIndex + 1], 
-		vertexBuffer.data[posIndex + 2], 
-		vertexBuffer.data[posIndex + 3]);
+		vertexBuffer.data[posIndex + 2], 1.0);
 	v_WorldPosition = vec3(worldPosition);
 
-	uint normalIndex = u_VertexCount * 4 + index * 3;
+	uint normalIndex = u_VertexCount * 3 + gl_VertexID * 3;
 	mat3 normalMatrix = transpose(inverse(mat3(u_Model)));
 	v_Normal = normalMatrix * vec3(
 		vertexBuffer.data[normalIndex], 
 		vertexBuffer.data[normalIndex + 1], 
 		vertexBuffer.data[normalIndex + 2]);
 
-	uint texCoordIndex = u_VertexCount * 7 + index * 2;
+	uint texCoordIndex = u_VertexCount * 6 + gl_VertexID * 2;
 	v_TexCoord = vec2(
 		vertexBuffer.data[texCoordIndex], 
 		vertexBuffer.data[texCoordIndex + 1]);
 
-	v_TexIndex = uint(vertexBuffer.data[u_VertexCount * 9 + index]);
-	
+	v_TexIndex = textureMapIndexArray.indices[gl_VertexID];
+
 	gl_Position = ViewProjection * worldPosition;
 }
 
