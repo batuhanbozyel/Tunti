@@ -106,7 +106,7 @@ namespace Tunti
 			glCreateBuffers(1, &textureMapIndexBuffer);
 			glNamedBufferStorage(textureMapIndexBuffer, vertexCount * sizeof(uint32_t), nullptr, GL_DYNAMIC_STORAGE_BIT);
 			glCopyNamedBufferSubData(openGLBufferRef.TextureMapIndexBuffer, textureMapIndexBuffer, 0, 0, openGLBufferRef.VertexCount * sizeof(uint32_t));
-			glNamedBufferSubData(textureMapIndexBuffer, openGLBufferRef.TextureMapIndexBuffer * sizeof(uint32_t), mesh.TexIndex.size() * sizeof(uint32_t), mesh.TexIndex.data());
+			glNamedBufferSubData(textureMapIndexBuffer, openGLBufferRef.VertexCount * sizeof(uint32_t), mesh.TexIndex.size() * sizeof(uint32_t), mesh.TexIndex.data());
 
 			// Create Index Buffer
 			glCreateBuffers(1, &indexBuffer);

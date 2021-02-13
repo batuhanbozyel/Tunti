@@ -108,7 +108,7 @@ void main()
 
     vec3 dummy = normalize(worldPos + N + albedo + metalness + ambientOcclusion);
 
-    color = vec4(dummy, 1.0);
+    color = vec4(albedo, 1.0);
 }
 
 /*

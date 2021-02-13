@@ -14,6 +14,8 @@ namespace Tunti
 		void OnStart(Scene& scene, float verticalFov = 60.0f, float nearClip = 0.01f, float farClip = 1000.0f);
 		void OnUpdate();
 
+		void SetMovementSpeed(float speed) { m_MovementSpeed = speed; }
+		void SetMouseSensitivity(float sensitivity) { m_MouseSensitivity = sensitivity; }
 		void SetViewportSize(uint32_t width, uint32_t height);
 	private:
 		float m_MovementSpeed = 0.01f;
