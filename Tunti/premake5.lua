@@ -59,6 +59,7 @@ project "Tunti"
 
 	filter "system:windows"
 		systemversion "latest"
+		links "Shlwapi.lib"
 
 	filter "configurations:Debug"
 		defines "DEBUG_ENABLED"

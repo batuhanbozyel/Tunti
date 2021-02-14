@@ -27,6 +27,7 @@
 
 #ifdef _WIN32
 #include <Windows.h>
+#include <Shlwapi.h>
 #endif
 
 #include <glm/glm.hpp>

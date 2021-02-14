@@ -5,6 +5,8 @@
 
 #include "stb_image/stb_image.h"
 
+#include "Tunti/Core/FileManager.h"
+
 namespace Tunti
 {
 	// OpenGLTexture
@@ -16,11 +18,12 @@ namespace Tunti
 		glTextureParameteri(m_TextureID, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTextureParameteri(m_TextureID, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-		glTextureParameteri(m_TextureID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTextureParameteri(m_TextureID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteri(m_TextureID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTextureParameteri(m_TextureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
-		glTextureStorage2D(m_TextureID, 1, GL_RGBA8, data.width, data.height);
+		glTextureStorage2D(m_TextureID, 4, GL_RGBA8, data.width, data.height);
 		glTextureSubImage2D(m_TextureID, 0, 0, 0, data.width, data.height, GL_RGBA, GL_UNSIGNED_BYTE, data.buffer);
+		glGenerateTextureMipmap(m_TextureID);
 
 		m_TextureHandle = glGetTextureHandleARB(m_TextureID);
 		// Temporary
@@ -36,8 +39,8 @@ namespace Tunti
 		glTextureParameteri(m_TextureID, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTextureParameteri(m_TextureID, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-		glTextureParameteri(m_TextureID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTextureParameteri(m_TextureID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteri(m_TextureID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTextureParameteri(m_TextureID, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
 
 		glTextureStorage2D(m_TextureID, 1, GL_RGBA8, 1, 1);
 		glTextureSubImage2D(m_TextureID, 0, 0, 0, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
@@ -110,7 +113,7 @@ namespace Tunti
 					textureMap->Textures[typeIndex] = textureIt->second->m_TextureHandle;
 				else
 				{
-					stbi_set_flip_vertically_on_load(1);
+					FileManager::GetFileExtension(textureFile) == ".tga" ? stbi_set_flip_vertically_on_load(0) : stbi_set_flip_vertically_on_load(1);
 
 					TextureData data;
 					data.buffer = stbi_load(
