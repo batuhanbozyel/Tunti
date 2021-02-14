@@ -46,6 +46,9 @@ namespace Tunti
 		if (Input::IsKeyPressed(Input::Key::LeftShift))
 			velocity *= 2.5f;
 
+		if (Input::IsKeyPressed(Input::Key::LeftControl))
+			velocity /= 2.5f;
+
 		if (Input::IsKeyPressed(Input::Key::W))
 			m_Transform->Translation += forward * velocity;
 

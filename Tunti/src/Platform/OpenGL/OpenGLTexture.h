@@ -58,7 +58,7 @@ namespace Tunti
 		uint32_t m_TextureMapCount = 1;
 		GLuint m_TextureMapSSBO;
 
-		OpenGLTexture2D m_DefaultTexture;
+		OpenGLTexture2D m_WhiteTexture;
 		Ref<TextureMap> m_DefaultTextureMap;
 		std::unordered_map<std::string, Scope<OpenGLTexture2D>> m_Textures;
 		std::unordered_map<std::string, Scope<OpenGLCubemapTexture>> m_Cubemaps;

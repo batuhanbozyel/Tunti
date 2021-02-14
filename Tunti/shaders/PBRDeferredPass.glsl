@@ -19,17 +19,16 @@ void main()
 
 const float PI = 3.14159265359f;
 
-layout(location = 0) out vec4 color;
+layout(location = 0) out vec4 outColor;
 
 layout(location = 0) in vec2 v_TexCoord;
 
 struct Light
 {
+    vec4 AttenuationFactors; // x: Intensity, y: Constant, z: Linear, w: Quadratic
+    vec4 ColorAndType; // rgb: Color, a: Type
     vec3 Position;
     vec3 Direction;
-    vec3 Color;
-    vec4 AttenuationFactors; // x: Instesity, y: Constant, z: Linear, w: Quadratic
-    uint Type;
 };
 
 layout(std140, binding = 0) uniform ViewProjectionUniform
@@ -40,8 +39,8 @@ layout(std140, binding = 0) uniform ViewProjectionUniform
 
 layout(std140, binding = 4) uniform LightsUniform
 {
-    Light Lights[MAX_LIGHTS];
     int NumLights;
+    Light Lights[MAX_LIGHTS];
 };
 
 uniform sampler2D u_PositionAttachment;
@@ -82,11 +81,12 @@ void main()
     {
         // Per-light radiance
         Light light = Lights[i];
-        vec3 L = normalize(light.Position - worldPos);
-        vec3 H = normalize(V + L);
-        float distance = length(light.Position - worldPos);
-        float attenuation = 1.0 / (distance * distance);
-        vec3 radiance = light.Color * attenuation;
+        vec3 L = -1.0 * normalize(light.Direction);
+        vec3 H = normalize(L + V);
+
+        float attenuation = 1.0;
+
+        vec3 radiance = light.ColorAndType.rgb * light.AttenuationFactors.x * attenuation;
 
         // Cook-Torrance BRDF
         float NDF = DistributionGGX(N, H, roughness);
@@ -104,10 +104,16 @@ void main()
         float NdotL = max(dot(N, L), 0.0);
         Lo += (kD * albedo / PI + specular) * radiance * NdotL;
     }
+    // Temporary till IBL
+    vec3 ambient = vec3(0.03) * albedo * ambientOcclusion;
+    vec3 color = ambient + Lo;
 
-    vec3 dummy = normalize(worldPos + N + albedo + metalness + ambientOcclusion);
+    // HDR tonemapping
+    color = color / (color + vec3(1.0));
+    // gamma correct
+    color = pow(color, vec3(1.0 / 2.2));
 
-    color = vec4(albedo, 1.0);
+    outColor = vec4(color, 1.0);
 }
 
 /*

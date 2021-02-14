@@ -18,10 +18,10 @@ namespace Tunti
 		glm::mat4 cameraTransform;
 		glm::vec3 cameraPosition;
 		{
-			auto view = m_Registry.view<TransformComponent, CameraComponent>();
+			auto view = m_Registry.view<CameraComponent, TransformComponent>();
 			for (auto entity : view)
 			{
-				auto [transform, camera] = view.get<TransformComponent, CameraComponent>(entity);
+				auto [camera, transform] = view.get<CameraComponent, TransformComponent>(entity);
 
 				if (camera.Primary)
 				{
@@ -36,15 +36,25 @@ namespace Tunti
 		if (mainCamera)
 		{
 			Renderer::BeginScene(*mainCamera, cameraTransform, cameraPosition);
-
-			auto group = m_Registry.group<TransformComponent>(entt::get<MeshRendererComponent>);
-			for (auto entity : group)
 			{
-				auto& [meshRenderer, transform] = group.get<MeshRendererComponent, TransformComponent>(entity);
+				auto view = m_Registry.view<TransformComponent, LightComponent>();
+				for (auto entity : view)
+				{
+					auto& [light, transform] = view.get<LightComponent, TransformComponent>(entity);
 
-				Renderer::DrawMesh(meshRenderer.MeshBuffer, meshRenderer.MaterialInstanceRef, transform);
+					Renderer::SubmitLight(light, transform.Translation, transform.Transform() * glm::vec4(0.0f, 0.0f, -1.0f, 0.0f));
+				}
 			}
 
+			{
+				auto view = m_Registry.view<TransformComponent, MeshRendererComponent>();
+				for (auto entity : view)
+				{
+					auto& [meshRenderer, transform] = view.get<MeshRendererComponent, TransformComponent>(entity);
+
+					Renderer::DrawMesh(meshRenderer.MeshBuffer, meshRenderer.MaterialInstanceRef, transform);
+				}
+			}
 			Renderer::EndScene();
 		}
 	}

@@ -1,10 +1,11 @@
 #pragma once
+#include "Light.h"
+#include "RendererBindingTable.h"
 
 namespace Tunti
 {
 	struct Shader;
 	struct MeshData;
-	struct LightData;
 	struct WindowProps;
 	struct CubemapTexture;
 
@@ -30,7 +31,14 @@ namespace Tunti
 		std::function<void(CubemapTexture skybox)> SetSkybox;
 		std::function<void()> ClearSkybox;
 
-		std::vector<LightData> LightQueue;
+#pragma pack(push, 1)
+		struct LightQueueContainer
+		{
+			uint32_t LightCount = 0;
+			float _Padding[3] = { 0.0f };
+			std::array<LightData, RendererConstants::MaximumLightNumber> Lights;
+		} LightQueue;
+#pragma pack(pop)
 		std::unordered_map<Ref<Material>, std::unordered_map<Ref<MaterialInstance>, std::vector<std::tuple<MeshData, glm::mat4>>>> MeshQueue;
 	};
 
@@ -41,7 +49,7 @@ namespace Tunti
 		static void Shutdown();
 
 		static void Submit(const std::function<void()>& renderPass);
-		static void DrawLight(const LightData& light, const glm::mat4& transform);
+		static void SubmitLight(const Light& light, const glm::vec3& position, const glm::vec4& direction);
 		static void DrawMesh(const MeshData& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform);
 
 		static decltype(RendererAPI::None) GetAPI() { return s_GraphicsAPI; }

@@ -71,10 +71,16 @@ namespace Tunti
 
 	struct LightComponent
 	{
-		LightData Light;
+		Light _Light;
 
 		LightComponent() = default;
+		LightComponent(const LightComponent&) = default;
 		LightComponent(LightType type)
-			: Light(type) {}
+			: _Light(type) {}
+
+		operator const Light& () const
+		{
+			return _Light;
+		}
 	};
 }

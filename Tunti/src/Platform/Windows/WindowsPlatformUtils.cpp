@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Tunti/Core/Platform.h"
-#include "Tunti/Core/FileManager.h"
+#include "Tunti/Utility/PlatformUtils.h"
 
 #ifdef PLATFORM_WINDOWS
 

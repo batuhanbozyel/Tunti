@@ -10,10 +10,8 @@
 #include "Tunti/Core/Application.h"
 
 #include "Tunti/Renderer/Mesh.h"
-#include "Tunti/Renderer/Light.h"
 #include "Tunti/Renderer/Camera.h"
 #include "Tunti/Renderer/Material.h"
-#include "Tunti/Renderer/RendererBindingTable.h"
 
 namespace Tunti
 {
@@ -131,20 +129,17 @@ namespace Tunti
 		glBindVertexArray(s_Data.VertexArray);
 
 		glCreateBuffers(1, &s_Data.LightsUniformBuffer);
-		glNamedBufferStorage(s_Data.LightsUniformBuffer, (sizeof(glm::vec4) * 4 + sizeof(uint32_t)) * 100, nullptr, GL_DYNAMIC_STORAGE_BIT | GL_MAP_WRITE_BIT);
+		glNamedBufferStorage(s_Data.LightsUniformBuffer, sizeof(LightQueueContainer), nullptr, GL_DYNAMIC_STORAGE_BIT | GL_MAP_WRITE_BIT);
 		glBindBufferBase(GL_UNIFORM_BUFFER, RendererBindingTable::LightsUniformBuffer, s_Data.LightsUniformBuffer);
 
 		glCreateBuffers(1, &s_Data.ViewProjectionUniformBuffer);
 		glNamedBufferStorage(s_Data.ViewProjectionUniformBuffer, 2 * sizeof(glm::mat4) + sizeof(glm::vec3), nullptr, GL_DYNAMIC_STORAGE_BIT);
 		glBindBufferBase(GL_UNIFORM_BUFFER, RendererBindingTable::ViewProjectionUniformBuffer, s_Data.ViewProjectionUniformBuffer);
 
-		const WindowProps& props = Application::GetActiveWindow()->GetWindowProps();
-		ConstructGBuffer(props.Width, props.Height);
-
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
 		OpenGLShaderCache* shaderCache = OpenGLShaderCache::GetInstance();
 		s_Data.TexturedQuadShader = shaderCache->LoadShader(RendererShaders::TexturedQuad);
+
+		InitDeferredRenderer(window);
 
 		BeginScene = [&](const Camera& camera, const glm::mat4& transform, const glm::vec3& position)
 		{
@@ -174,9 +169,7 @@ namespace Tunti
 		{
 			glBindTextureUnit(RendererBindingTable::SkyboxTextureUnit, 0);
 			s_Data.SkyboxShader.reset();
-		};
-
-		InitDeferredRenderer(window);
+		};		
 	}
 
 	OpenGLRenderer::~OpenGLRenderer()
@@ -262,6 +255,10 @@ namespace Tunti
 
 	void OpenGLRenderer::InitDeferredRenderer(GLFWwindow* window)
 	{
+		const WindowProps& props = Application::GetActiveWindow()->GetWindowProps();
+		ConstructGBuffer(props.Width, props.Height);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
 		glfwSetFramebufferSizeCallback(window, [](GLFWwindow*, int width, int height)
 		{
 			if (width == 0 || height == 0 || (s_DeferredData.GBuffer.Width == width && s_DeferredData.GBuffer.Height == height))
@@ -320,11 +317,8 @@ namespace Tunti
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			void* lightBuffPtr = glMapNamedBuffer(s_Data.LightsUniformBuffer, GL_WRITE_ONLY);
-			memcpy(lightBuffPtr, LightQueue.data(), LightQueue.size() * sizeof(LightData));
-			lightBuffPtr = ((LightData*)lightBuffPtr) + LightQueue.size();
-			*(int*)lightBuffPtr = LightQueue.size();
-			glUnmapNamedBuffer(s_Data.LightsUniformBuffer);
+			// Update Light Buffer's content
+			glNamedBufferSubData(s_Data.LightsUniformBuffer, 0, sizeof(glm::vec4) + sizeof(LightData) * LightQueue.LightCount, &LightQueue);
 
 			s_DeferredData.PBRDeferredPassShader->Bind();
 			glDrawArraysIndirect(GL_TRIANGLES, &s_Data.QuadIndirectCommand);

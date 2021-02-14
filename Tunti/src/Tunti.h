@@ -5,7 +5,6 @@
 #include "Tunti/Core/Application.h"
 #include "Tunti/Core/Input.h"
 #include "Tunti/Core/Log.h"
-#include "Tunti/Core/FileManager.h"
 
 // Renderer
 #include "Tunti/Renderer/Renderer.h"
@@ -16,6 +15,7 @@
 #include "Tunti/Renderer/Material.h"
 
 // Utility
+#include "Tunti/Utility/PlatformUtils.h"
 #include "Tunti/Utility/CameraControllers.h"
 
 // Scene

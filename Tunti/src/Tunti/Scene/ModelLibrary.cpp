@@ -4,6 +4,8 @@
 #include "Tunti/Renderer/Material.h"
 #include "Tunti/Renderer/Mesh.h"
 
+#include <assimp/pbrmaterial.h>
+
 namespace Tunti
 {
 	static constexpr unsigned int assimpFlags =
@@ -73,16 +75,26 @@ namespace Tunti
 			aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
 			AddTexturePath(directory, texturePaths, material, aiTextureType_DIFFUSE, TextureType::Albedo);
+			if (texturePaths[static_cast<uint16_t>(TextureType::Albedo)].empty())
+				AddTexturePath(directory, texturePaths, material, aiTextureType_BASE_COLOR, TextureType::Albedo);
+
 			AddTexturePath(directory, texturePaths, material, aiTextureType_NORMALS, TextureType::Normal);
 			if (texturePaths[static_cast<uint16_t>(TextureType::Normal)].empty())
-			{
+				AddTexturePath(directory, texturePaths, material, aiTextureType_NORMAL_CAMERA, TextureType::Normal);
+			if(texturePaths[static_cast<uint16_t>(TextureType::Normal)].empty())
 				AddTexturePath(directory, texturePaths, material, aiTextureType_HEIGHT, TextureType::Normal);
-				if (texturePaths[static_cast<uint16_t>(TextureType::Normal)].empty())
-					AddTexturePath(directory, texturePaths, material, aiTextureType_DISPLACEMENT, TextureType::Normal);
-			}
+
 			AddTexturePath(directory, texturePaths, material, aiTextureType_SPECULAR, TextureType::Metalness);
+			if (texturePaths[static_cast<uint16_t>(TextureType::Metalness)].empty())
+				AddTexturePath(directory, texturePaths, material, aiTextureType_METALNESS, TextureType::Metalness);
+
 			AddTexturePath(directory, texturePaths, material, aiTextureType_SHININESS, TextureType::Roughness);
+			if (texturePaths[static_cast<uint16_t>(TextureType::Roughness)].empty())
+				AddTexturePath(directory, texturePaths, material, aiTextureType_DIFFUSE_ROUGHNESS, TextureType::Roughness);
+			
 			AddTexturePath(directory, texturePaths, material, aiTextureType_LIGHTMAP, TextureType::AmbientOcclusion);
+			if (texturePaths[static_cast<uint16_t>(TextureType::AmbientOcclusion)].empty())
+				AddTexturePath(directory, texturePaths, material, aiTextureType_AMBIENT_OCCLUSION, TextureType::AmbientOcclusion);
 
 			textureMap = TextureLibrary::LoadTextureMap(texturePaths);
 			model->TextureMaps.push_back(textureMap);

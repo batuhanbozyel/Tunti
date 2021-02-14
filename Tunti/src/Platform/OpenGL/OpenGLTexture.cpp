@@ -5,7 +5,7 @@
 
 #include "stb_image/stb_image.h"
 
-#include "Tunti/Core/FileManager.h"
+#include "Tunti/Utility/PlatformUtils.h"
 
 namespace Tunti
 {
@@ -86,7 +86,7 @@ namespace Tunti
 	OpenGLTextureCache::OpenGLTextureCache()
 		: m_DefaultTextureMap(CreateRef<TextureMap>())
 	{
-		std::fill(m_DefaultTextureMap->Textures.begin(), m_DefaultTextureMap->Textures.end(), m_DefaultTexture.m_TextureHandle);
+		std::fill(m_DefaultTextureMap->Textures.begin(), m_DefaultTextureMap->Textures.end(), m_WhiteTexture.m_TextureHandle);
 		glCreateBuffers(1, &m_TextureMapSSBO);
 		glNamedBufferStorage(m_TextureMapSSBO, SizeofTextureMap * MaxTextures, nullptr, GL_DYNAMIC_STORAGE_BIT);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, RendererBindingTable::TextureMapsShaderStorageBuffer, m_TextureMapSSBO);
@@ -138,12 +138,12 @@ namespace Tunti
 			}
 			else
 			{
-				textureMap->Textures[typeIndex] = m_DefaultTexture.m_TextureHandle;
+				textureMap->Textures[typeIndex] = m_WhiteTexture.m_TextureHandle;
 				glNamedBufferSubData(
 					m_TextureMapSSBO,
 					SizeofTextureMap * m_TextureMapCount + OffsetofTextureType(type),
 					sizeof(GLuint64),
-					&m_DefaultTexture.m_TextureHandle);
+					&m_WhiteTexture.m_TextureHandle);
 			}
 			
 			type = static_cast<TextureType>(typeIndex + 1);

@@ -29,4 +29,9 @@ namespace Tunti
 		static constexpr char* TexturedQuad = "../Tunti/shaders/TexturedQuad.glsl";
 		static constexpr char* ObjectOutlining = "../Tunti/shaders/ObjectOutlining.glsl";
 	}
+
+	namespace RendererConstants
+	{
+		static constexpr uint32_t MaximumLightNumber = 100;
+	}
 }

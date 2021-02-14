@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "Mesh.h"
-#include "Light.h"
 #include "Camera.h"
 #include "Shader.h"
 #include "Texture.h"
@@ -11,7 +10,6 @@
 #include "Platform/OpenGL/OpenGLRenderer.h"
 
 #include "Tunti/Core/Window.h"
-
 
 namespace Tunti
 {
@@ -44,9 +42,9 @@ namespace Tunti
 		s_Instance->RenderPasses.push_back(renderPass);
 	}
 
-	void Renderer::DrawLight(const LightData& light, const glm::mat4& transform)
+	void Renderer::SubmitLight(const Light& light, const glm::vec3& position, const glm::vec4& direction)
 	{
-
+		s_Instance->LightQueue.Lights[s_Instance->LightQueue.LightCount++] = LightData(light, position, direction);
 	}
 
 	void Renderer::DrawMesh(const MeshData& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform)
@@ -69,6 +67,7 @@ namespace Tunti
 
  		s_Instance->EndScene();
 		s_Instance->MeshQueue.clear();
+		s_Instance->LightQueue.LightCount = 0;
 	}
 
 	void Renderer::SetSkybox(CubemapTexture skybox)
