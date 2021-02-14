@@ -51,7 +51,6 @@ uniform sampler2D u_AlbedoSpecularAttachment;
 /*
     Function declarations
 */
-float saturate(float f);
 float Fd90(float NoL, float roughness);
 float KDisneyTerm(float NoL, float NoV, float roughness);
 vec3 FresnelSchlick(float NdotV, vec3 F0);
@@ -112,15 +111,6 @@ void main()
 }
 
 /*
-    Utility Functions
-*/
-
-float saturate(float f)
-{
-    return clamp(f, 0.0f, 1.0f);
-}
-
-/*
     PBR Functions
 */
 
@@ -149,7 +139,7 @@ float DistributionGGX(vec3 N, vec3 H, float roughness)
     float alpha = roughness * roughness;
     float alpha2 = alpha * alpha;
 
-    float NdotH = saturate(dot(N, H));
+    float NdotH = max(dot(N, H), 0.0);
     float NdotH2 = NdotH * NdotH;
 
     return (alpha2) / (PI * (NdotH2 * (alpha2 - 1.0f) + 1.0f) * (NdotH2 * (alpha2 - 1.0f) + 1.0f));

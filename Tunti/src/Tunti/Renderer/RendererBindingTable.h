@@ -23,7 +23,7 @@ namespace Tunti
 	namespace RendererShaders
 	{
 		static constexpr char* GeometryPass = "../Tunti/shaders/GeometryPass.glsl";
-		static constexpr char* LightingPass = "../Tunti/shaders/LightingPass.glsl";
+		static constexpr char* PBRDeferredPass = "../Tunti/shaders/PBRDeferredPass.glsl";
 
 		static constexpr char* Skybox = "../Tunti/shaders/Skybox.glsl";
 		static constexpr char* TexturedQuad = "../Tunti/shaders/TexturedQuad.glsl";

@@ -42,7 +42,7 @@ namespace Tunti
 	Ref<MaterialInstance> Material::DefaulMaterialInstance()
 	{
 		if (!s_DefaultMaterial)
-			s_DefaultMaterial = CreateRef<Material>(ShaderLibrary::LoadShader(RendererShaders::LightingPass));
+			s_DefaultMaterial = CreateRef<Material>(ShaderLibrary::LoadShader(RendererShaders::PBRDeferredPass));
 
 		if (!s_DefaultMaterialInstance)
 			s_DefaultMaterialInstance = CreateInstanceFrom(s_DefaultMaterial);
