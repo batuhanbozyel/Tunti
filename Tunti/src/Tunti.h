@@ -15,7 +15,7 @@
 #include "Tunti/Renderer/Material.h"
 
 // Utility
-#include "Tunti/Utility/PlatformUtils.h"
+#include "Tunti/Utility/ModelLibrary.h"
 #include "Tunti/Utility/CameraControllers.h"
 
 // Scene
@@ -23,7 +23,6 @@
 #include "Tunti/Scene/Entity.h"
 #include "Tunti/Scene/SceneCamera.h"
 #include "Tunti/Scene/Components.h"
-#include "Tunti/Scene/ModelLibrary.h"
 
 // 3rd-Party Includes
 #include <glm/glm.hpp>

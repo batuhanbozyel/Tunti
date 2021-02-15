@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <filesystem>
 #include <memory>
 #include <utility>
 #include <algorithm>
@@ -27,7 +28,6 @@
 
 #ifdef _WIN32
 #include <Windows.h>
-#include <Shlwapi.h>
 #endif
 
 #include <glm/glm.hpp>
