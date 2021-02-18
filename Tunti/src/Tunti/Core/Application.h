@@ -26,7 +26,7 @@ namespace Tunti
 		static void EnableCursor();
 		static void SetCursorPos(float x, float y);
 
-		static const Scope<Window>& GetActiveWindow() { return s_Instance->m_ActiveWindow; }
+		static const Scope<Window>& GetWindow() { return s_Instance->m_Window; }
 		static Application* GetInstance() { return s_Instance; }
 	protected:
 		void PushLayer(Layer* layer);
@@ -40,7 +40,7 @@ namespace Tunti
 		bool OnWindowResize(WindowResizeEvent& e);
 	private:
 		Scope<Time> m_Timer;
-		Scope<Window> m_ActiveWindow;
+		Scope<Window> m_Window;
 		LayerStack m_LayerStack;
 		bool m_Running = false;
 	private:

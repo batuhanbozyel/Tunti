@@ -6,8 +6,8 @@ namespace Tunti
 {
 	void FirstPersonCameraController::OnStart(Scene& scene, float verticalFov, float nearClip, float farClip)
 	{
-		uint32_t width = Application::GetActiveWindow()->GetWindowProps().Width;
-		uint32_t height = Application::GetActiveWindow()->GetWindowProps().Height;
+		uint32_t width = Application::GetWindow()->GetWindowProps().Width;
+		uint32_t height = Application::GetWindow()->GetWindowProps().Height;
 
 		m_FpsCameraEntity = scene.CreateEntity("First Person Camera");
 		m_FpsCameraEntity.AddComponent<CameraComponent>(width, height).Camera.SetPerspective(verticalFov, nearClip, farClip);
@@ -17,6 +17,7 @@ namespace Tunti
 		m_MouseLastX = (float)width / 2.0f;
 		m_MouseLastY = (float)height / 2.0f;
 
+		Application::SetCursorPos(m_MouseLastX, m_MouseLastY);
 		Application::DisableCursor();
 	}
 
@@ -37,7 +38,7 @@ namespace Tunti
 		/* Camera Rotation */
 		
 		/* Camera Movement */
-		glm::quat orientation = glm::quat(m_Transform->Rotation);
+		glm::quat orientation = m_Transform->Rotation;
 		glm::vec3 forward = glm::rotate(orientation, glm::vec3(0.0f, 0.0f, -1.0f));
 		glm::vec3 right = glm::rotate(orientation, glm::vec3(1.0f, 0.0f, 0.0f));
 

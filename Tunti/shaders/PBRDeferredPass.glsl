@@ -50,12 +50,19 @@ uniform sampler2D u_AlbedoSpecularAttachment;
 /*
     Function declarations
 */
+float saturate(float f);
+vec2 saturate(vec2 vec);
+vec3 saturate(vec3 vec);
 float Fd90(float NoL, float roughness);
 float KDisneyTerm(float NoL, float NoV, float roughness);
 vec3 FresnelSchlick(float NdotV, vec3 F0);
+vec3 FresnelSchlick(float NdotV, vec3 F0, float roughness);
 vec3 FresnelSchlickRoughness(float NdotV, vec3 F0, float roughness);
 float DistributionGGX(vec3 N, vec3 H, float roughness);
 float GeometryAttenuationGGXSmith(float NdotL, float NdotV, float roughness);
+float GAShlick(float cosTheta, float k);
+float GAShlickGGXSmith(float cosLi, float cosLo, float roughness);
+vec3 FresnelSchlick(vec3 F0, float cosTheta);
 
 void main()
 {
@@ -67,46 +74,42 @@ void main()
     float roughness = texture(u_NormalAttachment, v_TexCoord).a;
     float ambientOcclusion = texture(u_PositionAttachment, v_TexCoord).a;
 
-    // Lighting Data
-    vec3 N = texture(u_NormalAttachment, v_TexCoord).rgb;
-    vec3 V = normalize(CameraPosition - worldPos);
-    vec3 R = reflect(-V, N);
+    vec3 Lo = normalize(CameraPosition - worldPos);
 
-    // Reflectance at normal incidence
-    vec3 F0 = mix(vec3(0.04), albedo, metalness);
+    vec3 N = normalize(texture(u_NormalAttachment, v_TexCoord).rgb);
 
-    // Reflectance equation
-    vec3 Lo = vec3(0.0);
+    float cosLo = max(0.0f, dot(N, Lo));
+
+    vec3 Lr = 2.0f * cosLo * N - Lo;
+
+    vec3 F0 = mix(vec3(0.04f), albedo, metalness);
+
+    vec3 color = vec3(0.0f);
     for(int i = 0; i < NumLights; i++)
     {
-        // Per-light radiance
-        Light light = Lights[i];
-        vec3 L = -1.0 * normalize(light.Direction);
-        vec3 H = normalize(L + V);
+        vec3 Li = -Lights[i].Direction;
+        vec3 Lradiance = Lights[i].ColorAndType.rgb * Lights[i].AttenuationFactors.x;
+        
+        vec3 Lh = normalize(Li + Lo);
 
-        float attenuation = 1.0;
+        float cosLi = max(0.0f, dot(N, Li));
 
-        vec3 radiance = light.ColorAndType.rgb * light.AttenuationFactors.x * attenuation;
+        vec3 F = FresnelSchlick(F0, max(0.0f, dot(Lh, Lo)));
 
-        // Cook-Torrance BRDF
-        float NDF = DistributionGGX(N, H, roughness);
-        float G = GeometryAttenuationGGXSmith(dot(N, L), dot(N, V), roughness);
-        vec3 F = FresnelSchlick(max(dot(H, V), 0.0), F0);
+        float D = DistributionGGX(N, Lh, roughness);
 
-        vec3 nominator = NDF * G * F;
-        float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001;
-        vec3 specular = nominator / denominator;
+        float G = GAShlickGGXSmith(cosLi, cosLo, roughness);
 
-        vec3 kS = F;
-        vec3 kD = vec3(1.0) - kS;
-        kD *= 1.0 - metalness;
+        vec3 kD = mix(vec3(1.0f) - F, vec3(0.0f), metalness);
 
-        float NdotL = max(dot(N, L), 0.0);
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL;
+        vec3 diffuseBRDF = kD * albedo;
+        vec3 specularBRDF = (F * D * G) / max(0.0001f, 4.0f * cosLi * cosLo);
+
+        color += (diffuseBRDF + specularBRDF) * Lradiance * cosLi;
     }
     // Temporary till IBL
     vec3 ambient = vec3(0.03) * albedo * ambientOcclusion;
-    vec3 color = ambient + Lo;
+    color += ambient;
 
     // HDR tonemapping
     color = color / (color + vec3(1.0));
@@ -114,6 +117,27 @@ void main()
     color = pow(color, vec3(1.0 / 2.2));
 
     outColor = vec4(color, 1.0);
+}
+
+/*
+    Utility Functions
+*/
+
+float saturate(float f)
+{
+    return clamp(f, 0.0, 1.0);
+}
+
+
+vec2 saturate(vec2 vec)
+{
+    return clamp(vec, 0.0, 1.0);
+}
+
+
+vec3 saturate(vec3 vec)
+{
+    return clamp(vec, 0.0, 1.0);
 }
 
 /*
@@ -133,6 +157,16 @@ float KDisneyTerm(float NoL, float NoV, float roughness)
 vec3 FresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
+}
+
+vec3 FresnelSchlick(vec3 F0, float cosTheta)
+{
+    return F0 + (vec3(1.0f) - F0) * pow(1.0f - cosTheta, 5.0f);
+}
+
+vec3 FresnelSchlick(float NdotV, vec3 F0, float roughness)
+{
+    return F0 + (max(vec3(1.0f - roughness), F0) - F0) * pow(1.0f - NdotV, 5.0f);
 }
 
 vec3 FresnelSchlickRoughness(float NdotV, vec3 F0, float roughness)
@@ -161,4 +195,16 @@ float GeometryAttenuationGGXSmith(float NdotL, float NdotV, float roughness)
     float ggxV = (2.0f * NdotV) / (NdotV + sqrt(NdotV2 + kRough2 * (1.0f - NdotV2)));
 
     return ggxL * ggxV;
+}
+
+float GAShlick(float cosTheta, float k)
+{
+    return cosTheta / (cosTheta * (1.0f - k) + k);
+}
+
+float GAShlickGGXSmith(float cosLi, float cosLo, float roughness)
+{
+    float r = roughness + 1.0f;
+    float k = (r * r) / 8.0f;
+    return GAShlick(cosLi, k) * GAShlick(cosLo, k);
 }

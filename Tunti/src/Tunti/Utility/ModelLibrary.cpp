@@ -86,11 +86,11 @@ namespace Tunti
 					}
 					mesh.Indices.push_back(uniqueVertices[vertex]);
 				}
+
 				model->Meshes.push_back(mesh);
 				model->TextureMaps.push_back(textureMap);
 				model->MaterialInstances.push_back(Material::DefaulMaterialInstance());
 			}
-
 			return model;
 		}
 	}

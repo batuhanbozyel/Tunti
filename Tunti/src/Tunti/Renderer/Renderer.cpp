@@ -13,7 +13,7 @@
 
 namespace Tunti
 {
-	void Renderer::Init(decltype(RendererAPI::None) api)
+	void Renderer::Init()
 	{
 		if (s_Instance)
 		{
@@ -21,8 +21,7 @@ namespace Tunti
 			return;
 		}
 
-		s_GraphicsAPI = api;
-		switch (api)
+		switch (API)
 		{
 			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); break;
 			case RendererAPI::OpenGL: s_Instance = new OpenGLRenderer(); break;
@@ -42,7 +41,7 @@ namespace Tunti
 		s_Instance->RenderPasses.push_back(renderPass);
 	}
 
-	void Renderer::SubmitLight(const Light& light, const glm::vec3& position, const glm::vec4& direction)
+	void Renderer::SubmitLight(const Light& light, const glm::vec3& position, const glm::vec3& direction)
 	{
 		s_Instance->LightQueue.Lights[s_Instance->LightQueue.LightCount++] = LightData(light, position, direction);
 	}
@@ -55,9 +54,9 @@ namespace Tunti
 		((meshQueue[material])[materialInstance]).push_back({ mesh, transform });
 	}
 
-	void Renderer::BeginScene(const Camera& camera, const glm::mat4& transform, const glm::vec3& position)
+	void Renderer::BeginScene(const Camera& camera, const glm::mat4& view, const glm::vec3& position)
 	{
-		s_Instance->BeginScene(camera, transform, position);
+		s_Instance->BeginScene(camera, view, position);
 	}
 
 	void Renderer::EndScene()

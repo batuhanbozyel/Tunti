@@ -11,32 +11,32 @@ namespace Tunti
 	{
 		bool IsKeyPressed(int keycode)
 		{
-			int state = glfwGetKey(static_cast<GLFWwindow*>(Application::GetActiveWindow()->GetNativeWindow()), keycode);
+			int state = glfwGetKey(Application::GetWindow()->GetHandle(), keycode);
 			return state == GLFW_PRESS;
 		}
 
 		bool IsKeyReleased(int keycode)
 		{
-			int state = glfwGetKey(static_cast<GLFWwindow*>(Application::GetActiveWindow()->GetNativeWindow()), keycode);
+			int state = glfwGetKey(Application::GetWindow()->GetHandle(), keycode);
 			return state == GLFW_RELEASE;
 		}
 
 		bool IsKeyRepeated(int keycode)
 		{
-			int state = glfwGetKey(static_cast<GLFWwindow*>(Application::GetActiveWindow()->GetNativeWindow()), keycode);
+			int state = glfwGetKey(Application::GetWindow()->GetHandle(), keycode);
 			return state == GLFW_REPEAT;
 		}
 
 		bool IsMouseButtonPressed(int button)
 		{
-			int state = glfwGetMouseButton(static_cast<GLFWwindow*>(Application::GetActiveWindow()->GetNativeWindow()), button);
+			int state = glfwGetMouseButton(Application::GetWindow()->GetHandle(), button);
 			return state == GLFW_PRESS;
 		}
 
 		std::pair<float, float> GetMousePos()
 		{
 			double xpos, ypos;
-			glfwGetCursorPos(static_cast<GLFWwindow*>(Application::GetActiveWindow()->GetNativeWindow()), &xpos, &ypos);
+			glfwGetCursorPos(Application::GetWindow()->GetHandle(), &xpos, &ypos);
 			return { static_cast<float>(xpos), static_cast<float>(ypos) };
 		}
 

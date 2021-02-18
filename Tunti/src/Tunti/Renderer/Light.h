@@ -34,11 +34,12 @@ namespace Tunti
 	{
 		Light _Light;
 		glm::vec4 Position{ 0.0f };
-		glm::vec4 Direction{ 0.0f };
+		glm::vec3 Direction{ 0.0f };
+		float _Padding{ 0.0f };
 
 		LightData() = default;
 
-		LightData(const Light& light, const glm::vec3& position, const glm::vec4& direction)
+		LightData(const Light& light, const glm::vec3& position, const glm::vec3& direction)
 			: _Light(light), Position(glm::vec4(position, 0.0f)), Direction(direction) {}
 	};
 #pragma pack(pop)

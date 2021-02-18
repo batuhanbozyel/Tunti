@@ -25,7 +25,7 @@ namespace Tunti
 	struct TransformComponent
 	{
 		glm::vec3 Translation = { 0.0f, 0.0f, 0.0f };
-		glm::vec3 Rotation = { 0.0f, 0.0f, 0.0f };
+		glm::quat Rotation = glm::quat();
 		glm::vec3 Scale = { 1.0f, 1.0f, 1.0f };
 
 		TransformComponent() = default;
@@ -36,15 +36,20 @@ namespace Tunti
 		operator glm::mat4() const
 		{
 			return glm::translate(glm::mat4(1.0f), Translation)
-				* glm::toMat4(glm::quat(Rotation))
+				* glm::toMat4(Rotation)
 				* glm::scale(glm::mat4(1.0f), Scale);
 		}
 
-		glm::mat4 Transform() const
+		glm::mat4 GetTransform() const
 		{
 			return glm::translate(glm::mat4(1.0f), Translation)
 				* glm::toMat4(glm::quat(Rotation))
 				* glm::scale(glm::mat4(1.0f), Scale);
+		}
+
+		glm::vec3 GetDirection() const
+		{
+			return glm::normalize(Rotation * glm::vec3(0.0f, 1.0f, 0.0f));
 		}
 	};
 

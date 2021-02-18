@@ -15,7 +15,7 @@ namespace Tunti
 	void Scene::OnUpdate()
 	{
 		const Camera* mainCamera = nullptr;
-		glm::mat4 cameraTransform;
+		glm::mat4 cameraView;
 		glm::vec3 cameraPosition;
 		{
 			auto view = m_Registry.view<CameraComponent, TransformComponent>();
@@ -26,7 +26,7 @@ namespace Tunti
 				if (camera.Primary)
 				{
 					mainCamera = &camera.Camera;
-					cameraTransform = transform;
+					cameraView = glm::inverse(transform.GetTransform());
 					cameraPosition = transform.Translation;
 					break;
 				}
@@ -35,14 +35,14 @@ namespace Tunti
 
 		if (mainCamera)
 		{
-			Renderer::BeginScene(*mainCamera, cameraTransform, cameraPosition);
+			Renderer::BeginScene(*mainCamera, cameraView, cameraPosition);
 			{
 				auto view = m_Registry.view<TransformComponent, LightComponent>();
 				for (auto entity : view)
 				{
 					auto& [light, transform] = view.get<LightComponent, TransformComponent>(entity);
 
-					Renderer::SubmitLight(light, transform.Translation, transform.Transform() * glm::vec4(0.0f, 0.0f, -1.0f, 0.0f));
+					Renderer::SubmitLight(light, transform.Translation, transform.GetDirection());
 				}
 			}
 

@@ -8,7 +8,8 @@ layout(location = 3) flat out uint v_TexIndex;
 
 layout(std140, binding = 0) uniform ViewProjectionUniform
 {
-    mat4 ViewProjection;
+    mat4 View;
+	mat4 Projection;
 	vec3 CameraPosition;
 };
 
@@ -30,14 +31,14 @@ uniform uint u_BaseVertex;
 void main()
 {
 	uint posIndex = gl_VertexID * 3;
-	vec4 worldPosition = u_Model * vec4(
+	vec4 worldFragPos = u_Model * vec4(
 		vertexBuffer.data[posIndex], 
 		vertexBuffer.data[posIndex + 1], 
 		vertexBuffer.data[posIndex + 2], 1.0);
-	v_WorldPosition = vec3(worldPosition);
+	v_WorldPosition = vec3(worldFragPos);
 
-	uint normalIndex = u_VertexCount * 3 + gl_VertexID * 3;
 	mat3 normalMatrix = transpose(inverse(mat3(u_Model)));
+	uint normalIndex = u_VertexCount * 3 + gl_VertexID * 3;
 	v_Normal = normalMatrix * vec3(
 		vertexBuffer.data[normalIndex], 
 		vertexBuffer.data[normalIndex + 1], 
@@ -50,7 +51,7 @@ void main()
 
 	v_TexIndex = textureMapIndexArray.indices[gl_VertexID];
 
-	gl_Position = ViewProjection * worldPosition;
+	gl_Position = Projection * View * worldFragPos;
 }
 
 #type fragment

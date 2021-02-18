@@ -102,11 +102,8 @@ namespace Tunti
 
 	OpenGLRenderer::OpenGLRenderer()
 	{
-		GLFWwindow* window = static_cast<GLFWwindow*>(Application::GetActiveWindow()->GetNativeWindow());
-		LOG_ASSERT(window, "Window could not found!");
-
-		glfwMakeContextCurrent(window);
-		glfwSwapInterval(static_cast<int>(Application::GetActiveWindow()->GetWindowProps().VSync));
+		glfwMakeContextCurrent(Application::GetWindow()->GetHandle());
+		glfwSwapInterval(static_cast<int>(Application::GetWindow()->GetWindowProps().VSync));
 
 		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		LOG_ASSERT(status, "Glad initialization failed");
@@ -139,17 +136,28 @@ namespace Tunti
 		OpenGLShaderCache* shaderCache = OpenGLShaderCache::GetInstance();
 		s_Data.TexturedQuadShader = shaderCache->LoadShader(RendererShaders::TexturedQuad);
 
-		InitDeferredRenderer(window);
+		InitDeferredRenderer(Application::GetWindow()->GetHandle());
 
-		BeginScene = [&](const Camera& camera, const glm::mat4& transform, const glm::vec3& position)
+		BeginScene = [&](const Camera& camera, const glm::mat4& view, const glm::vec3& position)
 		{
 			// Update Uniform Buffers' contents
-			glNamedBufferSubData(s_Data.ViewProjectionUniformBuffer, 0, sizeof(glm::mat4), glm::value_ptr(camera.GetProjection() * glm::inverse(transform)));
-			glNamedBufferSubData(s_Data.ViewProjectionUniformBuffer, sizeof(glm::mat4), sizeof(glm::vec3), glm::value_ptr(position));
+			struct ViewProjection
+			{
+				glm::mat4 View;
+				glm::mat4 Projection;
+				glm::vec3 Position;
+
+				ViewProjection(const glm::mat4& view, const glm::mat4& proj, const glm::vec3& position)
+					: View(view), Projection(proj), Position(position)
+				{
+				}
+			} viewProj(view, camera.GetProjection(), position);
+			glNamedBufferSubData(s_Data.ViewProjectionUniformBuffer, 0, sizeof(ViewProjection), &viewProj);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		};
 
 		EndScene = [&]()
-		{			
+		{
 			
 		};
 
@@ -169,7 +177,11 @@ namespace Tunti
 		{
 			glBindTextureUnit(RendererBindingTable::SkyboxTextureUnit, 0);
 			s_Data.SkyboxShader.reset();
-		};		
+		};
+
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_CULL_FACE);
+		glDisable(GL_BLEND);
 	}
 
 	OpenGLRenderer::~OpenGLRenderer()
@@ -255,7 +267,7 @@ namespace Tunti
 
 	void OpenGLRenderer::InitDeferredRenderer(GLFWwindow* window)
 	{
-		const WindowProps& props = Application::GetActiveWindow()->GetWindowProps();
+		const WindowProps& props = Application::GetWindow()->GetWindowProps();
 		ConstructGBuffer(props.Width, props.Height);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -315,7 +327,8 @@ namespace Tunti
 		RenderPasses.push_back([&]()
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glDisable(GL_DEPTH_TEST);
+			glDisable(GL_CULL_FACE);
 
 			// Update Light Buffer's content
 			glNamedBufferSubData(s_Data.LightsUniformBuffer, 0, sizeof(glm::vec4) + sizeof(LightData) * LightQueue.LightCount, &LightQueue);
