@@ -16,7 +16,9 @@ namespace Tunti
 		void InitDeferredRenderer(GLFWwindow* window);
 		void DestroyDeferredRenderer();
 	private:
-		static void ConstructGBuffer(uint32_t width, uint32_t height);
+		static void ConstructScreenBuffer(uint32_t width, uint32_t height);
+		static void ConstructGBuffer();
+		static void ConstructShadowMapBuffer(uint32_t resolution);
 
 		static void SetCommonUniformProperties(const Ref<Material>& material, const Ref<OpenGLShader>& shader);
 		static void SetUniqueUniformProperties(const Ref<MaterialInstance>& materialInstance, const Ref<OpenGLShader>& shader);

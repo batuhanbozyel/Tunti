@@ -52,6 +52,17 @@ namespace Tunti
 		const Ref<Material>& material = materialInstance->GetParentMaterial();
 
 		((meshQueue[material])[materialInstance]).push_back({ mesh, transform });
+		s_Instance->MeshShadowPassQueue.push_back({ mesh, transform });
+	}
+
+	void Renderer::ResizeFramebuffers(uint32_t width, uint32_t height)
+	{
+		s_Instance->ResizeFramebuffers(width, height);
+	}
+
+	Texture2D Renderer::GetFramebufferTexture()
+	{
+		return s_Instance->GetFramebufferTexture();
 	}
 
 	void Renderer::BeginScene(const Camera& camera, const glm::mat4& view, const glm::vec3& position)
@@ -66,6 +77,7 @@ namespace Tunti
 
  		s_Instance->EndScene();
 		s_Instance->MeshQueue.clear();
+		s_Instance->MeshShadowPassQueue.clear();
 		s_Instance->LightQueue.LightCount = 0;
 	}
 

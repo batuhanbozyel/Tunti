@@ -6,6 +6,7 @@ namespace Tunti
 {
 	struct Shader;
 	struct MeshData;
+	struct Texture2D;
 	struct WindowProps;
 	struct CubemapTexture;
 
@@ -24,6 +25,9 @@ namespace Tunti
 			Vulkan
 		};
 	protected:
+		std::function<Texture2D()> GetFramebufferTexture;
+		std::function<void(uint32_t, uint32_t)> ResizeFramebuffers;
+
 		std::function<void(const Camera&, const glm::mat4&, const glm::vec3&)> BeginScene;
 		std::vector<std::function<void()>> RenderPasses;
 		std::function<void()> EndScene;
@@ -39,6 +43,7 @@ namespace Tunti
 			std::array<LightData, RendererConstants::MaximumLightNumber> Lights;
 		} LightQueue;
 #pragma pack(pop)
+		std::vector<std::tuple<MeshData, glm::mat4>> MeshShadowPassQueue;
 		std::unordered_map<Ref<Material>, std::unordered_map<Ref<MaterialInstance>, std::vector<std::tuple<MeshData, glm::mat4>>>> MeshQueue;
 	};
 
@@ -54,6 +59,8 @@ namespace Tunti
 		static void SubmitLight(const Light& light, const glm::vec3& position, const glm::vec3& direction);
 		static void DrawMesh(const MeshData& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform);
 
+		static void ResizeFramebuffers(uint32_t width, uint32_t height);
+		static Texture2D GetFramebufferTexture();
 		static decltype(RendererAPI::None) GetAPI() { return API; }
 
 		static void BeginScene(const Camera& camera, const glm::mat4& view, const glm::vec3& position);

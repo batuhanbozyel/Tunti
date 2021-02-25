@@ -108,15 +108,15 @@ void main()
         color += (diffuseBRDF + specularBRDF) * Lradiance * cosLi;
     }
     // Temporary till IBL
-    vec3 ambient = vec3(0.03) * albedo * ambientOcclusion;
+    vec3 ambient = vec3(0.03f) * albedo * ambientOcclusion;
     color += ambient;
 
     // HDR tonemapping
-    color = color / (color + vec3(1.0));
+    color = color / (color + vec3(1.0f));
     // gamma correct
-    color = pow(color, vec3(1.0 / 2.2));
+    color = pow(color, vec3(1.0f / 2.2f));
 
-    outColor = vec4(color, 1.0);
+    outColor = vec4(color, 1.0f);
 }
 
 /*
