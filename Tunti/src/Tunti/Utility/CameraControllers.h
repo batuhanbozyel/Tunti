@@ -10,6 +10,7 @@ namespace Tunti
 	{
 	public:
 		FirstPersonCameraController() = default;
+		~FirstPersonCameraController() = default;
 
 		void OnStart(Scene& scene, float verticalFov = 60.0f, float nearClip = 0.01f, float farClip = 1000.0f);
 		void OnUpdate();

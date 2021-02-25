@@ -12,6 +12,11 @@ namespace Tunti
 		return entity;
 	}
 
+	void Scene::DestroyEntity(Entity entity)
+	{
+		m_Registry.destroy(entity);
+	}
+
 	void Scene::OnUpdate()
 	{
 		const Camera* mainCamera = nullptr;
@@ -27,7 +32,7 @@ namespace Tunti
 				{
 					mainCamera = &camera.Camera;
 					cameraView = glm::inverse(transform.GetTransform());
-					cameraPosition = transform.Translation;
+					cameraPosition = transform.Position;
 					break;
 				}
 			}
@@ -42,7 +47,7 @@ namespace Tunti
 				{
 					auto& [light, transform] = view.get<LightComponent, TransformComponent>(entity);
 
-					Renderer::SubmitLight(light, transform.Translation, transform.GetDirection());
+					Renderer::SubmitLight(light, transform.Position, transform.GetDirection());
 				}
 			}
 

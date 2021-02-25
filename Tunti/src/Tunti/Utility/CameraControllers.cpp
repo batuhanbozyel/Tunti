@@ -12,7 +12,7 @@ namespace Tunti
 		m_FpsCameraEntity = scene.CreateEntity("First Person Camera");
 		m_FpsCameraEntity.AddComponent<CameraComponent>(width, height).Camera.SetPerspective(verticalFov, nearClip, farClip);
 		m_Transform = &m_FpsCameraEntity.GetComponent<TransformComponent>();
-		m_Transform->Translation = glm::vec3(0.0f, 0.0f, 8.0f);
+		m_Transform->Position = glm::vec3(0.0f, 0.0f, 8.0f);
 
 		m_MouseLastX = (float)width / 2.0f;
 		m_MouseLastY = (float)height / 2.0f;
@@ -51,16 +51,16 @@ namespace Tunti
 			velocity /= 2.5f;
 
 		if (Input::IsKeyPressed(Input::Key::W))
-			m_Transform->Translation += forward * velocity;
+			m_Transform->Position += forward * velocity;
 
 		if (Input::IsKeyPressed(Input::Key::S))
-			m_Transform->Translation -= forward * velocity;
+			m_Transform->Position -= forward * velocity;
 
 		if (Input::IsKeyPressed(Input::Key::A))
-			m_Transform->Translation -= right * velocity;
+			m_Transform->Position -= right * velocity;
 
 		if (Input::IsKeyPressed(Input::Key::D))
-			m_Transform->Translation += right * velocity;
+			m_Transform->Position += right * velocity;
 		/* Camera Movement */
 	}
 

@@ -13,8 +13,11 @@ namespace Tunti
 		~Scene() = default;
 
 		Entity CreateEntity(const std::string& name = std::string("Entity"));
+		void DestroyEntity(Entity entity);
 
 		void OnUpdate();
+
+		entt::registry& GetSceneRegistry() { return m_Registry; }
 	private:
 		entt::registry m_Registry;
 

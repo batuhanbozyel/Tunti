@@ -8,6 +8,7 @@ namespace Tunti
 	public:
 		enum class ProjectionType { Perspective = 0, Orthographic = 1 };
 	public:
+		SceneCamera();
 		SceneCamera(uint32_t width, uint32_t height);
 		virtual ~SceneCamera() = default;
 

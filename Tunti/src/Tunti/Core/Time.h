@@ -18,12 +18,12 @@ namespace Tunti
 
 		static void OnTick()
 		{
-			float time = static_cast<float>(glfwGetTime());
-			s_Instance->m_DeltaTime = (time - s_Instance->m_LastFrameTime) * 1000.0f;
+			double time = glfwGetTime();
+			s_Instance->m_DeltaTime = (time - s_Instance->m_LastFrameTime) * 1000.0;
 			s_Instance->m_LastFrameTime = time;
 		}
 
-		static float DeltaTime()
+		static double DeltaTime()
 		{
 			return s_Instance->m_DeltaTime;
 		}
@@ -31,8 +31,8 @@ namespace Tunti
 		Time(const Time& other) = delete;
 		Time& operator=(const Time& other) = delete;
 	private:
-		float m_LastFrameTime = 0.0f;
-		float m_DeltaTime = 0.0f;
+		double m_LastFrameTime = 0.0f;
+		double m_DeltaTime = 0.0f;
 
 		static inline Time* s_Instance = nullptr;
 	};

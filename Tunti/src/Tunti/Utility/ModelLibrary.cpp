@@ -30,7 +30,6 @@ namespace Tunti
 			auto& attrib = reader.GetAttrib();
 			auto& shapes = reader.GetShapes();
 			auto& materials = reader.GetMaterials();
-
 			
 			Ref<Model> model = CreateRef<Model>();
 			std::unordered_map<Vertex, uint32_t> uniqueVertices{};
