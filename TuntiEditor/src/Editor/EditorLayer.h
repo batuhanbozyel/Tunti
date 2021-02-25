@@ -1,37 +1,24 @@
 #pragma once
 #include "Tunti/Core/Layer.h"
-#include "SceneFrame.h"
+#include "EditorAPI.h"
 
 namespace TEditor
 {
 	class EditorLayer : public Tunti::Layer
 	{
 	public:
-		static EditorLayer* Create();
-		virtual ~EditorLayer() = default;
+		EditorLayer();
+		~EditorLayer() = default;
 
-		virtual void OnAttach();
-		virtual void OnDetach();
-
+		virtual void OnAttach() override;
 		virtual void OnEvent(Tunti::Event& e) override;
 		virtual void OnUpdate() override;
-
-		void StopScenePlay();
-		void StartScenePlay();
-	protected:
-		EditorLayer();
-
-		virtual void ImGuiBeginRender();
-		virtual void ImGuiEndRender();
 	private:
-		void MenuBarView();
-		void StatsView();
-		void SceneView();
-
-		bool OnKeyPress(Tunti::KeyPressedEvent& e);
+		std::string OpenFileDialog();
+		void Begin();
+		void End();
+		static void SetDarkThemeColors();
 	private:
-		bool m_ScenePlay = false;
-		SceneFrame m_Scene;
-		static EditorLayer* s_EditorAPI;
+		Tunti::Scope<EditorAPI> m_EditorAPI = nullptr;
 	};
 }

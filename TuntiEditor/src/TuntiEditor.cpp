@@ -1,18 +1,26 @@
-#include "TuntiEditor.h"
+#include "Tunti.h"
 #include "Tunti/Core/EntryPoint.h"
+
+#include "Editor/EditorLayer.h"
 
 namespace TEditor
 {
-	TuntiEditor::TuntiEditor()
-		: Application("Tunti Editor", Tunti::WindowFlag::MaximizedWindow), m_EditorLayer(EditorLayer::Create())
+	class TuntiEditor : public Tunti::Application
 	{
-		PushOverlay(m_EditorLayer);
-	}
-
-	TuntiEditor::~TuntiEditor()
-	{
-		PopOverlay(m_EditorLayer);
-	}
+	public:
+		TuntiEditor()
+			: Application("Tunti Editor", Tunti::WindowFlag::MaximizedWindow), m_EditorLayer(new EditorLayer)
+		{
+			PushLayer(m_EditorLayer);
+		}
+		~TuntiEditor()
+		{
+			PopLayer(m_EditorLayer);
+			delete m_EditorLayer;
+		}
+	private:
+		EditorLayer* m_EditorLayer;
+	};
 }
 
 Tunti::Application* CreateApplication()
