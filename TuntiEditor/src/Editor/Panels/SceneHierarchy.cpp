@@ -55,7 +55,7 @@ namespace TEditor
 
 	// SceneHierarchyPanel
 
-	void SceneHierarchy::OnRender()
+	void SceneHierarchy::OnImGuiRender()
 	{
 		ImGui::Begin("Scene Hierarchy");
 

@@ -7,14 +7,19 @@ namespace TEditor
 	struct SceneData
 	{
 		Tunti::Scene SceneContext;
-		Tunti::EditorCamera SceneEditorCamera;
+		Tunti::EditorCamera SceneEditorCamera{ 90.0f, 16.0f / 9.0f, 0.1f, 10000.0f };
 		Tunti::FirstPersonCameraController FPSCamera;
+
+		bool IsSceneHovered = false;
 
 	} static s_Data;
 
 	void SceneViewport::OnEvent(Tunti::Event& e)
 	{
-		s_Data.SceneEditorCamera.OnEvent(e);
+		if (s_Data.IsSceneHovered)
+		{
+			s_Data.SceneEditorCamera.OnEvent(e);
+		}
 	}
 
 	void SceneViewport::OnStart()
@@ -46,7 +51,7 @@ namespace TEditor
 #endif
 	}
 
-	void SceneViewport::OnRender()
+	void SceneViewport::OnImGuiRender()
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
 		ImGui::Begin("Scene Viewport");
@@ -57,6 +62,8 @@ namespace TEditor
 		Tunti::Renderer::ResizeFramebuffers(viewportSize.x, viewportSize.y);
 		s_Data.SceneEditorCamera.SetViewportSize(viewportSize.x, viewportSize.y);
 
+		s_Data.IsSceneHovered = ImGui::IsItemHovered();
+
 		ImGui::End();
 		ImGui::PopStyleVar();
 	}
@@ -64,7 +71,10 @@ namespace TEditor
 	void SceneViewport::OnEditorUpdate(double dt)
 	{
 		Tunti::Application::EnableCursor();
-		s_Data.SceneEditorCamera.OnUpdate(dt);
+
+		if (s_Data.IsSceneHovered)
+			s_Data.SceneEditorCamera.OnUpdate(dt);
+		
 		s_Data.SceneContext.OnUpdateEditor(dt, s_Data.SceneEditorCamera);
 	}
 

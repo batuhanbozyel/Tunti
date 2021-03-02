@@ -9,7 +9,7 @@ namespace TEditor
 	{
 		void OnEvent(Tunti::Event& e);
 		void OnStart();
-		void OnRender();
+		void OnImGuiRender();
 		void OnEditorUpdate(double dt);
 		void OnPlay(double dt);
 

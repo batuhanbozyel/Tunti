@@ -17,7 +17,6 @@ namespace TEditor
 		std::string OpenFileDialog();
 		void Begin();
 		void End();
-		static void SetDarkThemeColors();
 	private:
 		Tunti::EditorCamera m_EditorCamera;
 

@@ -116,7 +116,7 @@ namespace TEditor
 		}
 	}
 
-	void Inspector::OnRender()
+	void Inspector::OnImGuiRender()
 	{
 		ImGui::Begin("Inspector");
 		Tunti::Entity& selectedEntity = SceneHierarchy::GetSelectedEntity();

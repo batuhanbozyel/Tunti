@@ -6,7 +6,7 @@ namespace TEditor
 {
 	namespace SceneHierarchy
 	{
-		void OnRender();
+		void OnImGuiRender();
 
 		Tunti::Entity& GetSelectedEntity();
 	};

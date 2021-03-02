@@ -4,6 +4,6 @@ namespace TEditor
 {
 	namespace Inspector
 	{
-		void OnRender();
+		void OnImGuiRender();
 	}
 }
