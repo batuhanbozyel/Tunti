@@ -36,6 +36,7 @@ namespace Tunti
 			for (const auto& shape : shapes)
 			{
 				Mesh mesh;
+				mesh.Name = shape.name;
 				std::array<std::string, static_cast<uint32_t>(TextureType::COUNT)> texturePaths;
 				if (materials.size())
 				{
@@ -83,7 +84,6 @@ namespace Tunti
 					}
 					mesh.Indices.push_back(uniqueVertices[vertex]);
 				}
-
 				model->Meshes.emplace_back(std::move(mesh));
 				model->TextureMaps.emplace_back(std::move(textureMap));
 				model->MaterialInstances.emplace_back(Material::DefaulMaterialInstance());

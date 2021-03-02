@@ -19,6 +19,7 @@ namespace Tunti
 
 	struct Mesh
 	{
+		std::string Name;
 		std::vector<glm::vec3> Position;
 		std::vector<glm::vec3> Normal;
 		std::vector<glm::vec2> TexCoord;

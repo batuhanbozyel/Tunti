@@ -24,31 +24,12 @@ namespace TEditor
 
 	void SceneViewport::OnStart()
 	{
-#if 0
-		s_Data.FPSCamera.OnStart(s_Data.SceneContext);
-		Tunti::Ref<Tunti::Model> cubeModel = Tunti::ModelLibrary::Load("./assets/primitives/cube.obj");
-		for (uint32_t i = 0; i < cubeModel->Meshes.size(); i++)
-		{
-			Tunti::Entity cubeSubentity = s_Data.SceneContext.CreateEntity("Cube_" + std::to_string(i));
-			cubeSubentity.AddComponent<Tunti::MeshRendererComponent>(cubeModel->Meshes[i], cubeModel->MaterialInstances[i]).ModelRef = cubeModel;
-			cubeSubentity.GetComponent<Tunti::TransformComponent>().Position = glm::vec3(0.0f, 0.0f, -4.0f);
-			cubeSubentity.GetComponent<Tunti::TransformComponent>().Rotation = glm::vec3(0.0f, 30.0f, 0.0f);
-		}
-
-		Tunti::Ref<Tunti::Model> lightConeModel = Tunti::ModelLibrary::Load("../TuntiEditor/assets/primitives/cone.obj");
-		for (uint32_t i = 0; i < lightConeModel->Meshes.size(); i++)
-		{
-			Tunti::Entity lightConeEntity = s_Data.SceneContext.CreateEntity("LightCone");
-			lightConeEntity.AddComponent<Tunti::MeshRendererComponent>(lightConeModel->Meshes[i], lightConeModel->MaterialInstances[i]);
-	}
-#else
 		Tunti::Ref<Tunti::Model> sponzaModel = Tunti::ModelLibrary::Load("../Sandbox/assets/models/sponza/sponza.obj");
 		for (uint32_t i = 0; i < sponzaModel->Meshes.size(); i++)
 		{
-			Tunti::Entity sponzaSubEntity = s_Data.SceneContext.CreateEntity("Sponza_" + std::to_string(i));
+			Tunti::Entity sponzaSubEntity = s_Data.SceneContext.CreateEntity(sponzaModel->Meshes[i].Name);
 			sponzaSubEntity.AddComponent<Tunti::MeshRendererComponent>(sponzaModel->Meshes[i], sponzaModel->MaterialInstances[i]);
 		}
-#endif
 	}
 
 	void SceneViewport::OnImGuiRender()
