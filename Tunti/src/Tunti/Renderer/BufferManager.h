@@ -3,7 +3,7 @@
 
 namespace Tunti
 {
-	struct MeshData
+	struct MeshRenderer
 	{
 		uint32_t BaseVertex = 0;
 		uint32_t BaseIndex = 0;
@@ -13,6 +13,6 @@ namespace Tunti
 	class BufferManager
 	{
 	public:
-		static MeshData AllocateGraphicsBuffer(const Mesh& mesh, size_t key);
+		static MeshRenderer AllocateGraphicsBuffer(const Mesh& mesh, size_t key);
 	};
 }

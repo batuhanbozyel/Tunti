@@ -6,9 +6,9 @@ namespace Tunti
 {
 	// OpenGLBufferManager
 
-	MeshData OpenGLBufferManager::AllocateGraphicsBuffer(const Mesh& mesh, size_t key)
+	MeshRenderer OpenGLBufferManager::AllocateGraphicsBuffer(const Mesh& mesh, size_t key)
 	{
-		MeshData meshData;
+		MeshRenderer meshData;
 		meshData.Count = mesh.Indices.size();
 
 		uint32_t vertexCount = mesh.Position.size();

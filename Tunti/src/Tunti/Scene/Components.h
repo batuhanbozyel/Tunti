@@ -25,7 +25,7 @@ namespace Tunti
 	struct TransformComponent
 	{
 		glm::vec3 Position = glm::vec3(0.0f);
-		glm::quat Rotation = glm::quat();
+		glm::vec3 Rotation = glm::vec3(0.0f);
 		glm::vec3 Scale = glm::vec3(1.0f);
 
 		TransformComponent() = default;
@@ -36,42 +36,33 @@ namespace Tunti
 		operator glm::mat4() const
 		{
 			return glm::translate(glm::mat4(1.0f), Position)
-				* glm::toMat4(Rotation)
+				* glm::toMat4(glm::quat(glm::radians(Rotation)))
 				* glm::scale(glm::mat4(1.0f), Scale);
 		}
 
 		glm::mat4 GetTransform() const
 		{
 			return glm::translate(glm::mat4(1.0f), Position)
-				* glm::toMat4(Rotation)
+				* glm::toMat4(glm::quat(glm::radians(Rotation)))
 				* glm::scale(glm::mat4(1.0f), Scale);
 		}
 
-		glm::vec3 GetDirection() const
+		glm::vec3 GetFrontDirection() const
 		{
-			return glm::normalize(Rotation * glm::vec3(0.0f, 1.0f, 0.0f));
+			return glm::rotate(GetOrientation(), glm::vec3(0.0f, 0.0f, -1.0f));
 		}
 
-		void Rotate(const glm::vec3& degrees)
+		glm::quat GetOrientation() const
 		{
-			Rotation = glm::rotate(Rotation, glm::radians(degrees));
-		}
-
-		void SetRotation(const glm::vec3& degrees)
-		{
-			Rotation = glm::rotate(glm::quat(), glm::radians(degrees));
-		}
-
-		void SetPosition(const glm::vec3& position)
-		{
-			Position = position;
+			return glm::quat(glm::radians(Rotation));
 		}
 	};
 
 	struct MeshRendererComponent
 	{
-		MeshData MeshBuffer;
-		Ref<MaterialInstance> MaterialInstanceRef;
+		MeshRenderer MeshBuffer;
+		Ref<MaterialInstance> MaterialInstanceRef = Material::DefaulMaterialInstance();
+		Ref<Model> ModelRef = nullptr;
 
 		MeshRendererComponent() = default;
 		MeshRendererComponent(const Mesh& mesh, const Ref<MaterialInstance>& materialInstance)

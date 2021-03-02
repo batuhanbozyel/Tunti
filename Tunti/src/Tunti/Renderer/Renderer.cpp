@@ -23,8 +23,8 @@ namespace Tunti
 
 		switch (API)
 		{
-			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); break;
-			case RendererAPI::OpenGL: s_Instance = new OpenGLRenderer(); break;
+		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); break;
+		case RendererAPI::OpenGL: s_Instance = new OpenGLRenderer(); break;
 		}
 
 		Log::Trace("Renderer has initialized successfully!");
@@ -32,7 +32,7 @@ namespace Tunti
 
 	void Renderer::Shutdown()
 	{
-		if(s_Instance)
+		if (s_Instance)
 			delete s_Instance;
 	}
 
@@ -43,10 +43,11 @@ namespace Tunti
 
 	void Renderer::SubmitLight(const Light& light, const glm::vec3& position, const glm::vec3& direction)
 	{
+		//s_Instance->LightQueue.Lights[s_Instance->LightQueue.LightCount++] = LightData(light, position, glm::vec3(direction.x, -direction.y, direction.z));
 		s_Instance->LightQueue.Lights[s_Instance->LightQueue.LightCount++] = LightData(light, position, direction);
 	}
 
-	void Renderer::DrawMesh(const MeshData& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform)
+	void Renderer::DrawMesh(const MeshRenderer& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform)
 	{
 		auto& meshQueue = s_Instance->MeshQueue;
 		const Ref<Material>& material = materialInstance->GetParentMaterial();
@@ -75,7 +76,7 @@ namespace Tunti
 		for (const auto& renderPass : s_Instance->RenderPasses)
 			renderPass();
 
- 		s_Instance->EndScene();
+		s_Instance->EndScene();
 		s_Instance->MeshQueue.clear();
 		s_Instance->MeshShadowPassQueue.clear();
 		s_Instance->LightQueue.LightCount = 0;

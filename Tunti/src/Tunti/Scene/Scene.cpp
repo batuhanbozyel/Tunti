@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Tunti.h"
 #include "Scene.h"
+#include "Tunti/Utility/EditorCamera.h"
 
 namespace Tunti
 {
@@ -17,7 +18,7 @@ namespace Tunti
 		m_Registry.destroy(entity);
 	}
 
-	void Scene::OnUpdate()
+	void Scene::OnUpdateRuntime(double dt)
 	{
 		const Camera* mainCamera = nullptr;
 		glm::mat4 cameraView;
@@ -47,7 +48,7 @@ namespace Tunti
 				{
 					auto& [light, transform] = view.get<LightComponent, TransformComponent>(entity);
 
-					Renderer::SubmitLight(light, transform.Position, transform.GetDirection());
+					Renderer::SubmitLight(light, transform.Position, transform.GetFrontDirection());
 				}
 			}
 
@@ -62,5 +63,30 @@ namespace Tunti
 			}
 			Renderer::EndScene();
 		}
+	}
+
+	void Scene::OnUpdateEditor(double dt, const EditorCamera& camera)
+	{
+		Renderer::BeginScene(camera, camera.GetViewMatrix(), camera.GetPosition());
+		{
+			auto view = m_Registry.view<TransformComponent, LightComponent>();
+			for (auto entity : view)
+			{
+				auto& [light, transform] = view.get<LightComponent, TransformComponent>(entity);
+
+				Renderer::SubmitLight(light, transform.Position, transform.GetFrontDirection());
+			}
+		}
+
+		{
+			auto view = m_Registry.view<TransformComponent, MeshRendererComponent>();
+			for (auto entity : view)
+			{
+				auto& [meshRenderer, transform] = view.get<MeshRendererComponent, TransformComponent>(entity);
+
+				Renderer::DrawMesh(meshRenderer.MeshBuffer, meshRenderer.MaterialInstanceRef, transform);
+			}
+		}
+		Renderer::EndScene();
 	}
 }

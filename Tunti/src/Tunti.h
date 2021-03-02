@@ -17,6 +17,7 @@
 // Utility
 #include "Tunti/Utility/ModelLibrary.h"
 #include "Tunti/Utility/CameraControllers.h"
+#include "Tunti/Utility/EditorCamera.h"
 
 // Scene
 #include "Tunti/Scene/Scene.h"

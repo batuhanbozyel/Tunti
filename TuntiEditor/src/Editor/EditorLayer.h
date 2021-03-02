@@ -12,13 +12,15 @@ namespace TEditor
 
 		virtual void OnAttach() override;
 		virtual void OnEvent(Tunti::Event& e) override;
-		virtual void OnUpdate() override;
+		virtual void OnUpdate(double dt) override;
 	private:
 		std::string OpenFileDialog();
 		void Begin();
 		void End();
 		static void SetDarkThemeColors();
 	private:
+		Tunti::EditorCamera m_EditorCamera;
+
 		Tunti::Scope<EditorAPI> m_EditorAPI = nullptr;
 	};
 }

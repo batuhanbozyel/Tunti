@@ -138,6 +138,7 @@
     <ClInclude Include="src\Editor\Panels\Inspector.h" />
     <ClInclude Include="src\Editor\Panels\SceneHierarchy.h" />
     <ClInclude Include="src\Editor\Panels\SceneViewport.h" />
+    <ClInclude Include="src\Editor\Utils.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLEditor.h" />
   </ItemGroup>
   <ItemGroup>
@@ -145,6 +146,7 @@
     <ClCompile Include="src\Editor\Panels\Inspector.cpp" />
     <ClCompile Include="src\Editor\Panels\SceneHierarchy.cpp" />
     <ClCompile Include="src\Editor\Panels\SceneViewport.cpp" />
+    <ClCompile Include="src\Editor\Utils.cpp" />
     <ClCompile Include="src\Platform\OpenGL\ImGuiOpenGLBuild.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLEditor.cpp" />
     <ClCompile Include="src\TuntiEditor.cpp" />

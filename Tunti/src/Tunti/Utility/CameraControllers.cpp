@@ -21,7 +21,7 @@ namespace Tunti
 		Application::DisableCursor();
 	}
 
-	void FirstPersonCameraController::OnUpdate()
+	void FirstPersonCameraController::OnUpdate(double dt)
 	{
 		/* Camera Rotation */
 		auto[mouseX, mouseY] = Input::GetMousePos();
@@ -34,15 +34,15 @@ namespace Tunti
 
 		m_Pitch = glm::clamp(m_Pitch, -80.0f, 80.0f);
 
-		m_Transform->Rotation = glm::rotate(glm::quat(), glm::radians(glm::vec3(m_Pitch, m_Yaw, 0.0f)));
+		m_Transform->Rotation = glm::vec3(m_Pitch, m_Yaw, 0.0f);
 		/* Camera Rotation */
 		
 		/* Camera Movement */
-		glm::quat orientation = m_Transform->Rotation;
+		glm::quat orientation = m_Transform->GetOrientation();
 		glm::vec3 forward = glm::rotate(orientation, glm::vec3(0.0f, 0.0f, -1.0f));
 		glm::vec3 right = glm::rotate(orientation, glm::vec3(1.0f, 0.0f, 0.0f));
 
-		float velocity = Time::DeltaTime() * m_MovementSpeed;
+		float velocity = dt * m_MovementSpeed;
 
 		if (Input::IsKeyPressed(Input::Key::LeftShift))
 			velocity *= 2.5f;

@@ -5,7 +5,7 @@
 namespace Tunti
 {
 	struct Shader;
-	struct MeshData;
+	struct MeshRenderer;
 	struct Texture2D;
 	struct WindowProps;
 	struct CubemapTexture;
@@ -43,8 +43,8 @@ namespace Tunti
 			std::array<LightData, RendererConstants::MaximumLightNumber> Lights;
 		} LightQueue;
 #pragma pack(pop)
-		std::vector<std::tuple<MeshData, glm::mat4>> MeshShadowPassQueue;
-		std::unordered_map<Ref<Material>, std::unordered_map<Ref<MaterialInstance>, std::vector<std::tuple<MeshData, glm::mat4>>>> MeshQueue;
+		std::vector<std::tuple<MeshRenderer, glm::mat4>> MeshShadowPassQueue;
+		std::unordered_map<Ref<Material>, std::unordered_map<Ref<MaterialInstance>, std::vector<std::tuple<MeshRenderer, glm::mat4>>>> MeshQueue;
 	};
 
 	class Renderer final
@@ -57,7 +57,7 @@ namespace Tunti
 
 		static void Submit(const std::function<void()>& renderPass);
 		static void SubmitLight(const Light& light, const glm::vec3& position, const glm::vec3& direction);
-		static void DrawMesh(const MeshData& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform);
+		static void DrawMesh(const MeshRenderer& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform);
 
 		static void ResizeFramebuffers(uint32_t width, uint32_t height);
 		static Texture2D GetFramebufferTexture();

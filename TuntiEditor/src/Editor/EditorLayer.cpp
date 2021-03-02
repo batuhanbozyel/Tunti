@@ -25,6 +25,9 @@ namespace TEditor
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
+		io.Fonts->AddFontFromFileTTF("assets/fonts/roboto/Roboto-Medium.ttf", 16.0f);
+		io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/roboto/Roboto-Medium.ttf", 16.0f);
+
 		SetDarkThemeColors();
 
 		ImGuiStyle& style = ImGui::GetStyle();
@@ -57,11 +60,13 @@ namespace TEditor
 		e.Handled |= e.IsInCategory(Tunti::EventCategoryMouse) & io.WantCaptureMouse;
 		e.Handled |= e.IsInCategory(Tunti::EventCategoryKeyboard) & io.WantCaptureKeyboard;
 		Tunti::EventDispatcher dispatcher(e);
+
+		SceneViewport::OnEvent(e);
 	}
 
-	void EditorLayer::OnUpdate()
+	void EditorLayer::OnUpdate(double dt)
 	{
-		SceneViewport::OnPlay(); // Temporary
+		SceneViewport::OnEditorUpdate(dt);
 
 		Begin();
 

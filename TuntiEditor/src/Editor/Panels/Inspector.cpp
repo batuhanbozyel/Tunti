@@ -5,6 +5,8 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
+#include "Editor/Utils.h"
+
 namespace TEditor
 {
 	static void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
@@ -156,6 +158,7 @@ namespace TEditor
 						selectedEntity.AddComponent<Tunti::MeshRendererComponent>();
 					else
 						Tunti::Log::Warn("This entity already has the Mesh Renderer Component!");
+
 					ImGui::CloseCurrentPopup();
 				}
 
@@ -167,9 +170,7 @@ namespace TEditor
 			DrawComponent<Tunti::TransformComponent>("Transform", selectedEntity, [](auto& component)
 			{
 				DrawVec3Control("Position", component.Position);
-				glm::vec3 rotation = glm::degrees(glm::eulerAngles(component.Rotation));
-				DrawVec3Control("Rotation", rotation);
-				component.SetRotation(rotation);
+				DrawVec3Control("Rotation", component.Rotation);
 				DrawVec3Control("Scale", component.Scale, 1.0f);
 			});
 
@@ -178,6 +179,18 @@ namespace TEditor
 				auto& camera = component.Camera;
 
 				ImGui::Checkbox("Primary", &component.Primary);
+			});
+
+			DrawComponent<Tunti::MeshRendererComponent>("Mesh Renderer", selectedEntity, [](auto& component)
+			{
+				ImGui::Text(Tunti::ModelLibrary::GetModelPath(component.ModelRef).c_str());
+
+				float contentWidth = ImGui::GetContentRegionAvail().x;
+				ImGui::SameLine(contentWidth - contentWidth / 20.0f, 0.0f);
+				if (ImGui::Button("...", { 30, 20 }))
+				{
+					std::string filePath = Utils::OpenFileDialog();
+				}
 			});
 		}
 

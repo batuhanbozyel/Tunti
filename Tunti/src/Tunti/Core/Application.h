@@ -5,7 +5,6 @@
 
 #include "Base.h"
 #include "Window.h"
-#include "Time.h"
 #include "LayerStack.h"
 
 int main(int argc, char** argv);
@@ -39,9 +38,11 @@ namespace Tunti
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
 	private:
-		Scope<Time> m_Timer;
 		Scope<Window> m_Window;
 		LayerStack m_LayerStack;
+
+		float m_LastFrameTime = 0.0f;
+
 		bool m_Running = false;
 	private:
 		static Application* s_Instance;

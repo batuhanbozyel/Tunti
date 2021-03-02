@@ -70,11 +70,13 @@ namespace TEditor
 		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
 			s_Data.SelectedEntity = {};
 
-		// Right-click on blank space
 		if (ImGui::BeginPopupContextWindow(0, 1, false))
 		{
 			if (ImGui::MenuItem("Create Empty Entity"))
 				context.CreateEntity("Empty Entity");
+
+			if (ImGui::MenuItem("Directional Light"))
+				context.CreateEntity("Directional Light").AddComponent<Tunti::LightComponent>();
 
 			ImGui::EndPopup();
 		}

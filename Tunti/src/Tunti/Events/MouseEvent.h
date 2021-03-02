@@ -76,7 +76,7 @@ namespace Tunti
 		MouseScrolledEvent(float xoffset, float yoffset)
 			: m_MouseScrollOffset(xoffset, yoffset) {}
 
-		inline const std::pair<float, float>& GetOffset() const { return m_MouseScrollOffset; }
+		const std::pair<float, float>& GetOffset() const { return m_MouseScrollOffset; }
 
 		std::string ToString() const override
 		{

@@ -31,6 +31,7 @@
       <Filter>Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Editor\Panels\Inspector.h" />
+    <ClInclude Include="src\Editor\Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Editor\EditorLayer.cpp">
@@ -50,5 +51,6 @@
     </ClCompile>
     <ClCompile Include="src\TuntiEditor.cpp" />
     <ClCompile Include="src\Editor\Panels\Inspector.cpp" />
+    <ClCompile Include="src\Editor\Utils.cpp" />
   </ItemGroup>
 </Project>

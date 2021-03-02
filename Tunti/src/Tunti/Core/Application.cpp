@@ -12,7 +12,6 @@ namespace Tunti
 			s_Instance = this;
 			m_Running = true;
 			Log::Init();
-			m_Timer = CreateScope<Time>();
 
 			Renderer::API = RendererAPI::OpenGL;
 
@@ -37,8 +36,11 @@ namespace Tunti
 		m_LayerStack.OnStart();
 		while (m_Running)
 		{
-			Time::OnTick();
-			m_LayerStack.OnUpdate();
+			double time = glfwGetTime();
+			double dt = (time - m_LastFrameTime) * 1000.0;
+			m_LastFrameTime = time;
+
+			m_LayerStack.OnUpdate(dt);
 			m_Window->OnUpdate();
 		}
 	}

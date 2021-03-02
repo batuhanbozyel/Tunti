@@ -36,8 +36,6 @@ namespace Tunti
 			for (const auto& shape : shapes)
 			{
 				Mesh mesh;
-
-				Ref<TextureMap> textureMap;
 				std::array<std::string, static_cast<uint32_t>(TextureType::COUNT)> texturePaths;
 				if (materials.size())
 				{
@@ -52,7 +50,7 @@ namespace Tunti
 					texturePaths[static_cast<uint32_t>(TextureType::Roughness)] = fileDirectory + materials[shape.mesh.material_ids[0]].roughness_texname;
 					texturePaths[static_cast<uint32_t>(TextureType::AmbientOcclusion)] = fileDirectory + materials[shape.mesh.material_ids[0]].ambient_texname;
 				}
-				textureMap = TextureLibrary::LoadTextureMap(texturePaths);
+				Ref<TextureMap> textureMap = TextureLibrary::LoadTextureMap(texturePaths);
 
 				for (const auto& index : shape.mesh.indices)
 				{
@@ -86,9 +84,9 @@ namespace Tunti
 					mesh.Indices.push_back(uniqueVertices[vertex]);
 				}
 
-				model->Meshes.push_back(mesh);
-				model->TextureMaps.push_back(textureMap);
-				model->MaterialInstances.push_back(Material::DefaulMaterialInstance());
+				model->Meshes.emplace_back(std::move(mesh));
+				model->TextureMaps.emplace_back(std::move(textureMap));
+				model->MaterialInstances.emplace_back(Material::DefaulMaterialInstance());
 			}
 			return model;
 		}
@@ -133,6 +131,17 @@ namespace Tunti
 			}
 
 			return modelCacheIt->second;
+		}
+
+		std::string GetModelPath(const Ref<Model>& model)
+		{
+			for (const auto& [path, modelRef] : s_ModelCache)
+			{
+				if (modelRef == model)
+					return path;
+			}
+
+			return std::string{};
 		}
 
 		void Flush()
