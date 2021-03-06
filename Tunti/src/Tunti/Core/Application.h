@@ -14,7 +14,7 @@ namespace Tunti
 	class Application
 	{
 	public:
-		Application(const std::string& appName = "Doge", const WindowFlag& flag = WindowFlag::CustomWindow);
+		Application(const std::string& appName = "Tunti", const WindowFlag& flag = WindowFlag::CustomWindow);
 		~Application();
 
 		void Run();

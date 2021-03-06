@@ -8,6 +8,8 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include "Tunti/Core/Input.h"
+#include "Tunti/Events/Event.h"
+#include "Tunti/Events/MouseEvent.h"
 
 namespace Tunti
 {

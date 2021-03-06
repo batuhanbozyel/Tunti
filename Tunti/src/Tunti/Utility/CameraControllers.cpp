@@ -1,5 +1,11 @@
 #include "pch.h"
-#include "Tunti.h"
+
+#include "Tunti/Core/Input.h"
+#include "Tunti/Core/Application.h"
+
+#include "Tunti/Scene/Entity.h"
+#include "Tunti/Scene/Components.h"
+
 #include "CameraControllers.h"
 
 namespace Tunti

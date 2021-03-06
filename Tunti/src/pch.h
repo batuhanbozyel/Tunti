@@ -35,6 +35,9 @@
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
+
 #include "Tunti/Core/Log.h"
 #include "Tunti/Core/Base.h"
 #include "Tunti/Core/Platform.h"

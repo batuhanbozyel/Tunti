@@ -1,9 +1,9 @@
 #pragma once
-#include "Tunti/Scene/Entity.h"
 
 namespace Tunti
 {
 	class Scene;
+	class Entity;
 	struct TransformComponent;
 
 	class FirstPersonCameraController

@@ -1,9 +1,9 @@
 #pragma once
-#include "Tunti/Renderer/Texture.h"
 
 namespace Tunti
 {
 	struct Mesh;
+	struct TextureMap;
 	class MaterialInstance;
 
 	struct Model
@@ -21,7 +21,7 @@ namespace Tunti
 	namespace ModelLibrary
 	{
 		Ref<Model> Load(const std::string& filePath);
-		// TODO: Use hashtable to retrieve path instead of linear searching
+		// TODO: Use hash table to retrieve path instead of linear searching
 		std::string GetModelPath(const Ref<Model>& model);
 		void Flush();
 	};

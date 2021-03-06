@@ -1,11 +1,11 @@
 #pragma once
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include "SceneCamera.h"
 
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/quaternion.hpp>
-
+#include "Tunti/Renderer/Light.h"
+#include "Tunti/Renderer/Material.h"
 #include "Tunti/Renderer/BufferManager.h"
+
+#include "Tunti/Utility/ModelLibrary.h"
 
 namespace Tunti
 {

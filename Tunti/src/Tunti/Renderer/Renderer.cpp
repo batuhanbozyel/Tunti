@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Mesh.h"
+#include "Light.h"
 #include "Camera.h"
 #include "Shader.h"
 #include "Texture.h"
@@ -23,8 +24,8 @@ namespace Tunti
 
 		switch (API)
 		{
-		case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); break;
-		case RendererAPI::OpenGL: s_Instance = new OpenGLRenderer(); break;
+			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); break;
+			case RendererAPI::OpenGL: s_Instance = new OpenGLRenderer(); break;
 		}
 
 		Log::Trace("Renderer has initialized successfully!");
@@ -43,8 +44,7 @@ namespace Tunti
 
 	void Renderer::SubmitLight(const Light& light, const glm::vec3& position, const glm::vec3& direction)
 	{
-		//s_Instance->LightQueue.Lights[s_Instance->LightQueue.LightCount++] = LightData(light, position, glm::vec3(direction.x, -direction.y, direction.z));
-		s_Instance->LightQueue.Lights[s_Instance->LightQueue.LightCount++] = LightData(light, position, direction);
+		s_Instance->LightQueue.Lights[s_Instance->LightQueue.LightCount++] = LightData(light, position, glm::vec3(direction.x, -direction.y, direction.z));
 	}
 
 	void Renderer::DrawMesh(const MeshRenderer& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform)

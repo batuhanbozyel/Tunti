@@ -1,9 +1,11 @@
 #pragma once
 #include "Tunti/Renderer/Camera.h"
-#include "Tunti/Events/MouseEvent.h"
 
 namespace Tunti
 {
+	class Event;
+	class MouseScrolledEvent;
+
 	class EditorCamera : public Camera
 	{
 	public:

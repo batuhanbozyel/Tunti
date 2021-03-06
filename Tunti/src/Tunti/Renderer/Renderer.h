@@ -5,9 +5,9 @@
 namespace Tunti
 {
 	struct Shader;
-	struct MeshRenderer;
 	struct Texture2D;
 	struct WindowProps;
+	struct MeshRenderer;
 	struct CubemapTexture;
 
 	class Camera;

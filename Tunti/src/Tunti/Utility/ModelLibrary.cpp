@@ -5,6 +5,7 @@
 #include <tinyobjloader/tiny_obj_loader.h>
 
 #include "Tunti/Renderer/Material.h"
+#include "Tunti/Renderer/Texture.h"
 #include "Tunti/Renderer/Mesh.h"
 
 namespace Tunti
