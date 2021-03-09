@@ -36,7 +36,10 @@ namespace Tunti
 				if (camera.Primary)
 				{
 					mainCamera = &camera.Camera;
-					cameraView = glm::inverse(transform.GetTransform());
+					cameraView = glm::lookAt(
+						transform.Position,
+						transform.Position + transform.GetFrontDirection(),
+						transform.GetUpDirection());
 					cameraPosition = transform.Position;
 					break;
 				}
@@ -52,7 +55,7 @@ namespace Tunti
 				{
 					auto& [light, transform] = view.get<LightComponent, TransformComponent>(entity);
 
-					Renderer::SubmitLight(light, transform.Position, transform.GetFrontDirection());
+					Renderer::SubmitLight(light, transform.Position, cameraView * glm::vec4(-transform.GetFrontDirection(), 0.0f));
 				}
 			}
 
@@ -71,14 +74,15 @@ namespace Tunti
 
 	void Scene::OnUpdateEditor(double dt, const EditorCamera& camera)
 	{
-		Renderer::BeginScene(camera, camera.GetViewMatrix(), camera.GetPosition());
+		const glm::mat4& cameraView = camera.GetViewMatrix();
+		Renderer::BeginScene(camera, cameraView, camera.GetPosition());
 		{
 			auto view = m_Registry.view<TransformComponent, LightComponent>();
 			for (auto entity : view)
 			{
 				auto& [light, transform] = view.get<LightComponent, TransformComponent>(entity);
 
-				Renderer::SubmitLight(light, transform.Position, transform.GetFrontDirection());
+				Renderer::SubmitLight(light, transform.Position, cameraView * glm::vec4(-transform.GetFrontDirection(), 0.0f));
 			}
 		}
 

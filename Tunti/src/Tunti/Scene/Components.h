@@ -47,14 +47,24 @@ namespace Tunti
 				* glm::scale(glm::mat4(1.0f), Scale);
 		}
 
-		glm::vec3 GetFrontDirection() const
-		{
-			return glm::rotate(GetOrientation(), glm::vec3(0.0f, 0.0f, -1.0f));
-		}
-
 		glm::quat GetOrientation() const
 		{
 			return glm::quat(glm::radians(Rotation));
+		}
+
+		glm::vec3 GetUpDirection() const
+		{
+			return glm::rotate(GetOrientation(), glm::vec3(0.0f, 1.0f, 0.0f));
+		}
+
+		glm::vec3 GetRightDirection() const
+		{
+			return glm::rotate(GetOrientation(), glm::vec3(1.0f, 0.0f, 0.0f));
+		}
+
+		glm::vec3 GetFrontDirection() const
+		{
+			return glm::rotate(GetOrientation(), glm::vec3(0.0f, 0.0f, -1.0f));
 		}
 	};
 

@@ -33,7 +33,8 @@ struct Light
 
 layout(std140, binding = 0) uniform ViewProjectionUniform
 {
-    mat4 ViewProjection;
+    mat4 View;
+	mat4 Projection;
 	vec3 CameraPosition;
 };
 
@@ -50,62 +51,61 @@ uniform sampler2D u_AlbedoSpecularAttachment;
 /*
     Function declarations
 */
-float saturate(float f);
-vec2 saturate(vec2 vec);
-vec3 saturate(vec3 vec);
+float Saturate(float f);
+vec3 LinearizeColor(vec3 color);
 float Fd90(float NoL, float roughness);
 float KDisneyTerm(float NoL, float NoV, float roughness);
-vec3 FresnelSchlick(float NdotV, vec3 F0);
-vec3 FresnelSchlick(float NdotV, vec3 F0, float roughness);
-vec3 FresnelSchlickRoughness(float NdotV, vec3 F0, float roughness);
 float DistributionGGX(vec3 N, vec3 H, float roughness);
 float GeometryAttenuationGGXSmith(float NdotL, float NdotV, float roughness);
-float GAShlick(float cosTheta, float k);
-float GAShlickGGXSmith(float cosLi, float cosLo, float roughness);
-vec3 FresnelSchlick(vec3 F0, float cosTheta);
+vec3 FresnelSchlick(float NdotV, vec3 F0);
 
 void main()
 {
-    vec3 worldPos = texture(u_PositionAttachment, v_TexCoord).rgb;
+    vec3 viewPos = texture(u_PositionAttachment, v_TexCoord).rgb;
 
     // Material Properties
-    vec3 albedo = pow(texture(u_AlbedoSpecularAttachment, v_TexCoord).rgb, vec3(2.2));
+    vec3 albedo = LinearizeColor(texture(u_AlbedoSpecularAttachment, v_TexCoord).rgb);
     float metalness = texture(u_AlbedoSpecularAttachment, v_TexCoord).a;
     float roughness = texture(u_NormalAttachment, v_TexCoord).a;
     float ambientOcclusion = texture(u_PositionAttachment, v_TexCoord).a;
 
-    vec3 Lo = normalize(CameraPosition - worldPos);
-
+    vec3 V = normalize(-viewPos);
     vec3 N = normalize(texture(u_NormalAttachment, v_TexCoord).rgb);
+    vec3 R = reflect(-V, N);
 
-    float cosLo = max(0.0f, dot(N, Lo));
-
-    vec3 Lr = 2.0f * cosLo * N - Lo;
+    float NdotV = max(dot(N, V), 0.0001f);
 
     vec3 F0 = mix(vec3(0.04f), albedo, metalness);
+    vec3 F = FresnelSchlick(NdotV, F0);
+
+    vec3 kS = F;
+    vec3 kD = vec3(1.0f) - kS;
+    kD *= 1.0f - metalness;
 
     vec3 color = vec3(0.0f);
+    vec3 diffuse = vec3(0.0f);
+    vec3 specular = vec3(0.0f);
     for(int i = 0; i < NumLights; i++)
     {
-        vec3 Li = -Lights[i].Direction;
-        vec3 Lradiance = Lights[i].ColorAndType.rgb * Lights[i].AttenuationFactors.x;
-        
-        vec3 Lh = normalize(Li + Lo);
+        Light light = Lights[i];
+        vec3 L = normalize(-light.Direction);
+        vec3 H = normalize(L + V);
 
-        float cosLi = max(0.0f, dot(N, Li));
+        vec3 lightColor = LinearizeColor(light.ColorAndType.rgb) * light.AttenuationFactors.x;
 
-        vec3 F = FresnelSchlick(F0, max(0.0f, dot(Lh, Lo)));
+        float NdotL = Saturate(dot(N, L));
 
-        float D = DistributionGGX(N, Lh, roughness);
+        diffuse = albedo / PI;
 
-        float G = GAShlickGGXSmith(cosLi, cosLo, roughness);
+        float kDisney = KDisneyTerm(NdotL, NdotV, roughness);
 
-        vec3 kD = mix(vec3(1.0f) - F, vec3(0.0f), metalness);
+        float D = DistributionGGX(N, H, roughness);
 
-        vec3 diffuseBRDF = kD * albedo;
-        vec3 specularBRDF = (F * D * G) / max(0.0001f, 4.0f * cosLi * cosLo);
+        float G = GeometryAttenuationGGXSmith(NdotL, NdotV, roughness);
 
-        color += (diffuseBRDF + specularBRDF) * Lradiance * cosLi;
+        specular = (F * D * G) / (4.0f * NdotL * NdotV + 0.0001f);
+
+        color += (diffuse * kDisney * kD + specular) * lightColor * NdotL;
     }
     // Temporary till IBL
     vec3 ambient = vec3(0.03f) * albedo * ambientOcclusion;
@@ -123,21 +123,14 @@ void main()
     Utility Functions
 */
 
-float saturate(float f)
+vec3 LinearizeColor(vec3 color)
 {
-    return clamp(f, 0.0, 1.0);
+    return pow(color.rgb, vec3(2.2f));
 }
 
-
-vec2 saturate(vec2 vec)
+float Saturate(float f)
 {
-    return clamp(vec, 0.0, 1.0);
-}
-
-
-vec3 saturate(vec3 vec)
-{
-    return clamp(vec, 0.0, 1.0);
+    return clamp(f, 0.0f, 1.0f);
 }
 
 /*
@@ -154,32 +147,12 @@ float KDisneyTerm(float NoL, float NoV, float roughness)
     return (1.0f + Fd90(NoL, roughness) * pow(1.0f - NoL, 5.0f)) * (1.0f + Fd90(NoV, roughness) * pow(1.0f - NoV, 5.0f));
 }
 
-vec3 FresnelSchlick(float cosTheta, vec3 F0)
-{
-    return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
-}
-
-vec3 FresnelSchlick(vec3 F0, float cosTheta)
-{
-    return F0 + (vec3(1.0f) - F0) * pow(1.0f - cosTheta, 5.0f);
-}
-
-vec3 FresnelSchlick(float NdotV, vec3 F0, float roughness)
-{
-    return F0 + (max(vec3(1.0f - roughness), F0) - F0) * pow(1.0f - NdotV, 5.0f);
-}
-
-vec3 FresnelSchlickRoughness(float NdotV, vec3 F0, float roughness)
-{
-    return F0 + (max(vec3(1.0f - roughness), F0) - F0) * pow(1.0f - NdotV, 5.0f);
-}
-
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
     float alpha = roughness * roughness;
     float alpha2 = alpha * alpha;
 
-    float NdotH = max(dot(N, H), 0.0);
+    float NdotH = Saturate(dot(N, H));
     float NdotH2 = NdotH * NdotH;
 
     return (alpha2) / (PI * (NdotH2 * (alpha2 - 1.0f) + 1.0f) * (NdotH2 * (alpha2 - 1.0f) + 1.0f));
@@ -197,14 +170,7 @@ float GeometryAttenuationGGXSmith(float NdotL, float NdotV, float roughness)
     return ggxL * ggxV;
 }
 
-float GAShlick(float cosTheta, float k)
+vec3 FresnelSchlick(float NdotV, vec3 F0)
 {
-    return cosTheta / (cosTheta * (1.0f - k) + k);
-}
-
-float GAShlickGGXSmith(float cosLi, float cosLo, float roughness)
-{
-    float r = roughness + 1.0f;
-    float k = (r * r) / 8.0f;
-    return GAShlick(cosLi, k) * GAShlick(cosLo, k);
+    return F0 + (1.0f - F0) * pow(1.0f - NdotV, 5.0f);
 }

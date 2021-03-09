@@ -44,7 +44,7 @@ namespace Tunti
 
 	void Renderer::SubmitLight(const Light& light, const glm::vec3& position, const glm::vec3& direction)
 	{
-		s_Instance->LightQueue.Lights[s_Instance->LightQueue.LightCount++] = LightData(light, position, glm::vec3(direction.x, -direction.y, direction.z));
+		s_Instance->LightQueue.Lights[s_Instance->LightQueue.LightCount++] = LightData(light, position, direction);
 	}
 
 	void Renderer::DrawMesh(const MeshRenderer& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform)

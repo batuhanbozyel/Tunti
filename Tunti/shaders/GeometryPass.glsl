@@ -1,7 +1,7 @@
 #type vertex
 #version 450 core
 
-layout(location = 0) out vec3 v_WorldPosition;
+layout(location = 0) out vec3 v_ViewPosition;
 layout(location = 1) out vec3 v_Normal;
 layout(location = 2) out vec2 v_TexCoord;
 layout(location = 3) flat out uint v_TexIndex;
@@ -31,13 +31,12 @@ uniform uint u_BaseVertex;
 void main()
 {
 	uint posIndex = gl_VertexID * 3;
-	vec4 worldFragPos = u_Model * vec4(
+	v_ViewPosition = vec3(View * u_Model * vec4(
 		vertexBuffer.data[posIndex], 
 		vertexBuffer.data[posIndex + 1], 
-		vertexBuffer.data[posIndex + 2], 1.0);
-	v_WorldPosition = vec3(worldFragPos);
+		vertexBuffer.data[posIndex + 2], 1.0f));
 
-	mat3 normalMatrix = transpose(inverse(mat3(u_Model)));
+	mat3 normalMatrix = transpose(inverse(mat3(View * u_Model)));
 	uint normalIndex = u_VertexCount * 3 + gl_VertexID * 3;
 	v_Normal = normalMatrix * vec3(
 		vertexBuffer.data[normalIndex], 
@@ -51,7 +50,7 @@ void main()
 
 	v_TexIndex = textureMapIndexArray.indices[gl_VertexID];
 
-	gl_Position = Projection * View * worldFragPos;
+	gl_Position = Projection * vec4(v_ViewPosition, 1.0f);
 }
 
 #type fragment
@@ -62,7 +61,7 @@ layout(location = 0) out vec4 g_Position;
 layout(location = 1) out vec4 g_Normal;
 layout(location = 2) out vec4 g_AlbedoSpec;
 
-layout(location = 0) in vec3 v_WorldPosition;
+layout(location = 0) in vec3 v_ViewPosition;
 layout(location = 1) in vec3 v_Normal;
 layout(location = 2) in vec2 v_TexCoord;
 layout(location = 3) flat in uint v_TexIndex;
@@ -86,11 +85,11 @@ vec3 computeNormal();
 void main()
 {
 	g_Position = vec4(
-		v_WorldPosition.xyz,
+		v_ViewPosition,
 		texture(sampler2D(textureArray.textures[v_TexIndex].AmbientOcclusion), v_TexCoord).r);
 
 	g_Normal = vec4(
-		computeNormal().xyz, 
+		computeNormal(), 
 		texture(sampler2D(textureArray.textures[v_TexIndex].Roughness), v_TexCoord).r);
 
 	g_AlbedoSpec = vec4(
@@ -101,9 +100,10 @@ void main()
 vec3 computeNormal()
 {
 	vec3 texNormal = normalize(texture(sampler2D(textureArray.textures[v_TexIndex].Normal), v_TexCoord).rgb * 2.0f - 1.0f);
+	texNormal.g = texNormal.g;
 
-	vec3 dPosX  = dFdx(v_WorldPosition);
-    vec3 dPosY  = dFdy(v_WorldPosition);
+	vec3 dPosX  = dFdx(v_ViewPosition);
+    vec3 dPosY  = dFdy(v_ViewPosition);
     vec2 dTexX = dFdx(v_TexCoord);
     vec2 dTexY = dFdy(v_TexCoord);
 
