@@ -4,105 +4,105 @@
 
 namespace Tunti
 {
-	OpenGLShader::OpenGLShader(const std::string& source)
+	OpenGLShaderProgram::OpenGLShaderProgram(const std::string& source)
 	{
 		auto& parsedSource = ParseShaderSource(source);
 		Compile(parsedSource[GL_VERTEX_SHADER], parsedSource[GL_FRAGMENT_SHADER]);
 		CalculateUniformLocations();
 	}
 
-	OpenGLShader::OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc)
+	OpenGLShaderProgram::OpenGLShaderProgram(const std::string& vertexSrc, const std::string& fragmentSrc)
 	{
 		Compile(vertexSrc, fragmentSrc);
 		CalculateUniformLocations();
 	}
 
-	OpenGLShader::~OpenGLShader()
+	OpenGLShaderProgram::~OpenGLShaderProgram()
 	{
-		glDeleteProgram(m_ShaderHandle);
+		glDeleteProgram(m_ShaderProgramHandle);
 	}
 
-	void OpenGLShader::Bind() const
+	void OpenGLShaderProgram::Bind() const
 	{
-		glUseProgram(m_ShaderHandle);
+		glUseProgram(m_ShaderProgramHandle);
 	}
 
-	void OpenGLShader::Unbind() const
+	void OpenGLShaderProgram::Unbind() const
 	{
 		glUseProgram(0);
 	}
 
-	void OpenGLShader::SetUniformInt(const char* name, int value) const
+	void OpenGLShaderProgram::SetUniformInt(const char* name, int value) const
 	{
-		glProgramUniform1i(m_ShaderHandle, GetUniformLocation(name), value);
+		glProgramUniform1i(m_ShaderProgramHandle, GetUniformLocation(name), value);
 	}
 
-	void OpenGLShader::SetUniformInt2(const char* name, const glm::ivec2& value) const
+	void OpenGLShaderProgram::SetUniformInt2(const char* name, const glm::ivec2& value) const
 	{
-		glProgramUniform2i(m_ShaderHandle, GetUniformLocation(name), value.x, value.y);
+		glProgramUniform2i(m_ShaderProgramHandle, GetUniformLocation(name), value.x, value.y);
 	}
 
-	void OpenGLShader::SetUniformInt3(const char* name, const glm::ivec3& value) const
+	void OpenGLShaderProgram::SetUniformInt3(const char* name, const glm::ivec3& value) const
 	{
-		glProgramUniform3i(m_ShaderHandle, GetUniformLocation(name), value.x, value.y, value.z);
+		glProgramUniform3i(m_ShaderProgramHandle, GetUniformLocation(name), value.x, value.y, value.z);
 	}
 
-	void OpenGLShader::SetUniformInt4(const char* name, const glm::ivec4& value) const
+	void OpenGLShaderProgram::SetUniformInt4(const char* name, const glm::ivec4& value) const
 	{
-		glProgramUniform4i(m_ShaderHandle, GetUniformLocation(name), value.x, value.y, value.z, value.w);
+		glProgramUniform4i(m_ShaderProgramHandle, GetUniformLocation(name), value.x, value.y, value.z, value.w);
 	}
 
-	void OpenGLShader::SetUniformUInt(const char* name, uint32_t value) const
+	void OpenGLShaderProgram::SetUniformUInt(const char* name, uint32_t value) const
 	{
-		glProgramUniform1ui(m_ShaderHandle, GetUniformLocation(name), value);
+		glProgramUniform1ui(m_ShaderProgramHandle, GetUniformLocation(name), value);
 	}
 
-	void OpenGLShader::SetUniformUInt2(const char* name, const glm::uvec2& value) const
+	void OpenGLShaderProgram::SetUniformUInt2(const char* name, const glm::uvec2& value) const
 	{
-		glProgramUniform2ui(m_ShaderHandle, GetUniformLocation(name), value.x, value.y);
+		glProgramUniform2ui(m_ShaderProgramHandle, GetUniformLocation(name), value.x, value.y);
 	}
 
-	void OpenGLShader::SetUniformUInt3(const char* name, const glm::uvec3& value) const
+	void OpenGLShaderProgram::SetUniformUInt3(const char* name, const glm::uvec3& value) const
 	{
-		glProgramUniform3ui(m_ShaderHandle, GetUniformLocation(name), value.x, value.y, value.z);
+		glProgramUniform3ui(m_ShaderProgramHandle, GetUniformLocation(name), value.x, value.y, value.z);
 	}
 
-	void OpenGLShader::SetUniformUInt4(const char* name, const glm::uvec4& value) const
+	void OpenGLShaderProgram::SetUniformUInt4(const char* name, const glm::uvec4& value) const
 	{
-		glProgramUniform4ui(m_ShaderHandle, GetUniformLocation(name), value.x, value.y, value.z, value.w);
+		glProgramUniform4ui(m_ShaderProgramHandle, GetUniformLocation(name), value.x, value.y, value.z, value.w);
 	}
 
-	void OpenGLShader::SetUniformFloat(const char* name, float value) const
+	void OpenGLShaderProgram::SetUniformFloat(const char* name, float value) const
 	{
-		glProgramUniform1f(m_ShaderHandle, GetUniformLocation(name), value);
+		glProgramUniform1f(m_ShaderProgramHandle, GetUniformLocation(name), value);
 	}
 
-	void OpenGLShader::SetUniformFloat2(const char* name, const glm::vec2& value) const
+	void OpenGLShaderProgram::SetUniformFloat2(const char* name, const glm::vec2& value) const
 	{
-		glProgramUniform2f(m_ShaderHandle, GetUniformLocation(name), value.x, value.y);
+		glProgramUniform2f(m_ShaderProgramHandle, GetUniformLocation(name), value.x, value.y);
 	}
 
-	void OpenGLShader::SetUniformFloat3(const char* name, const glm::vec3& value) const
+	void OpenGLShaderProgram::SetUniformFloat3(const char* name, const glm::vec3& value) const
 	{
-		glProgramUniform3f(m_ShaderHandle, GetUniformLocation(name), value.x, value.y, value.z);
+		glProgramUniform3f(m_ShaderProgramHandle, GetUniformLocation(name), value.x, value.y, value.z);
 	}
 
-	void OpenGLShader::SetUniformFloat4(const char* name, const glm::vec4& value) const
+	void OpenGLShaderProgram::SetUniformFloat4(const char* name, const glm::vec4& value) const
 	{
-		glProgramUniform4f(m_ShaderHandle, GetUniformLocation(name), value.x, value.y, value.z, value.w);
+		glProgramUniform4f(m_ShaderProgramHandle, GetUniformLocation(name), value.x, value.y, value.z, value.w);
 	}
 
-	void OpenGLShader::SetUniformMat3(const char* name, const glm::mat3& value) const
+	void OpenGLShaderProgram::SetUniformMat3(const char* name, const glm::mat3& value) const
 	{
-		glProgramUniformMatrix3fv(m_ShaderHandle, GetUniformLocation(name), 1, GL_FALSE, &value[0][0]);
+		glProgramUniformMatrix3fv(m_ShaderProgramHandle, GetUniformLocation(name), 1, GL_FALSE, &value[0][0]);
 	}
 
-	void OpenGLShader::SetUniformMat4(const char* name, const glm::mat4& value) const
+	void OpenGLShaderProgram::SetUniformMat4(const char* name, const glm::mat4& value) const
 	{
-		glProgramUniformMatrix4fv(m_ShaderHandle, GetUniformLocation(name), 1, GL_FALSE, &value[0][0]);
+		glProgramUniformMatrix4fv(m_ShaderProgramHandle, GetUniformLocation(name), 1, GL_FALSE, &value[0][0]);
 	}
 
-	std::unordered_map<std::string, UniformProperty> OpenGLShader::GetMaterialInfo() const
+	std::unordered_map<std::string, UniformProperty> OpenGLShaderProgram::GetMaterialInfo() const
 	{
 		std::unordered_map<std::string, UniformProperty> uniforms;
 
@@ -113,17 +113,17 @@ namespace Tunti
 		return uniforms;
 	}
 
-	uint32_t OpenGLShader::GetUniformLocation(const char* name) const
+	uint32_t OpenGLShaderProgram::GetUniformLocation(const char* name) const
 	{
 		auto& mapLocation = m_UniformCache.find(name);
 		LOG_ASSERT(mapLocation != m_UniformCache.end(), std::string(name) + ": Uniform could not found!");
 		return mapLocation->second.Location;
 	}
 
-	void OpenGLShader::CalculateUniformLocations()
+	void OpenGLShaderProgram::CalculateUniformLocations()
 	{
 		GLint uniform_count = 0;
-		glGetProgramiv(m_ShaderHandle, GL_ACTIVE_UNIFORMS, &uniform_count);
+		glGetProgramiv(m_ShaderProgramHandle, GL_ACTIVE_UNIFORMS, &uniform_count);
 
 		if (uniform_count != 0)
 		{
@@ -131,16 +131,16 @@ namespace Tunti
 			GLsizei length = 0;
 			GLsizei count = 0;
 			GLenum 	type = GL_NONE;
-			glGetProgramiv(m_ShaderHandle, GL_ACTIVE_UNIFORM_MAX_LENGTH, &max_name_len);
+			glGetProgramiv(m_ShaderProgramHandle, GL_ACTIVE_UNIFORM_MAX_LENGTH, &max_name_len);
 
 			Scope<char[]> uniform_name = CreateScope<char[]>(max_name_len);
 
 			for (GLint i = 0; i < uniform_count; ++i)
 			{
-				glGetActiveUniform(m_ShaderHandle, i, max_name_len, &length, &count, &type, uniform_name.get());
+				glGetActiveUniform(m_ShaderProgramHandle, i, max_name_len, &length, &count, &type, uniform_name.get());
 				
 				UniformProperty prop;
-				prop.Location = glGetUniformLocation(m_ShaderHandle, uniform_name.get());
+				prop.Location = glGetUniformLocation(m_ShaderProgramHandle, uniform_name.get());
 				prop.Type = MaterialDataIndex::NONE;
 
 				switch (type)
@@ -172,7 +172,7 @@ namespace Tunti
 		}
 	}
 
-	void OpenGLShader::Compile(const std::string& vertexSrc, const std::string& fragmentSrc)
+	void OpenGLShaderProgram::Compile(const std::string& vertexSrc, const std::string& fragmentSrc)
 	{
 		// Create an empty vertex shader handle
 		GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -240,29 +240,29 @@ namespace Tunti
 		// Vertex and fragment shaders are successfully compiled.
 		// Now time to link them together into a program.
 		// Get a program object.
-		m_ShaderHandle = glCreateProgram();
+		m_ShaderProgramHandle = glCreateProgram();
 
 		// Attach our shaders to our program
-		glAttachShader(m_ShaderHandle, vertexShader);
-		glAttachShader(m_ShaderHandle, fragmentShader);
+		glAttachShader(m_ShaderProgramHandle, vertexShader);
+		glAttachShader(m_ShaderProgramHandle, fragmentShader);
 
 		// Link our program
-		glLinkProgram(m_ShaderHandle);
+		glLinkProgram(m_ShaderProgramHandle);
 
 		// Note the different functions here: glGetProgram* instead of glGetShader*.
 		GLint isLinked = 0;
-		glGetProgramiv(m_ShaderHandle, GL_LINK_STATUS, (int*)&isLinked);
+		glGetProgramiv(m_ShaderProgramHandle, GL_LINK_STATUS, (int*)&isLinked);
 		if (isLinked == GL_FALSE)
 		{
 			GLint maxLength = 0;
-			glGetProgramiv(m_ShaderHandle, GL_INFO_LOG_LENGTH, &maxLength);
+			glGetProgramiv(m_ShaderProgramHandle, GL_INFO_LOG_LENGTH, &maxLength);
 
 			// The maxLength includes the NULL character
 			std::vector<GLchar> infoLog(maxLength);
-			glGetProgramInfoLog(m_ShaderHandle, maxLength, &maxLength, &infoLog[0]);
+			glGetProgramInfoLog(m_ShaderProgramHandle, maxLength, &maxLength, &infoLog[0]);
 
 			// We don't need the program anymore.
-			glDeleteProgram(m_ShaderHandle);
+			glDeleteProgram(m_ShaderProgramHandle);
 			// Don't leak shaders either.
 			glDeleteShader(vertexShader);
 			glDeleteShader(fragmentShader);
@@ -274,11 +274,11 @@ namespace Tunti
 		}
 
 		// Always detach shaders after a successful link.
-		glDetachShader(m_ShaderHandle, vertexShader);
-		glDetachShader(m_ShaderHandle, fragmentShader);
+		glDetachShader(m_ShaderProgramHandle, vertexShader);
+		glDetachShader(m_ShaderProgramHandle, fragmentShader);
 	}
 
-	std::unordered_map<uint32_t, std::string> OpenGLShader::ParseShaderSource(const std::string& source)
+	std::unordered_map<uint32_t, std::string> OpenGLShaderProgram::ParseShaderSource(const std::string& source)
 	{
 		auto ShaderType = [](const std::string& type)
 		{
@@ -316,7 +316,7 @@ namespace Tunti
 
 	// OpenGLShaderCache
 
-	Shader OpenGLShaderCache::LoadShader(const std::string& filePath, const std::string& source)
+	Shader OpenGLShaderCache::LoadShaderProgram(const std::string& filePath, const std::string& source)
 	{
 		Shader shader;
 		const auto& shaderFileIt = m_ShaderFiles.find(filePath);
@@ -328,8 +328,8 @@ namespace Tunti
 		}
 		else
 		{
-			Ref<OpenGLShader> newShader = CreateRef<OpenGLShader>(source);
-			shader.Handle = newShader->m_ShaderHandle;
+			Ref<OpenGLShaderProgram> newShader = CreateRef<OpenGLShaderProgram>(source);
+			shader.Handle = newShader->m_ShaderProgramHandle;
 			m_ShaderFiles.insert(m_ShaderFiles.end(), { filePath, shader });
 			m_Shaders.insert(m_Shaders.end(), { shader, newShader });
 		}
@@ -337,7 +337,7 @@ namespace Tunti
 		return shader;
 	}
 
-	Shader OpenGLShaderCache::LoadShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
+	Shader OpenGLShaderCache::LoadShaderProgram(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
 	{
 		Shader shader;
 		const auto& shaderFileIt = m_ShaderFiles.find(name);
@@ -349,8 +349,8 @@ namespace Tunti
 		}
 		else
 		{
-			Ref<OpenGLShader> newShader = CreateRef<OpenGLShader>(vertexSrc, fragmentSrc);
-			shader.Handle = newShader->m_ShaderHandle;
+			Ref<OpenGLShaderProgram> newShader = CreateRef<OpenGLShaderProgram>(vertexSrc, fragmentSrc);
+			shader.Handle = newShader->m_ShaderProgramHandle;
 			m_ShaderFiles.insert(m_ShaderFiles.end(), { name, shader });
 			m_Shaders.insert(m_Shaders.end(), { shader, newShader });
 		}
@@ -358,11 +358,11 @@ namespace Tunti
 		return shader;
 	}
 
-	Ref<OpenGLShader> OpenGLShaderCache::LoadShader(const std::string& filepath)
+	Ref<OpenGLShaderProgram> OpenGLShaderCache::LoadShaderProgram(const std::string& filepath)
 	{
 		std::string source = ShaderLibrary::ReadFile(filepath);
 
-		Ref<OpenGLShader> shaderRef;
+		Ref<OpenGLShaderProgram> shaderRef;
 		const auto& shaderFileIt = m_ShaderFiles.find(filepath);
 
 		if (shaderFileIt != m_ShaderFiles.end())
@@ -373,14 +373,58 @@ namespace Tunti
 		}
 		else
 		{
-			Ref<OpenGLShader> newShader = CreateRef<OpenGLShader>(source);
-			Shader shader = newShader->m_ShaderHandle;
+			Ref<OpenGLShaderProgram> newShader = CreateRef<OpenGLShaderProgram>(source);
+			Shader shader = newShader->m_ShaderProgramHandle;
 			m_ShaderFiles.insert(m_ShaderFiles.end(), { filepath, shader });
 			m_Shaders.insert(m_Shaders.end(), { shader, newShader });
 			return newShader;
 		}
 
 		return shaderRef;
+	}
+
+	Shader OpenGLShaderCache::LoadComputeShader(const std::string& source)
+	{
+		const GLchar* srcBufferPtr = source.c_str();
+		GLuint shader = glCreateShader(GL_COMPUTE_SHADER);
+		glShaderSource(shader, 1, &srcBufferPtr, nullptr);
+		glCompileShader(shader);
+
+		GLint status;
+		glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
+		if (status == GL_FALSE) {
+			GLsizei infoLogSize;
+			glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogSize);
+			std::unique_ptr<GLchar[]> infoLog(new GLchar[infoLogSize]);
+			glGetShaderInfoLog(shader, infoLogSize, nullptr, infoLog.get());
+			Log::Error("Compute Shader compilation failed:");
+			LOG_ASSERT(false, infoLog.get());
+		}
+
+		GLuint program = glCreateProgram();
+		glAttachShader(program, shader);
+		glLinkProgram(program);
+
+		glDetachShader(program, shader);
+		glDeleteShader(shader);
+
+		glGetProgramiv(program, GL_LINK_STATUS, &status);
+
+		if (status == GL_TRUE) {
+			glValidateProgram(program);
+			glGetProgramiv(program, GL_VALIDATE_STATUS, &status);
+		}
+
+		if (status == GL_FALSE) {
+			GLsizei infoLogSize;
+			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogSize);
+			std::unique_ptr<GLchar[]> infoLog(new GLchar[infoLogSize]);
+			glGetProgramInfoLog(program, infoLogSize, nullptr, infoLog.get());
+			Log::Error("Compute Shader Linking failed: ");
+			LOG_ASSERT(false, infoLog.get());
+		}
+
+		return program;
 	}
 
 	void OpenGLShaderCache::Flush()

@@ -29,9 +29,7 @@ namespace Tunti
 			case GL_DEBUG_SEVERITY_HIGH:
 			{
 				Log::Critical(message);
-#if DEBUG_ENABLED
-				__debugbreak();
-#endif
+				LOG_ASSERT(false);
 				return;
 			}
 			case GL_DEBUG_SEVERITY_MEDIUM:       Log::Error(message); return;
@@ -92,8 +90,8 @@ namespace Tunti
 		GLuint ViewProjectionUniformBuffer;
 		GLuint LightsUniformBuffer;
 
-		Ref<OpenGLShader> SkyboxShader;
-		Ref<OpenGLShader> TexturedQuadShader;
+		Ref<OpenGLShaderProgram> SkyboxShader;
+		Ref<OpenGLShaderProgram> TexturedQuadShader;
 
 		GLuint ScreenFramebuffer;
 		GLuint ScreenFramebufferColorAttachment;
@@ -107,9 +105,9 @@ namespace Tunti
 		GeometryBuffer GBuffer;
 		ShadowPassData ShadowPass;
 
-		Ref<OpenGLShader> ShadowPassShader;
-		Ref<OpenGLShader> GeometryPassShader;
-		Ref<OpenGLShader> PBRDeferredPassShader;
+		Ref<OpenGLShaderProgram> ShadowPassShader;
+		Ref<OpenGLShaderProgram> GeometryPassShader;
+		Ref<OpenGLShaderProgram> PBRDeferredPassShader;
 	} static s_DeferredData;
 
 	OpenGLRenderer::OpenGLRenderer()
@@ -146,7 +144,7 @@ namespace Tunti
 		glBindBufferBase(GL_UNIFORM_BUFFER, RendererBindingTable::ViewProjectionUniformBuffer, s_Data.ViewProjectionUniformBuffer);
 
 		OpenGLShaderCache* shaderCache = OpenGLShaderCache::GetInstance();
-		s_Data.TexturedQuadShader = shaderCache->LoadShader(RendererShaders::TexturedQuad);
+		s_Data.TexturedQuadShader = shaderCache->LoadShaderProgram(RendererShaders::TexturedQuad);
 
 		InitDeferredRenderer(Application::GetWindow()->GetHandle());
 
@@ -182,7 +180,7 @@ namespace Tunti
 			if (!s_Data.SkyboxShader)
 			{
 				OpenGLShaderCache* shaderCache = OpenGLShaderCache::GetInstance();
-				s_Data.SkyboxShader = shaderCache->LoadShader(RendererShaders::Skybox);
+				s_Data.SkyboxShader = shaderCache->LoadShaderProgram(RendererShaders::Skybox);
 			}
 
 			glBindTextureUnit(RendererBindingTable::SkyboxTextureUnit, skybox);
@@ -228,7 +226,7 @@ namespace Tunti
 		glDeleteTextures(1, &s_Data.ScreenFramebufferColorAttachment);
 	}
 
-	void OpenGLRenderer::SetCommonUniformProperties(const Ref<Material>& material, const Ref<OpenGLShader>& shader)
+	void OpenGLRenderer::SetCommonUniformProperties(const Ref<Material>& material, const Ref<OpenGLShaderProgram>& shader)
 	{
 		for (const auto& [name, prop] : material->GetProperties())
 		{
@@ -262,7 +260,7 @@ namespace Tunti
 		}
 	}
 
-	void OpenGLRenderer::SetUniqueUniformProperties(const Ref<MaterialInstance>& materialInstance, const Ref<OpenGLShader>& shader)
+	void OpenGLRenderer::SetUniqueUniformProperties(const Ref<MaterialInstance>& materialInstance, const Ref<OpenGLShaderProgram>& shader)
 	{
 		for (const auto& [name, prop] : materialInstance->GetModifiedProperties())
 		{
@@ -321,10 +319,10 @@ namespace Tunti
 		});
 
 		OpenGLShaderCache* shaderCache = OpenGLShaderCache::GetInstance();
-		s_DeferredData.ShadowPassShader = shaderCache->LoadShader(RendererShaders::ShadowPass);
-		s_DeferredData.GeometryPassShader = shaderCache->LoadShader(RendererShaders::GeometryPass);
+		s_DeferredData.ShadowPassShader = shaderCache->LoadShaderProgram(RendererShaders::ShadowPass);
+		s_DeferredData.GeometryPassShader = shaderCache->LoadShaderProgram(RendererShaders::GeometryPass);
 
-		s_DeferredData.PBRDeferredPassShader = shaderCache->LoadShader(RendererShaders::PBRDeferredPass);
+		s_DeferredData.PBRDeferredPassShader = shaderCache->LoadShaderProgram(RendererShaders::PBRLightingPass);
 		s_DeferredData.PBRDeferredPassShader->SetUniformInt("u_PositionAttachment", RendererBindingTable::GBufferPositionTextureUnit);
 		s_DeferredData.PBRDeferredPassShader->SetUniformInt("u_NormalAttachment", RendererBindingTable::GBufferNormalTextureUnit);
 		s_DeferredData.PBRDeferredPassShader->SetUniformInt("u_AlbedoSpecularAttachment", RendererBindingTable::GBufferAlbedoSpecularTextureUnit);
@@ -349,14 +347,13 @@ namespace Tunti
 				glm::vec3(0.0f, 1.0f, 0.0f));
 			glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 			s_DeferredData.ShadowPassShader->SetUniformMat4("u_LightSpaceMatrix", lightSpaceMatrix);
-			
-			for (const auto& [material, materialInstanceMap] : MeshQueue)
+
+			for (const auto& [material, materialInstanceMap] : MeshMultiLayerQueue)
 			{
 				for (const auto& [materialInstance, meshArray] : materialInstanceMap)
 				{
 					const OpenGLGraphicsBuffer& buffer = (*OpenGLBufferManager::GetInstance())[std::hash<Ref<MaterialInstance>>{}(materialInstance)];
-					GLuint buffers[2] = { buffer.TextureMapIndexBuffer, buffer.VertexBuffer };
-					glBindBuffersBase(GL_SHADER_STORAGE_BUFFER, RendererBindingTable::TextureMapIndexShaderStorageBuffer, 2, buffers);
+					glBindBufferBase(GL_SHADER_STORAGE_BUFFER, RendererBindingTable::VertexBufferShaderStorageBuffer, buffer.VertexBuffer);
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.IndexBuffer);
 
 					for (const auto& [mesh, transform] : meshArray)
@@ -377,7 +374,7 @@ namespace Tunti
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			s_DeferredData.GeometryPassShader->Bind();
-			for (const auto& [material, materialInstanceMap] : MeshQueue)
+			for (const auto& [material, materialInstanceMap] : MeshMultiLayerQueue)
 			{
 				SetCommonUniformProperties(material, s_DeferredData.GeometryPassShader);
 				for (const auto& [materialInstance, meshArray] : materialInstanceMap)

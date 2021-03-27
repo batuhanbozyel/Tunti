@@ -24,7 +24,12 @@ namespace Tunti
 	{
 		static constexpr char* ShadowPass = "../Tunti/shaders/ShadowPass.glsl";
 		static constexpr char* GeometryPass = "../Tunti/shaders/GeometryPass.glsl";
-		static constexpr char* PBRDeferredPass = "../Tunti/shaders/PBRDeferredPass.glsl";
+		static constexpr char* PBRLightingPass = "../Tunti/shaders/PBRLightingPass.glsl";
+
+		static constexpr char* EquirectangularToCubemap = "../Tunti/shaders/EquirectangularToCubemap_Compute.glsl";
+		static constexpr char* PrefilteredSpecularEnvironmentMap = "../Tunti/shaders/PrefilteredSpecularEnvironmentMap_Compute.glsl";
+		static constexpr char* IrradianceCubemap = "../Tunti/shaders/IrradianceCubemap_Compute.glsl";
+		static constexpr char* BRDFto2DLUTTexture = "../Tunti/shaders/BRDFto2DLUTTexture_Compute.glsl";
 
 		static constexpr char* Skybox = "../Tunti/shaders/Skybox.glsl";
 		static constexpr char* TexturedQuad = "../Tunti/shaders/TexturedQuad.glsl";

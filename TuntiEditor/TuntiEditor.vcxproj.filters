@@ -21,27 +21,37 @@
     <ClInclude Include="src\Editor\EditorLayer.h">
       <Filter>Editor</Filter>
     </ClInclude>
+    <ClInclude Include="src\Editor\Panels\Inspector.h">
+      <Filter>Editor\Panels</Filter>
+    </ClInclude>
     <ClInclude Include="src\Editor\Panels\SceneHierarchy.h">
       <Filter>Editor\Panels</Filter>
     </ClInclude>
     <ClInclude Include="src\Editor\Panels\SceneViewport.h">
       <Filter>Editor\Panels</Filter>
     </ClInclude>
+    <ClInclude Include="src\Editor\Utils.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLEditor.h">
       <Filter>Platform\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="src\Editor\Panels\Inspector.h" />
-    <ClInclude Include="src\Editor\Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Editor\EditorLayer.cpp">
       <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Editor\Panels\Inspector.cpp">
+      <Filter>Editor\Panels</Filter>
     </ClCompile>
     <ClCompile Include="src\Editor\Panels\SceneHierarchy.cpp">
       <Filter>Editor\Panels</Filter>
     </ClCompile>
     <ClCompile Include="src\Editor\Panels\SceneViewport.cpp">
       <Filter>Editor\Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Editor\Utils.cpp">
+      <Filter>Editor</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\ImGuiOpenGLBuild.cpp">
       <Filter>Platform\OpenGL</Filter>
@@ -50,7 +60,5 @@
       <Filter>Platform\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\TuntiEditor.cpp" />
-    <ClCompile Include="src\Editor\Panels\Inspector.cpp" />
-    <ClCompile Include="src\Editor\Utils.cpp" />
   </ItemGroup>
 </Project>

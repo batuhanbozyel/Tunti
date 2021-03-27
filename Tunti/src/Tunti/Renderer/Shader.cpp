@@ -44,7 +44,7 @@ namespace Tunti
 		switch (Renderer::GetAPI())
 		{
 			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return Shader();
-			case RendererAPI::OpenGL: return OpenGLShaderCache::GetInstance()->LoadShader(filePath, source);
+			case RendererAPI::OpenGL: return OpenGLShaderCache::GetInstance()->LoadShaderProgram(filePath, source);
 		}
 
 		LOG_ASSERT(false, "RendererAPI is not specified!");
@@ -56,7 +56,19 @@ namespace Tunti
 		switch (Renderer::GetAPI())
 		{
 			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return Shader();
-			case RendererAPI::OpenGL: return OpenGLShaderCache::GetInstance()->LoadShader(name, vertexSrc, fragmentSrc);
+			case RendererAPI::OpenGL: return OpenGLShaderCache::GetInstance()->LoadShaderProgram(name, vertexSrc, fragmentSrc);
+		}
+
+		LOG_ASSERT(false, "RendererAPI is not specified!");
+		return Shader();
+	}
+
+	Shader ShaderLibrary::LoadComputeShader(const std::string& filePath)
+	{
+		switch (Renderer::GetAPI())
+		{
+			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return Shader();
+			case RendererAPI::OpenGL: return OpenGLShaderCache::GetInstance()->LoadComputeShader(filePath);
 		}
 
 		LOG_ASSERT(false, "RendererAPI is not specified!");
@@ -74,7 +86,7 @@ namespace Tunti
 			}
 			case RendererAPI::OpenGL:
 			{
-				Ref<OpenGLShader> apiShader = (*OpenGLShaderCache::GetInstance())[shader];
+				Ref<OpenGLShaderProgram> apiShader = (*OpenGLShaderCache::GetInstance())[shader];
 				return apiShader->GetMaterialInfo();
 			}
 		}

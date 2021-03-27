@@ -5,12 +5,12 @@ namespace Tunti
 {
 	class OpenGLShaderCache;
 
-	class OpenGLShader final
+	class OpenGLShaderProgram final
 	{
 	public:
-		explicit OpenGLShader(const std::string& source);
-		explicit OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc);
-		~OpenGLShader();
+		explicit OpenGLShaderProgram(const std::string& source);
+		explicit OpenGLShaderProgram(const std::string& vertexSrc, const std::string& fragmentSrc);
+		~OpenGLShaderProgram();
 
 		void Bind() const;
 		void Unbind() const;
@@ -35,22 +35,22 @@ namespace Tunti
 
 		bool operator==(const Shader& shader) const
 		{
-			return m_ShaderHandle == shader.Handle;
+			return m_ShaderProgramHandle == shader.Handle;
 		}
 
 		bool operator!=(const Shader& shader) const
 		{
-			return m_ShaderHandle != shader.Handle;
+			return m_ShaderProgramHandle != shader.Handle;
 		}
 
-		bool operator==(const OpenGLShader& shader) const
+		bool operator==(const OpenGLShaderProgram& shader) const
 		{
-			return m_ShaderHandle == shader.m_ShaderHandle;
+			return m_ShaderProgramHandle == shader.m_ShaderProgramHandle;
 		}
 
-		bool operator!=(const OpenGLShader& shader) const
+		bool operator!=(const OpenGLShaderProgram& shader) const
 		{
-			return m_ShaderHandle != shader.m_ShaderHandle;
+			return m_ShaderProgramHandle != shader.m_ShaderProgramHandle;
 		}
 
 		std::unordered_map<std::string, UniformProperty> GetMaterialInfo() const;
@@ -60,7 +60,7 @@ namespace Tunti
 		void Compile(const std::string& vertexSrc, const std::string& fragmentSrc);
 		std::unordered_map<uint32_t, std::string> ParseShaderSource(const std::string& source);
 	private:
-		GLuint m_ShaderHandle;
+		GLuint m_ShaderProgramHandle;
 		std::unordered_map<std::string, UniformProperty> m_UniformCache;
 
 		friend class OpenGLShaderCache;
@@ -71,10 +71,12 @@ namespace Tunti
 	public:
 		~OpenGLShaderCache() = default;
 
-		Ref<OpenGLShader> LoadShader(const std::string& filepath);
+		Ref<OpenGLShaderProgram> LoadShaderProgram(const std::string& filepath);
 
-		Shader LoadShader(const std::string& filePath, const std::string& source);
-		Shader LoadShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
+		Shader LoadShaderProgram(const std::string& filePath, const std::string& source);
+		Shader LoadShaderProgram(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
+
+		Shader LoadComputeShader(const std::string& source);
 
 		void Flush();
 
@@ -86,12 +88,12 @@ namespace Tunti
 			return s_Instance;
 		}
 
-		const Ref<OpenGLShader>& operator[](const std::string& shaderFile) const
+		const Ref<OpenGLShaderProgram>& operator[](const std::string& shaderFile) const
 		{
 			return m_Shaders.find(m_ShaderFiles.find(shaderFile)->second)->second;
 		}
 
-		const Ref<OpenGLShader>& operator[](const Shader& shader) const
+		const Ref<OpenGLShaderProgram>& operator[](const Shader& shader) const
 		{
 			return m_Shaders.find(shader)->second;
 		}
@@ -102,7 +104,7 @@ namespace Tunti
 		explicit OpenGLShaderCache() = default;
 	private:
 		std::unordered_map<std::string, Shader> m_ShaderFiles;
-		std::unordered_map<uint64_t, Ref<OpenGLShader>> m_Shaders;
+		std::unordered_map<uint64_t, Ref<OpenGLShaderProgram>> m_Shaders;
 
 		static inline OpenGLShaderCache* s_Instance = nullptr;
 	};

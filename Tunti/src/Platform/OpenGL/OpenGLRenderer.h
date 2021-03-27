@@ -5,7 +5,7 @@ struct GLFWwindow;
 
 namespace Tunti
 {
-	class OpenGLShader;
+	class OpenGLShaderProgram;
 
 	class OpenGLRenderer final : public RendererAPI
 	{
@@ -20,7 +20,7 @@ namespace Tunti
 		static void ConstructGBuffer();
 		static void ConstructShadowMapBuffer(uint32_t resolution);
 
-		static void SetCommonUniformProperties(const Ref<Material>& material, const Ref<OpenGLShader>& shader);
-		static void SetUniqueUniformProperties(const Ref<MaterialInstance>& materialInstance, const Ref<OpenGLShader>& shader);
+		static void SetCommonUniformProperties(const Ref<Material>& material, const Ref<OpenGLShaderProgram>& shader);
+		static void SetUniqueUniformProperties(const Ref<MaterialInstance>& materialInstance, const Ref<OpenGLShaderProgram>& shader);
 	};
 }

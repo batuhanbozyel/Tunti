@@ -35,6 +35,7 @@ namespace Tunti
 	public:
 		static Shader LoadShader(const std::string& filePath);
 		static Shader LoadShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
+		static Shader LoadComputeShader(const std::string& filePath);
 
 		static std::unordered_map<std::string, UniformProperty> GetMaterialInfo(Shader shader);
 		static std::string ReadFile(const std::string& filePath);

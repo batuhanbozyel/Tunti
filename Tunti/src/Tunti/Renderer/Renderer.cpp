@@ -49,11 +49,10 @@ namespace Tunti
 
 	void Renderer::DrawMesh(const MeshRenderer& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform)
 	{
-		auto& meshQueue = s_Instance->MeshQueue;
+		auto& meshMultiLayerQueue = s_Instance->MeshMultiLayerQueue;
 		const Ref<Material>& material = materialInstance->GetParentMaterial();
 
-		((meshQueue[material])[materialInstance]).push_back({ mesh, transform });
-		s_Instance->MeshShadowPassQueue.push_back({ mesh, transform });
+		((meshMultiLayerQueue[material])[materialInstance]).push_back({ mesh, transform });
 	}
 
 	void Renderer::ResizeFramebuffers(uint32_t width, uint32_t height)
@@ -77,8 +76,7 @@ namespace Tunti
 			renderPass();
 
 		s_Instance->EndScene();
-		s_Instance->MeshQueue.clear();
-		s_Instance->MeshShadowPassQueue.clear();
+		s_Instance->MeshMultiLayerQueue.clear();
 		s_Instance->LightQueue.LightCount = 0;
 	}
 

@@ -32,6 +32,18 @@ namespace Tunti
 		return nullptr;
 	}
 
+	EnvironmentMapTexture TextureLibrary::LoadEnvironmentMap(const std::string& path)
+	{
+		switch (Renderer::GetAPI())
+		{
+			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return EnvironmentMapTexture();
+			case RendererAPI::OpenGL: return OpenGLTextureCache::GetInstance()->CreateEnvironmentMap(path);
+		}
+
+		LOG_ASSERT(false, "RendererAPI initialization failed!");
+		return EnvironmentMapTexture();
+	}
+
 	CubemapTexture TextureLibrary::LoadCubemap(const std::string& folderPath,
 		const std::string& rightFace,
 		const std::string& leftFace,

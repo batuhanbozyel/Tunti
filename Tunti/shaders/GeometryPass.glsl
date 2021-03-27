@@ -100,7 +100,7 @@ void main()
 vec3 computeNormal()
 {
 	vec3 texNormal = normalize(texture(sampler2D(textureArray.textures[v_TexIndex].Normal), v_TexCoord).rgb * 2.0f - 1.0f);
-	texNormal.g = texNormal.g;
+	texNormal.g = -texNormal.g;
 
 	vec3 dPosX  = dFdx(v_ViewPosition);
     vec3 dPosY  = dFdy(v_ViewPosition);

@@ -43,8 +43,7 @@ namespace Tunti
 			std::array<LightData, RendererConstants::MaximumLightNumber> Lights;
 		} LightQueue;
 #pragma pack(pop)
-		std::vector<std::tuple<MeshRenderer, glm::mat4>> MeshShadowPassQueue;
-		std::unordered_map<Ref<Material>, std::unordered_map<Ref<MaterialInstance>, std::vector<std::tuple<MeshRenderer, glm::mat4>>>> MeshQueue;
+		std::unordered_map<Ref<Material>, std::unordered_map<Ref<MaterialInstance>, std::vector<std::tuple<MeshRenderer, glm::mat4>>>> MeshMultiLayerQueue;
 	};
 
 	class Renderer final
