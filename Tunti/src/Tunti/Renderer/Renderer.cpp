@@ -84,9 +84,4 @@ namespace Tunti
 	{
 		s_Instance->SetSkybox(skybox);
 	}
-
-	void Renderer::ClearSkybox()
-	{
-		s_Instance->ClearSkybox();
-	}
 }

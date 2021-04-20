@@ -32,8 +32,7 @@ namespace Tunti
 		std::vector<std::function<void()>> RenderPasses;
 		std::function<void()> EndScene;
 
-		std::function<void(CubemapTexture skybox)> SetSkybox;
-		std::function<void()> ClearSkybox;
+		std::function<void(CubemapTexture)> SetSkybox;
 
 #pragma pack(push, 1)
 		struct LightQueueContainer
@@ -66,7 +65,6 @@ namespace Tunti
 		static void EndScene();
 
 		static void SetSkybox(CubemapTexture skybox);
-		static void ClearSkybox();
 	private:
 		static inline RendererAPI* s_Instance = nullptr;
 	};

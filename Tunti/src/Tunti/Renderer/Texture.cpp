@@ -20,6 +20,11 @@ namespace Tunti
 		return nullptr;
 	}
 
+	EnvironmentMapTexture TextureLibrary::DefaultEnvironmentMap()
+	{
+		return LoadEnvironmentMap(RendererConstants::DefaultEnvironmentMap);
+	}
+
 	Ref<TextureMap> TextureLibrary::LoadTextureMap(const std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)>& textureFiles)
 	{
 		switch (Renderer::GetAPI())

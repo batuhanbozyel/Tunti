@@ -65,10 +65,12 @@ namespace Tunti
 
 	Shader ShaderLibrary::LoadComputeShader(const std::string& filePath)
 	{
+		const std::string& source = ReadFile(filePath);
+
 		switch (Renderer::GetAPI())
 		{
 			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return Shader();
-			case RendererAPI::OpenGL: return OpenGLShaderCache::GetInstance()->LoadComputeShader(filePath);
+			case RendererAPI::OpenGL: return OpenGLShaderCache::GetInstance()->LoadComputeShader(source);
 		}
 
 		LOG_ASSERT(false, "RendererAPI is not specified!");

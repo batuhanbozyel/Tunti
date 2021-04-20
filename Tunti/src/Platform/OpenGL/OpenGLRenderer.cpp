@@ -98,6 +98,7 @@ namespace Tunti
 		uint32_t ScreenWidth = 1280, ScreenHeight = 720;
 
 		const DrawArraysIndirectCommand QuadIndirectCommand = DrawArraysIndirectCommand(3, 1, 0, 0);
+		const DrawArraysIndirectCommand CubeIndirectCommand = DrawArraysIndirectCommand(36, 1, 0, 0);
 	} static s_Data;
 
 	struct OpenGLDeferredRendererData
@@ -145,6 +146,8 @@ namespace Tunti
 
 		OpenGLShaderCache* shaderCache = OpenGLShaderCache::GetInstance();
 		s_Data.TexturedQuadShader = shaderCache->LoadShaderProgram(RendererShaders::TexturedQuad);
+		s_Data.SkyboxShader = shaderCache->LoadShaderProgram(RendererShaders::Skybox);
+		s_Data.SkyboxShader->SetUniformInt("u_Skybox", RendererBindingTable::SkyboxTextureUnit);
 
 		InitDeferredRenderer(Application::GetWindow()->GetHandle());
 
@@ -177,20 +180,10 @@ namespace Tunti
 
 		SetSkybox = [&](CubemapTexture skybox)
 		{
-			if (!s_Data.SkyboxShader)
-			{
-				OpenGLShaderCache* shaderCache = OpenGLShaderCache::GetInstance();
-				s_Data.SkyboxShader = shaderCache->LoadShaderProgram(RendererShaders::Skybox);
-			}
+			OpenGLShaderCache* shaderCache = OpenGLShaderCache::GetInstance();
+			s_Data.SkyboxShader = shaderCache->LoadShaderProgram(RendererShaders::Skybox);
 
 			glBindTextureUnit(RendererBindingTable::SkyboxTextureUnit, skybox);
-			s_Data.SkyboxShader->SetUniformInt("u_Skybox", RendererBindingTable::SkyboxTextureUnit);
-		};
-
-		ClearSkybox = [&]()
-		{
-			glBindTextureUnit(RendererBindingTable::SkyboxTextureUnit, 0);
-			s_Data.SkyboxShader.reset();
 		};
 
 		ResizeFramebuffers = [&](uint32_t width, uint32_t height)
@@ -212,6 +205,10 @@ namespace Tunti
 		glDisable(GL_DEPTH_TEST);
 		glDisable(GL_CULL_FACE);
 		glDisable(GL_BLEND);
+
+		CubemapTexture defaultEnvironmentMap;
+		defaultEnvironmentMap.TextureID = OpenGLTextureCache::GetInstance()->CreateEnvironmentMap(RendererConstants::DefaultEnvironmentMap).EnvironmentMapTextureID;
+		SetSkybox(defaultEnvironmentMap);
 	}
 
 	OpenGLRenderer::~OpenGLRenderer()
@@ -330,8 +327,6 @@ namespace Tunti
 		// Shadow Pass
 		RenderPasses.push_back([&]()
 		{
-			glEnable(GL_DEPTH_TEST);
-			glEnable(GL_CULL_FACE);
 			glCullFace(GL_BACK);
 
 			glBindFramebuffer(GL_FRAMEBUFFER, s_DeferredData.ShadowPass.Framebuffer);
@@ -402,12 +397,25 @@ namespace Tunti
 			glBindFramebuffer(GL_FRAMEBUFFER, s_Data.ScreenFramebuffer);
 			glDisable(GL_DEPTH_TEST);
 			glDisable(GL_CULL_FACE);
+			glDepthMask(GL_FALSE);
 
 			// Update Light Buffer's content
 			glNamedBufferSubData(s_Data.LightsUniformBuffer, 0, sizeof(glm::vec4) + sizeof(LightData) * LightQueue.LightCount, &LightQueue);
 
 			s_DeferredData.PBRDeferredPassShader->Bind();
 			glDrawArraysIndirect(GL_TRIANGLES, &s_Data.QuadIndirectCommand);
+		});
+
+		// Skybox Pass
+		RenderPasses.push_back([&]()
+		{
+			glEnable(GL_DEPTH_TEST);
+			glEnable(GL_CULL_FACE);
+			glDepthMask(GL_TRUE);
+			glCullFace(GL_FRONT);
+
+			s_Data.SkyboxShader->Bind();
+			glDrawArraysIndirect(GL_TRIANGLES, &s_Data.CubeIndirectCommand);
 		});
 	}
 
@@ -486,6 +494,8 @@ namespace Tunti
 		glBindTextureUnit(RendererBindingTable::GBufferNormalTextureUnit, s_DeferredData.GBuffer.NormalAttachment);
 		glBindTextureUnit(RendererBindingTable::GBufferAlbedoSpecularTextureUnit, s_DeferredData.GBuffer.AlbedoSpecularAttachment);
 		glViewport(0, 0, s_Data.ScreenWidth, s_Data.ScreenHeight);
+
+		glNamedFramebufferRenderbuffer(s_Data.ScreenFramebuffer, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, s_DeferredData.GBuffer.DepthAttachment);
 	}
 
 	void OpenGLRenderer::ConstructShadowMapBuffer(uint32_t resolution)

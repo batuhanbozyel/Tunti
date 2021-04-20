@@ -393,12 +393,13 @@ namespace Tunti
 		GLint status;
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
 		if (status == GL_FALSE) {
-			GLsizei infoLogSize;
-			glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogSize);
-			std::unique_ptr<GLchar[]> infoLog(new GLchar[infoLogSize]);
-			glGetShaderInfoLog(shader, infoLogSize, nullptr, infoLog.get());
+			GLint maxLength = 0;
+			glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
+			std::vector<GLchar> infoLog(maxLength);
+			glGetShaderInfoLog(shader, maxLength, &maxLength, &infoLog[0]);
+
 			Log::Error("Compute Shader compilation failed:");
-			LOG_ASSERT(false, infoLog.get());
+			LOG_ASSERT(false, infoLog.data());
 		}
 
 		GLuint program = glCreateProgram();

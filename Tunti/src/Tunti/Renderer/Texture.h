@@ -81,6 +81,8 @@ namespace Tunti
 	{
 	public:
 		static Ref<TextureMap> DefaultTextureMap();
+		static EnvironmentMapTexture DefaultEnvironmentMap();
+
 		static Ref<TextureMap> LoadTextureMap(const std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)>& textureFiles);
 		static EnvironmentMapTexture LoadEnvironmentMap(const std::string& path);
 		static CubemapTexture LoadCubemap(const std::string& folderPath,

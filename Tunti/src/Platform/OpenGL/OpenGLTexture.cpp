@@ -103,7 +103,7 @@ namespace Tunti
 
 		// Load & convert equirectangular environment map to a cubemap texture.
 		{
-			GLuint equirectangularToCubemapShader = OpenGLShaderCache::GetInstance()->LoadComputeShader(RendererShaders::EquirectangularToCubemap);
+			GLuint equirectangularToCubemapShader = OpenGLShaderCache::GetInstance()->LoadComputeShader(ShaderLibrary::ReadFile(RendererShaders::EquirectangularToCubemap));
 
 			GLuint environmentMapEquirectengularTexture;
 			glCreateTextures(GL_TEXTURE_2D, 1, &environmentMapEquirectengularTexture);
@@ -125,7 +125,7 @@ namespace Tunti
 
 		// Compute pre-filtered specular environment map.
 		{
-			GLuint prefilteredSpecularEnvironmentMapShader = OpenGLShaderCache::GetInstance()->LoadComputeShader(RendererShaders::PrefilteredSpecularEnvironmentMap);
+			GLuint prefilteredSpecularEnvironmentMapShader = OpenGLShaderCache::GetInstance()->LoadComputeShader(ShaderLibrary::ReadFile(RendererShaders::PrefilteredSpecularEnvironmentMap));
 
 			glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_EnvironmentMapTextureID);
 			glTextureStorage2D(m_EnvironmentMapTextureID, mipmapLevels, GL_RGBA16F, envMapSize, envMapSize);
@@ -154,7 +154,7 @@ namespace Tunti
 
 		// Compute diffuse irradiance cubemap.
 		{
-			GLuint irradianceCubemapShader = OpenGLShaderCache::GetInstance()->LoadComputeShader(RendererShaders::IrradianceCubemap);
+			GLuint irradianceCubemapShader = OpenGLShaderCache::GetInstance()->LoadComputeShader(ShaderLibrary::ReadFile(RendererShaders::IrradianceCubemap));
 
 			glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_IrradianceMapTextureID);
 			glTextureStorage2D(m_IrradianceMapTextureID, 1, GL_RGBA16F, irradianceMapSize, irradianceMapSize);
@@ -171,7 +171,7 @@ namespace Tunti
 
 		// Compute Cook-Torrance BRDF 2D LUT for split-sum approximation.
 		{
-			GLuint brdfto2DLUTTextureShader = OpenGLShaderCache::GetInstance()->LoadComputeShader(RendererShaders::BRDFto2DLUTTexture);
+			GLuint brdfto2DLUTTextureShader = OpenGLShaderCache::GetInstance()->LoadComputeShader(ShaderLibrary::ReadFile(RendererShaders::BRDFto2DLUTTexture));
 
 			glCreateTextures(GL_TEXTURE_2D, 1, &m_BRDFto2DLUTTextureID);
 			glTextureStorage2D(m_BRDFto2DLUTTextureID, 1, GL_RG16F, brdfToLUTSize, brdfToLUTSize);
@@ -200,6 +200,7 @@ namespace Tunti
 
 	OpenGLTextureCache::OpenGLTextureCache()
 		: m_DefaultTextureMap(CreateRef<TextureMap>()),
+		m_DefaultEnvironmentMap(CreateRef<EnvironmentMapTexture>()),
 		m_WhiteTexture(std::array<unsigned char, 4>{255, 255, 255, 255}),
 		m_BlackTexture(std::array<unsigned char, 4>{0, 0, 0, 255})
 	{
@@ -208,6 +209,7 @@ namespace Tunti
 		glNamedBufferStorage(m_TextureMapSSBO, SizeofTextureMap * MaxTextures, nullptr, GL_DYNAMIC_STORAGE_BIT);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, RendererBindingTable::TextureMapsShaderStorageBuffer, m_TextureMapSSBO);
 		glNamedBufferSubData(m_TextureMapSSBO, 0, m_DefaultTextureMap->Textures.size() * sizeof(GLuint64), m_DefaultTextureMap->Textures.data());
+		m_EnvironmentMaps.emplace("default", Scope<OpenGLEnvironmentMapTexture>());
 	}
 
 	OpenGLTextureCache::~OpenGLTextureCache()

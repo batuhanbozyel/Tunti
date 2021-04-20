@@ -76,6 +76,7 @@ namespace Tunti
 		OpenGLTexture2D m_WhiteTexture;
 		OpenGLTexture2D m_BlackTexture;
 		Ref<TextureMap> m_DefaultTextureMap;
+		Ref<EnvironmentMapTexture> m_DefaultEnvironmentMap;
 		std::unordered_map<std::string, Scope<OpenGLTexture2D>> m_Textures;
 		std::unordered_map<std::string, Scope<OpenGLEnvironmentMapTexture>> m_EnvironmentMaps;
 		std::unordered_map<std::string, Scope<OpenGLCubemapTexture>> m_Cubemaps;
