@@ -91,7 +91,7 @@ namespace Tunti
 		GLuint LightsUniformBuffer;
 
 		Ref<OpenGLShaderProgram> SkyboxShader;
-		Ref<OpenGLShaderProgram> TexturedQuadShader;
+		Ref<OpenGLShaderProgram> FullscreenTriangleShader;
 
 		GLuint ScreenFramebuffer;
 		GLuint ScreenFramebufferColorAttachment;
@@ -145,7 +145,7 @@ namespace Tunti
 		glBindBufferBase(GL_UNIFORM_BUFFER, RendererBindingTable::ViewProjectionUniformBuffer, s_Data.ViewProjectionUniformBuffer);
 
 		OpenGLShaderCache* shaderCache = OpenGLShaderCache::GetInstance();
-		s_Data.TexturedQuadShader = shaderCache->LoadShaderProgram(RendererShaders::TexturedQuad);
+		s_Data.FullscreenTriangleShader = shaderCache->LoadShaderProgram(RendererShaders::FullscreenTriangle);
 		s_Data.SkyboxShader = shaderCache->LoadShaderProgram(RendererShaders::Skybox);
 		s_Data.SkyboxShader->SetUniformInt("u_Skybox", RendererBindingTable::SkyboxTextureUnit);
 

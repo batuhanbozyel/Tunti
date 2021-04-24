@@ -1,7 +1,10 @@
 #type vertex
 #version 450 core
 
-layout(location = 0) out vec2 v_TexCoord;
+layout(location = 0) out VertexInOut
+{
+	vec2 TexCoord;
+} VertexOut;
 
 void main() 
 {
@@ -9,7 +12,7 @@ void main()
     float y = -1.0 + float((gl_VertexID & 2) << 1);
 
     gl_Position = vec4(-1.0f + x*2.0f, -1.0f+y*2.0f, 0.0f, 1.0f);
-    v_TexCoord = vec2(x, y);
+    VertexOut.TexCoord = vec2(x, y);
 }
 
 #type fragment
@@ -21,7 +24,10 @@ const float PI = 3.14159265359f;
 
 layout(location = 0) out vec4 outColor;
 
-layout(location = 0) in vec2 v_TexCoord;
+layout(location = 0) in VertexInOut
+{
+	vec2 TexCoord;
+} VertexIn;
 
 struct Light
 {
@@ -60,14 +66,14 @@ vec3 FresnelSchlick(float NdotV, vec3 F0);
 
 void main()
 {
-    vec3 viewPos = texture(u_PositionAttachment, v_TexCoord).rgb;
+    vec3 viewPos = texture(u_PositionAttachment, VertexIn.TexCoord).rgb;
 
     // Material Properties
-    vec3 albedo = LinearizeColor(texture(u_AlbedoSpecularAttachment, v_TexCoord).rgb);
-    vec3 normal = texture(u_NormalAttachment, v_TexCoord).rgb;
-    float metalness = texture(u_AlbedoSpecularAttachment, v_TexCoord).a;
-    float roughness = texture(u_NormalAttachment, v_TexCoord).a;
-    float ambientOcclusion = texture(u_PositionAttachment, v_TexCoord).a;
+    vec3 albedo = LinearizeColor(texture(u_AlbedoSpecularAttachment, VertexIn.TexCoord).rgb);
+    vec3 normal = texture(u_NormalAttachment, VertexIn.TexCoord).rgb;
+    float metalness = texture(u_AlbedoSpecularAttachment, VertexIn.TexCoord).a;
+    float roughness = texture(u_NormalAttachment, VertexIn.TexCoord).a;
+    float ambientOcclusion = texture(u_PositionAttachment, VertexIn.TexCoord).a;
 
     vec3 V = normalize(-viewPos);
     vec3 N = normalize(normal);

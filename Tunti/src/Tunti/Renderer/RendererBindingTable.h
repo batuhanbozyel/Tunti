@@ -32,7 +32,7 @@ namespace Tunti
 		static constexpr char* BRDFto2DLUTTexture = "../Tunti/assets/shaders/BRDFto2DLUTTexture_Compute.glsl";
 
 		static constexpr char* Skybox = "../Tunti/assets/shaders/Skybox.glsl";
-		static constexpr char* TexturedQuad = "../Tunti/assets/shaders/TexturedQuad.glsl";
+		static constexpr char* FullscreenTriangle = "../Tunti/assets/shaders/FullscreenTriangle.glsl";
 		static constexpr char* ObjectOutlining = "../Tunti/assets/shaders/ObjectOutlining.glsl";
 	}
 
