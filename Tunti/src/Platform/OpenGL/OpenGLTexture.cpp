@@ -131,6 +131,8 @@ namespace Tunti
 			glTextureStorage2D(m_EnvironmentMapTextureID, mipmapLevels, GL_RGBA16F, envMapSize, envMapSize);
 			glTextureParameteri(m_EnvironmentMapTextureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 			glTextureParameteri(m_EnvironmentMapTextureID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTextureParameteri(m_EnvironmentMapTextureID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTextureParameteri(m_EnvironmentMapTextureID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			glTextureParameterf(m_EnvironmentMapTextureID, GL_TEXTURE_MAX_ANISOTROPY_EXT, MaxAnisotropy);
 
 			// Copy 0th mipmap level into destination environment map.

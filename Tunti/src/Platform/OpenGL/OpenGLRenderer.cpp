@@ -98,7 +98,7 @@ namespace Tunti
 		uint32_t ScreenWidth = 1280, ScreenHeight = 720;
 
 		const DrawArraysIndirectCommand QuadIndirectCommand = DrawArraysIndirectCommand(3, 1, 0, 0);
-		const DrawArraysIndirectCommand CubeIndirectCommand = DrawArraysIndirectCommand(36, 1, 0, 0);
+		const DrawArraysIndirectCommand CubeIndirectCommand = DrawArraysIndirectCommand(14, 1, 0, 0);
 	} static s_Data;
 
 	struct OpenGLDeferredRendererData
@@ -327,8 +327,6 @@ namespace Tunti
 		// Shadow Pass
 		RenderPasses.push_back([&]()
 		{
-			glCullFace(GL_BACK);
-
 			glBindFramebuffer(GL_FRAMEBUFFER, s_DeferredData.ShadowPass.Framebuffer);
 			glViewport(0, 0, s_DeferredData.ShadowPass.Resolution, s_DeferredData.ShadowPass.Resolution);
 			glClear(GL_DEPTH_BUFFER_BIT);
@@ -403,19 +401,27 @@ namespace Tunti
 			glNamedBufferSubData(s_Data.LightsUniformBuffer, 0, sizeof(glm::vec4) + sizeof(LightData) * LightQueue.LightCount, &LightQueue);
 
 			s_DeferredData.PBRDeferredPassShader->Bind();
-			glDrawArraysIndirect(GL_TRIANGLES, &s_Data.QuadIndirectCommand);
+			glDrawArraysIndirect(GL_TRIANGLE_STRIP, &s_Data.QuadIndirectCommand);
 		});
 
 		// Skybox Pass
 		RenderPasses.push_back([&]()
 		{
-			glEnable(GL_DEPTH_TEST);
+			glDepthRange(1.0f, 1.0f);
+
 			glEnable(GL_CULL_FACE);
-			glDepthMask(GL_TRUE);
 			glCullFace(GL_FRONT);
 
+			glEnable(GL_DEPTH_TEST);
+			glDepthMask(GL_TRUE);
+			glDepthFunc(GL_LEQUAL);
+
 			s_Data.SkyboxShader->Bind();
-			glDrawArraysIndirect(GL_TRIANGLES, &s_Data.CubeIndirectCommand);
+			glDrawArraysIndirect(GL_TRIANGLE_STRIP, &s_Data.CubeIndirectCommand);
+
+			glDepthRange(0.0f, 1.0f);
+			glDepthFunc(GL_LESS);
+			glCullFace(GL_BACK);
 		});
 	}
 
