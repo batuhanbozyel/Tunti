@@ -41,16 +41,36 @@ namespace Tunti
 				std::array<std::string, static_cast<uint32_t>(TextureType::COUNT)> texturePaths;
 				if (materials.size())
 				{
-					texturePaths[static_cast<uint32_t>(TextureType::Albedo)] = fileDirectory + materials[shape.mesh.material_ids[0]].diffuse_texname;
+					// Albedo
+					if (!materials[shape.mesh.material_ids[0]].diffuse_texname.empty()) {
+						texturePaths[static_cast<uint32_t>(TextureType::Albedo)] = fileDirectory + materials[shape.mesh.material_ids[0]].diffuse_texname;
+					}
 
-					texturePaths[static_cast<uint32_t>(TextureType::Normal)]
-						= fileDirectory + (materials[shape.mesh.material_ids[0]].normal_texname.empty() ? materials[shape.mesh.material_ids[0]].bump_texname : materials[shape.mesh.material_ids[0]].normal_texname);
+					// Normal
+					if (!materials[shape.mesh.material_ids[0]].normal_texname.empty()) {
+						texturePaths[static_cast<uint32_t>(TextureType::Normal)] = fileDirectory + materials[shape.mesh.material_ids[0]].normal_texname;
+					}
+					else if (!materials[shape.mesh.material_ids[0]].bump_texname.empty()) {
+						texturePaths[static_cast<uint32_t>(TextureType::Normal)] = fileDirectory + materials[shape.mesh.material_ids[0]].bump_texname;
+					}
 
-					texturePaths[static_cast<uint32_t>(TextureType::Metalness)]
-						= fileDirectory + (materials[shape.mesh.material_ids[0]].metallic_texname.empty() ? materials[shape.mesh.material_ids[0]].specular_texname : materials[shape.mesh.material_ids[0]].metallic_texname);
+					// Metalness
+					if (!materials[shape.mesh.material_ids[0]].metallic_texname.empty()) {
+						texturePaths[static_cast<uint32_t>(TextureType::Metalness)] = fileDirectory + materials[shape.mesh.material_ids[0]].metallic_texname;
+					}
+					else if (!materials[shape.mesh.material_ids[0]].specular_texname.empty()) {
+						texturePaths[static_cast<uint32_t>(TextureType::Metalness)] = fileDirectory + materials[shape.mesh.material_ids[0]].specular_texname;
+					}
 
-					texturePaths[static_cast<uint32_t>(TextureType::Roughness)] = fileDirectory + materials[shape.mesh.material_ids[0]].roughness_texname;
-					texturePaths[static_cast<uint32_t>(TextureType::AmbientOcclusion)] = fileDirectory + materials[shape.mesh.material_ids[0]].ambient_texname;
+					// Roughness
+					if (!materials[shape.mesh.material_ids[0]].roughness_texname.empty()) {
+						texturePaths[static_cast<uint32_t>(TextureType::Roughness)] = fileDirectory + materials[shape.mesh.material_ids[0]].roughness_texname;
+					}
+
+					// Ambient Occlusion
+					if (!materials[shape.mesh.material_ids[0]].ambient_texname.empty()) {
+						texturePaths[static_cast<uint32_t>(TextureType::AmbientOcclusion)] = fileDirectory + materials[shape.mesh.material_ids[0]].ambient_texname;
+					}
 				}
 				Ref<TextureMap> textureMap = TextureLibrary::LoadTextureMap(texturePaths);
 
@@ -106,6 +126,13 @@ namespace Tunti
 	namespace ModelLibrary
 	{
 		static std::unordered_map<std::string, Ref<Model>> s_ModelCache;
+		constexpr std::array<const char*, static_cast<int>(PrimitiveMesh::PRIMITIVE_MESH_COUNT)> PrimitivePaths = {
+			"../Tunti/assets/primitives/cube.obj",
+			"../Tunti/assets/primitives/sphere.obj",
+			"../Tunti/assets/primitives/cone.obj",
+			"../Tunti/assets/primitives/cylinder.obj",
+			"../Tunti/assets/primitives/plane.obj"
+		};
 
 		Ref<Model> Load(const std::string& filePath)
 		{
@@ -132,6 +159,11 @@ namespace Tunti
 			}
 
 			return modelCacheIt->second;
+		}
+
+		Ref<Model> LoadPrimitive(PrimitiveMesh primitive)
+		{
+			return Load(PrimitivePaths[static_cast<int>(primitive)]);
 		}
 
 		std::string GetModelPath(const Ref<Model>& model)

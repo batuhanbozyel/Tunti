@@ -24,14 +24,14 @@ namespace TEditor
 
 	void SceneViewport::OnStart()
 	{
-#if 1
+#if 0
 		Tunti::Ref<Tunti::Model> sponzaModel = Tunti::ModelLibrary::Load("../Sandbox/assets/models/sponza/sponza.obj");
 		for (uint32_t i = 0; i < sponzaModel->Meshes.size(); i++)
 		{
 			Tunti::Entity sponzaSubEntity = s_Data.SceneContext.CreateEntity(sponzaModel->Meshes[i].Name);
 			sponzaSubEntity.AddComponent<Tunti::MeshRendererComponent>(sponzaModel->Meshes[i], sponzaModel->MaterialInstances[i]);
 		}
-#else
+#elif 0
 		Tunti::Ref<Tunti::Model> backpackModel = Tunti::ModelLibrary::Load("../Sandbox/assets/models/backpack/backpack.obj");
 		for (uint32_t i = 0; i < backpackModel->Meshes.size(); i++)
 		{

@@ -3,7 +3,7 @@
 
 layout(location = 0) out VertexInOut
 {
-	vec3 ViewPosition;
+	vec3 WorldPosition;
 	vec3 Normal;
 	vec2 TexCoord;
 	flat uint TexIndex;
@@ -32,12 +32,12 @@ uniform mat4 u_Model;
 void main()
 {
 	uint posIndex = gl_VertexID * 3;
-	VertexOut.ViewPosition = vec3(View * u_Model * vec4(
+	VertexOut.WorldPosition = vec3(u_Model * vec4(
 		vertexBuffer.data[posIndex], 
 		vertexBuffer.data[posIndex + 1], 
 		vertexBuffer.data[posIndex + 2], 1.0f));
 
-	mat3 normalMatrix = transpose(inverse(mat3(View * u_Model)));
+	mat3 normalMatrix = transpose(inverse(mat3(u_Model)));
 	uint normalIndex = u_VertexCount * 3 + gl_VertexID * 3;
 	VertexOut.Normal = normalMatrix * vec3(
 		vertexBuffer.data[normalIndex], 
@@ -51,7 +51,7 @@ void main()
 
 	VertexOut.TexIndex = textureMapIndexArray.indices[gl_VertexID];
 
-	gl_Position = Projection * vec4(VertexOut.ViewPosition, 1.0f);
+	gl_Position = Projection * View * vec4(VertexOut.WorldPosition, 1.0f);
 }
 
 #type fragment
@@ -64,7 +64,7 @@ layout(location = 2) out vec4 g_AlbedoSpec;
 
 layout(location = 0) in VertexInOut
 {
-	vec3 ViewPosition;
+	vec3 WorldPosition;
 	vec3 Normal;
 	vec2 TexCoord;
 	flat uint TexIndex;
@@ -89,7 +89,7 @@ vec3 computeNormal();
 void main()
 {
 	g_Position = vec4(
-		VertexIn.ViewPosition,
+		VertexIn.WorldPosition,
 		texture(sampler2D(textureArray.textures[VertexIn.TexIndex].AmbientOcclusion), VertexIn.TexCoord).r);
 
 	g_Normal = vec4(
@@ -103,11 +103,10 @@ void main()
 
 vec3 computeNormal()
 {
-	vec3 texNormal = normalize(texture(sampler2D(textureArray.textures[VertexIn.TexIndex].Normal), VertexIn.TexCoord).rgb * 2.0f - 1.0f);
-	texNormal.g = -texNormal.g;
+	vec3 texNormal = texture(sampler2D(textureArray.textures[VertexIn.TexIndex].Normal), VertexIn.TexCoord).rgb * 2.0f - 1.0f;
 
-	vec3 dPosX  = dFdx(VertexIn.ViewPosition);
-    vec3 dPosY  = dFdy(VertexIn.ViewPosition);
+	vec3 dPosX  = dFdx(VertexIn.WorldPosition);
+    vec3 dPosY  = dFdy(VertexIn.WorldPosition);
     vec2 dTexX = dFdx(VertexIn.TexCoord);
     vec2 dTexY = dFdy(VertexIn.TexCoord);
 

@@ -84,4 +84,10 @@ namespace Tunti
 	{
 		s_Instance->SetSkybox(skybox);
 	}
+
+	void Renderer::SetEnvironmentMap(EnvironmentMapTexture environmentMap)
+	{
+		s_Instance->SetEnvironmentMap(environmentMap);
+	}
+
 }

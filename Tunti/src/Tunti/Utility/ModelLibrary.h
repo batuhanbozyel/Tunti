@@ -6,6 +6,16 @@ namespace Tunti
 	struct TextureMap;
 	class MaterialInstance;
 
+	enum class PrimitiveMesh
+	{
+		CUBE,
+		SPHERE,
+		CONE,
+		CYLINDER,
+		PLANE,
+		PRIMITIVE_MESH_COUNT
+	};
+
 	struct Model
 	{
 		std::vector<Mesh> Meshes;
@@ -21,7 +31,7 @@ namespace Tunti
 	namespace ModelLibrary
 	{
 		Ref<Model> Load(const std::string& filePath);
-		// TODO: Use hash table to retrieve path instead of linear searching
+		Ref<Model> LoadPrimitive(PrimitiveMesh primitive);
 		std::string GetModelPath(const Ref<Model>& model);
 		void Flush();
 	};

@@ -75,6 +75,56 @@ namespace TEditor
 			if (ImGui::MenuItem("Create Empty Entity"))
 				context.CreateEntity("Empty Entity");
 
+			if (ImGui::MenuItem("Cube"))
+			{
+				Tunti::Ref<Tunti::Model> model = Tunti::ModelLibrary::LoadPrimitive(Tunti::PrimitiveMesh::CUBE);
+				for (uint32_t i = 0; i < model->Meshes.size(); i++)
+				{
+					Tunti::Entity modelSubEntity = context.CreateEntity(model->Meshes[i].Name);
+					modelSubEntity.AddComponent<Tunti::MeshRendererComponent>(model->Meshes[i], model->MaterialInstances[i]);
+				}
+			}
+
+			if (ImGui::MenuItem("Sphere"))
+			{
+				Tunti::Ref<Tunti::Model> model = Tunti::ModelLibrary::LoadPrimitive(Tunti::PrimitiveMesh::SPHERE);
+				for (uint32_t i = 0; i < model->Meshes.size(); i++)
+				{
+					Tunti::Entity modelSubEntity = context.CreateEntity(model->Meshes[i].Name);
+					modelSubEntity.AddComponent<Tunti::MeshRendererComponent>(model->Meshes[i], model->MaterialInstances[i]);
+				}
+			}
+
+			if (ImGui::MenuItem("Cylinder"))
+			{
+				Tunti::Ref<Tunti::Model> model = Tunti::ModelLibrary::LoadPrimitive(Tunti::PrimitiveMesh::CYLINDER);
+				for (uint32_t i = 0; i < model->Meshes.size(); i++)
+				{
+					Tunti::Entity modelSubEntity = context.CreateEntity(model->Meshes[i].Name);
+					modelSubEntity.AddComponent<Tunti::MeshRendererComponent>(model->Meshes[i], model->MaterialInstances[i]);
+				}
+			}
+
+			if (ImGui::MenuItem("Cone"))
+			{
+				Tunti::Ref<Tunti::Model> model = Tunti::ModelLibrary::LoadPrimitive(Tunti::PrimitiveMesh::CONE);
+				for (uint32_t i = 0; i < model->Meshes.size(); i++)
+				{
+					Tunti::Entity modelSubEntity = context.CreateEntity(model->Meshes[i].Name);
+					modelSubEntity.AddComponent<Tunti::MeshRendererComponent>(model->Meshes[i], model->MaterialInstances[i]);
+				}
+			}
+
+			if (ImGui::MenuItem("Plane"))
+			{
+				Tunti::Ref<Tunti::Model> model = Tunti::ModelLibrary::LoadPrimitive(Tunti::PrimitiveMesh::PLANE);
+				for (uint32_t i = 0; i < model->Meshes.size(); i++)
+				{
+					Tunti::Entity modelSubEntity = context.CreateEntity(model->Meshes[i].Name);
+					modelSubEntity.AddComponent<Tunti::MeshRendererComponent>(model->Meshes[i], model->MaterialInstances[i]);
+				}
+			}
+
 			if (ImGui::MenuItem("Directional Light"))
 				context.CreateEntity("Directional Light").AddComponent<Tunti::LightComponent>();
 

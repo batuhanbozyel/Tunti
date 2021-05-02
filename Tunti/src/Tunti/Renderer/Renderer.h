@@ -9,6 +9,7 @@ namespace Tunti
 	struct WindowProps;
 	struct MeshRenderer;
 	struct CubemapTexture;
+	struct EnvironmentMapTexture;
 
 	class Camera;
 	class Material;
@@ -33,6 +34,7 @@ namespace Tunti
 		std::function<void()> EndScene;
 
 		std::function<void(CubemapTexture)> SetSkybox;
+		std::function<void(EnvironmentMapTexture)> SetEnvironmentMap;
 
 #pragma pack(push, 1)
 		struct LightQueueContainer
@@ -65,6 +67,7 @@ namespace Tunti
 		static void EndScene();
 
 		static void SetSkybox(CubemapTexture skybox);
+		static void SetEnvironmentMap(EnvironmentMapTexture environmentMap);
 	private:
 		static inline RendererAPI* s_Instance = nullptr;
 	};

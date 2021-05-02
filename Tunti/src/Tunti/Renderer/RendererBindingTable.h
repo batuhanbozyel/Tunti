@@ -10,6 +10,8 @@ namespace Tunti
 		static constexpr uint8_t GBufferPositionTextureUnit = 1;
 		static constexpr uint8_t GBufferNormalTextureUnit = 2;
 		static constexpr uint8_t GBufferAlbedoSpecularTextureUnit = 3;
+		static constexpr uint8_t IrradianceCubemapTextureUnit = 4;
+		static constexpr uint8_t BRDFtoLUTCubemapTextureUnit = 5;
 
 		// Buffer Bindings
 

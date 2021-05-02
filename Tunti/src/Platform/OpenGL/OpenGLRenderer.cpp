@@ -108,7 +108,7 @@ namespace Tunti
 
 		Ref<OpenGLShaderProgram> ShadowPassShader;
 		Ref<OpenGLShaderProgram> GeometryPassShader;
-		Ref<OpenGLShaderProgram> PBRDeferredPassShader;
+		Ref<OpenGLShaderProgram> PBRLightingPassShader;
 	} static s_DeferredData;
 
 	OpenGLRenderer::OpenGLRenderer()
@@ -180,10 +180,26 @@ namespace Tunti
 
 		SetSkybox = [&](CubemapTexture skybox)
 		{
-			OpenGLShaderCache* shaderCache = OpenGLShaderCache::GetInstance();
-			s_Data.SkyboxShader = shaderCache->LoadShaderProgram(RendererShaders::Skybox);
+			if (!s_Data.SkyboxShader)
+			{
+				OpenGLShaderCache* shaderCache = OpenGLShaderCache::GetInstance();
+				s_Data.SkyboxShader = shaderCache->LoadShaderProgram(RendererShaders::Skybox);
+			}
 
 			glBindTextureUnit(RendererBindingTable::SkyboxTextureUnit, skybox);
+		};
+
+		SetEnvironmentMap = [&](EnvironmentMapTexture environmentMap)
+		{
+			if (!s_Data.SkyboxShader)
+			{
+				OpenGLShaderCache* shaderCache = OpenGLShaderCache::GetInstance();
+				s_Data.SkyboxShader = shaderCache->LoadShaderProgram(RendererShaders::Skybox);
+			}
+
+			glBindTextureUnit(RendererBindingTable::SkyboxTextureUnit, environmentMap.EnvironmentMapTextureID);
+			glBindTextureUnit(RendererBindingTable::IrradianceCubemapTextureUnit, environmentMap.IrradianceMapTextureID);
+			glBindTextureUnit(RendererBindingTable::BRDFtoLUTCubemapTextureUnit, environmentMap.BRDFto2DLUTTextureID);
 		};
 
 		ResizeFramebuffers = [&](uint32_t width, uint32_t height)
@@ -206,9 +222,7 @@ namespace Tunti
 		glDisable(GL_CULL_FACE);
 		glDisable(GL_BLEND);
 
-		CubemapTexture defaultEnvironmentMap;
-		defaultEnvironmentMap.TextureID = OpenGLTextureCache::GetInstance()->CreateEnvironmentMap(RendererConstants::DefaultEnvironmentMap).EnvironmentMapTextureID;
-		SetSkybox(defaultEnvironmentMap);
+		SetEnvironmentMap(OpenGLTextureCache::GetInstance()->CreateEnvironmentMap(RendererConstants::DefaultEnvironmentMap));
 	}
 
 	OpenGLRenderer::~OpenGLRenderer()
@@ -319,10 +333,13 @@ namespace Tunti
 		s_DeferredData.ShadowPassShader = shaderCache->LoadShaderProgram(RendererShaders::ShadowPass);
 		s_DeferredData.GeometryPassShader = shaderCache->LoadShaderProgram(RendererShaders::GeometryPass);
 
-		s_DeferredData.PBRDeferredPassShader = shaderCache->LoadShaderProgram(RendererShaders::PBRLightingPass);
-		s_DeferredData.PBRDeferredPassShader->SetUniformInt("u_PositionAttachment", RendererBindingTable::GBufferPositionTextureUnit);
-		s_DeferredData.PBRDeferredPassShader->SetUniformInt("u_NormalAttachment", RendererBindingTable::GBufferNormalTextureUnit);
-		s_DeferredData.PBRDeferredPassShader->SetUniformInt("u_AlbedoSpecularAttachment", RendererBindingTable::GBufferAlbedoSpecularTextureUnit);
+		s_DeferredData.PBRLightingPassShader = shaderCache->LoadShaderProgram(RendererShaders::PBRLightingPass);
+		s_DeferredData.PBRLightingPassShader->SetUniformInt("u_PositionAttachment", RendererBindingTable::GBufferPositionTextureUnit);
+		s_DeferredData.PBRLightingPassShader->SetUniformInt("u_NormalAttachment", RendererBindingTable::GBufferNormalTextureUnit);
+		s_DeferredData.PBRLightingPassShader->SetUniformInt("u_AlbedoSpecularAttachment", RendererBindingTable::GBufferAlbedoSpecularTextureUnit);
+		s_DeferredData.PBRLightingPassShader->SetUniformInt("u_IrradianceCubemap", RendererBindingTable::IrradianceCubemapTextureUnit);
+		s_DeferredData.PBRLightingPassShader->SetUniformInt("u_SpecularCubemap", RendererBindingTable::SkyboxTextureUnit);
+		s_DeferredData.PBRLightingPassShader->SetUniformInt("u_SpecularBRDF_LUT", RendererBindingTable::BRDFtoLUTCubemapTextureUnit);
 
 		// Shadow Pass
 		RenderPasses.push_back([&]()
@@ -400,7 +417,7 @@ namespace Tunti
 			// Update Light Buffer's content
 			glNamedBufferSubData(s_Data.LightsUniformBuffer, 0, sizeof(glm::vec4) + sizeof(LightData) * LightQueue.LightCount, &LightQueue);
 
-			s_DeferredData.PBRDeferredPassShader->Bind();
+			s_DeferredData.PBRLightingPassShader->Bind();
 			glDrawArraysIndirect(GL_TRIANGLE_STRIP, &s_Data.QuadIndirectCommand);
 		});
 

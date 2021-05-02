@@ -259,12 +259,25 @@ namespace Tunti
 			}
 			else
 			{
-				textureMap->Textures[typeIndex] = m_WhiteTexture.m_TextureHandle;
-				glNamedBufferSubData(
-					m_TextureMapSSBO,
-					SizeofTextureMap * m_TextureMapCount + OffsetofTextureType(type),
-					sizeof(GLuint64),
-					&m_WhiteTexture.m_TextureHandle);
+				if (type == TextureType::Metalness)
+				{
+					textureMap->Textures[typeIndex] = m_BlackTexture.m_TextureHandle;
+					glNamedBufferSubData(
+						m_TextureMapSSBO,
+						SizeofTextureMap * m_TextureMapCount + OffsetofTextureType(type),
+						sizeof(GLuint64),
+						&m_BlackTexture.m_TextureHandle);
+				}
+				else
+				{
+					textureMap->Textures[typeIndex] = m_WhiteTexture.m_TextureHandle;
+					glNamedBufferSubData(
+						m_TextureMapSSBO,
+						SizeofTextureMap * m_TextureMapCount + OffsetofTextureType(type),
+						sizeof(GLuint64),
+						&m_WhiteTexture.m_TextureHandle);
+				}
+				
 			}
 			
 			type = static_cast<TextureType>(typeIndex + 1);
