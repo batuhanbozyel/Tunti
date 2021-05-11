@@ -55,7 +55,7 @@ namespace Tunti
 				{
 					auto& [light, transform] = view.get<LightComponent, TransformComponent>(entity);
 
-					Renderer::SubmitLight(light, transform.Position, glm::vec4(-transform.GetFrontDirection(), 0.0f));
+					Renderer::SubmitLight(light, transform.Position, -transform.GetFrontDirection());
 				}
 			}
 
@@ -82,7 +82,7 @@ namespace Tunti
 			{
 				auto& [light, transform] = view.get<LightComponent, TransformComponent>(entity);
 
-				Renderer::SubmitLight(light, transform.Position, glm::vec4(-transform.GetFrontDirection(), 0.0f));
+				Renderer::SubmitLight(light, transform.Position, -transform.GetFrontDirection());
 			}
 		}
 
