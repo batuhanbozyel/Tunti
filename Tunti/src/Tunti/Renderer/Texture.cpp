@@ -20,6 +20,11 @@ namespace Tunti
 		return nullptr;
 	}
 
+	EnvironmentMapTexture TextureLibrary::DefaultEnvironmentMap()
+	{
+		return LoadEnvironmentMap(RendererConstants::DefaultEnvironmentMap);
+	}
+
 	Ref<TextureMap> TextureLibrary::LoadTextureMap(const std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)>& textureFiles)
 	{
 		switch (Renderer::GetAPI())
@@ -30,6 +35,18 @@ namespace Tunti
 
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
 		return nullptr;
+	}
+
+	EnvironmentMapTexture TextureLibrary::LoadEnvironmentMap(const std::string& path)
+	{
+		switch (Renderer::GetAPI())
+		{
+			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return EnvironmentMapTexture();
+			case RendererAPI::OpenGL: return OpenGLTextureCache::GetInstance()->CreateEnvironmentMap(path);
+		}
+
+		LOG_ASSERT(false, "RendererAPI initialization failed!");
+		return EnvironmentMapTexture();
 	}
 
 	CubemapTexture TextureLibrary::LoadCubemap(const std::string& folderPath,

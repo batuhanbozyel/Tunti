@@ -12,7 +12,7 @@ namespace Tunti
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}
 		virtual void OnStart() {}
-		virtual void OnUpdate() {}
+		virtual void OnUpdate(double dt) {}
 		virtual void OnEvent(Event& e) {}
 	};
 }

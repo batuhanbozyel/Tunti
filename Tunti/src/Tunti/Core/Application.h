@@ -5,7 +5,6 @@
 
 #include "Base.h"
 #include "Window.h"
-#include "Time.h"
 #include "LayerStack.h"
 
 int main(int argc, char** argv);
@@ -15,7 +14,7 @@ namespace Tunti
 	class Application
 	{
 	public:
-		Application(const std::string& appName = "Doge", const WindowFlag& flag = WindowFlag::CustomWindow);
+		Application(const std::string& appName = "Tunti", const WindowFlag& flag = WindowFlag::CustomWindow);
 		~Application();
 
 		void Run();
@@ -26,7 +25,7 @@ namespace Tunti
 		static void EnableCursor();
 		static void SetCursorPos(float x, float y);
 
-		static const Scope<Window>& GetActiveWindow() { return s_Instance->m_ActiveWindow; }
+		static const Scope<Window>& GetWindow() { return s_Instance->m_Window; }
 		static Application* GetInstance() { return s_Instance; }
 	protected:
 		void PushLayer(Layer* layer);
@@ -39,9 +38,11 @@ namespace Tunti
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
 	private:
-		Scope<Time> m_Timer;
-		Scope<Window> m_ActiveWindow;
+		Scope<Window> m_Window;
 		LayerStack m_LayerStack;
+
+		float m_LastFrameTime = 0.0f;
+
 		bool m_Running = false;
 	private:
 		static Application* s_Instance;

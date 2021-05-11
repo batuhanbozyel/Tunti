@@ -1,8 +1,30 @@
 #pragma once
 #include "Tunti/Events/WindowEvent.h"
 
+#ifdef PLATFORM_WINDOWS
+#include <GLFW/glfw3.h>
 namespace Tunti
 {
+	struct NativeWindowHandle
+	{
+		GLFWwindow* Handle;
+
+		NativeWindowHandle() = default;
+		NativeWindowHandle(GLFWwindow* handle)
+			: Handle(handle)
+		{
+
+		}
+
+		operator GLFWwindow* () const
+		{
+			return Handle;
+		}
+	};
+#else
+#error Tunti Engine currently supports Windows only!
+#endif
+
 	enum class WindowFlag
 	{
 		BorderlessFullscreen,
@@ -13,7 +35,7 @@ namespace Tunti
 
 	struct WindowProps
 	{
-		WindowProps(const std::string& title = "Doge",
+		WindowProps(const std::string& title = "Tunti",
 			uint32_t width = 1280, uint32_t height = 720,
 			void* monitor = nullptr,
 			void* share = nullptr,
@@ -50,13 +72,13 @@ namespace Tunti
 		void SetEventCallbackFn(std::function<void(Event&)> callback) { m_Props.EventCallback = callback; }
 		bool VSync() const { return m_Props.VSync; }
 
-		void* GetNativeWindow() const { return m_Window; }
 		const WindowProps& GetWindowProps() const { return m_Props; }
+		const NativeWindowHandle& GetHandle() const;
 	private:
-		void* CreateNativeWindow(const WindowFlag& flag);
+		NativeWindowHandle CreateNativeWindow(const WindowFlag& flag);
 	private:
+		NativeWindowHandle m_Handle;
 		WindowProps m_Props;
-		void* m_Window;
 
 		static inline uint8_t s_WindowCount = 0;
 	};

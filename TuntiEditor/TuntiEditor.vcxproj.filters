@@ -4,6 +4,9 @@
     <Filter Include="Editor">
       <UniqueIdentifier>{8C1A20B0-78BC-4A86-6177-5EDA4DB8D1D6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Editor\Panels">
+      <UniqueIdentifier>{5E756613-CA35-E249-9370-2BC7FFEF2626}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Platform">
       <UniqueIdentifier>{2AC788B4-1694-E3BF-3FAD-D1672BD9184E}</UniqueIdentifier>
     </Filter>
@@ -12,30 +15,52 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Editor\EditorAPI.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
     <ClInclude Include="src\Editor\EditorLayer.h">
       <Filter>Editor</Filter>
     </ClInclude>
-    <ClInclude Include="src\Editor\SceneFrame.h">
+    <ClInclude Include="src\Editor\Panels\Inspector.h">
+      <Filter>Editor\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Editor\Panels\SceneHierarchy.h">
+      <Filter>Editor\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Editor\Panels\SceneViewport.h">
+      <Filter>Editor\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Editor\Utils.h">
       <Filter>Editor</Filter>
     </ClInclude>
-    <ClInclude Include="src\Platform\OpenGL\OpenGLEditorLayer.h">
+    <ClInclude Include="src\Platform\OpenGL\OpenGLEditor.h">
       <Filter>Platform\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="src\TuntiEditor.h" />
+    <ClInclude Include="src\Editor\Panels\Lighting.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Editor\EditorLayer.cpp">
       <Filter>Editor</Filter>
     </ClCompile>
-    <ClCompile Include="src\Editor\SceneFrame.cpp">
+    <ClCompile Include="src\Editor\Panels\Inspector.cpp">
+      <Filter>Editor\Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Editor\Panels\SceneHierarchy.cpp">
+      <Filter>Editor\Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Editor\Panels\SceneViewport.cpp">
+      <Filter>Editor\Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Editor\Utils.cpp">
       <Filter>Editor</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\ImGuiOpenGLBuild.cpp">
       <Filter>Platform\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="src\Platform\OpenGL\OpenGLEditorLayer.cpp">
+    <ClCompile Include="src\Platform\OpenGL\OpenGLEditor.cpp">
       <Filter>Platform\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\TuntiEditor.cpp" />
+    <ClCompile Include="src\Editor\Panels\Lighting.cpp" />
   </ItemGroup>
 </Project>

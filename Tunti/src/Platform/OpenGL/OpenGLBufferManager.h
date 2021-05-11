@@ -17,7 +17,7 @@ namespace Tunti
 	public:
 		~OpenGLBufferManager() = default;
 
-		MeshData AllocateGraphicsBuffer(const Mesh& mesh, size_t key);
+		MeshRenderer AllocateGraphicsBuffer(const Mesh& mesh, size_t key);
 
 		void Flush();
 

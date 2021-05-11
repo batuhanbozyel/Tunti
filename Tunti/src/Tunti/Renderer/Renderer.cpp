@@ -12,10 +12,9 @@
 
 #include "Tunti/Core/Window.h"
 
-
 namespace Tunti
 {
-	void Renderer::Init(decltype(RendererAPI::None) api)
+	void Renderer::Init()
 	{
 		if (s_Instance)
 		{
@@ -23,8 +22,7 @@ namespace Tunti
 			return;
 		}
 
-		s_GraphicsAPI = api;
-		switch (api)
+		switch (API)
 		{
 			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); break;
 			case RendererAPI::OpenGL: s_Instance = new OpenGLRenderer(); break;
@@ -35,7 +33,7 @@ namespace Tunti
 
 	void Renderer::Shutdown()
 	{
-		if(s_Instance)
+		if (s_Instance)
 			delete s_Instance;
 	}
 
@@ -44,22 +42,32 @@ namespace Tunti
 		s_Instance->RenderPasses.push_back(renderPass);
 	}
 
-	void Renderer::DrawLight(const LightData& light, const glm::mat4& transform)
+	void Renderer::SubmitLight(const Light& light, const glm::vec3& position, const glm::vec3& direction)
 	{
-
+		s_Instance->LightQueue.Lights[s_Instance->LightQueue.LightCount++] = LightData(light, position, direction);
 	}
 
-	void Renderer::DrawMesh(const MeshData& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform)
+	void Renderer::DrawMesh(const MeshRenderer& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform)
 	{
-		auto& meshQueue = s_Instance->MeshQueue;
+		auto& meshMultiLayerQueue = s_Instance->MeshMultiLayerQueue;
 		const Ref<Material>& material = materialInstance->GetParentMaterial();
 
-		((meshQueue[material])[materialInstance]).push_back({ mesh, transform });
+		((meshMultiLayerQueue[material])[materialInstance]).push_back({ mesh, transform });
 	}
 
-	void Renderer::BeginScene(const Camera& camera, const glm::mat4& transform, const glm::vec3& position)
+	void Renderer::ResizeFramebuffers(uint32_t width, uint32_t height)
 	{
-		s_Instance->BeginScene(camera, transform, position);
+		s_Instance->ResizeFramebuffers(width, height);
+	}
+
+	Texture2D Renderer::GetFramebufferTexture()
+	{
+		return s_Instance->GetFramebufferTexture();
+	}
+
+	void Renderer::BeginScene(const Camera& camera, const glm::mat4& view, const glm::vec3& position)
+	{
+		s_Instance->BeginScene(camera, view, position);
 	}
 
 	void Renderer::EndScene()
@@ -67,8 +75,9 @@ namespace Tunti
 		for (const auto& renderPass : s_Instance->RenderPasses)
 			renderPass();
 
- 		s_Instance->EndScene();
-		s_Instance->MeshQueue.clear();
+		s_Instance->EndScene();
+		s_Instance->MeshMultiLayerQueue.clear();
+		s_Instance->LightQueue.LightCount = 0;
 	}
 
 	void Renderer::SetSkybox(CubemapTexture skybox)
@@ -76,8 +85,9 @@ namespace Tunti
 		s_Instance->SetSkybox(skybox);
 	}
 
-	void Renderer::ClearSkybox()
+	void Renderer::SetEnvironmentMap(EnvironmentMapTexture environmentMap)
 	{
-		s_Instance->ClearSkybox();
+		s_Instance->SetEnvironmentMap(environmentMap);
 	}
+
 }

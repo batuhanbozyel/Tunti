@@ -19,11 +19,7 @@ project "Tunti"
 		"vendor/glm/glm/**.inl",
 
 		"vendor/stb_image/**.h",
-		"vendor/stb_image/**.cpp",
-
-		"vendor/assimp/**.h",
-		"vendor/assimp/**.hpp",
-		"vendor/assimp/**.inl",
+		"vendor/stb_image/**.cpp"
 	}
 
 	defines
@@ -40,26 +36,19 @@ project "Tunti"
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.spdlog}",
-		"%{IncludeDir.assimp}",
-		"%{IncludeDir.entt}"
-	}
-
-	libdirs
-	{
-		"%{LibraryDir.assimp}"
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.tinyobjloader"
 	}
 
 	links
 	{
 		"GLFW",
 		"Glad",
-		"opengl32.lib",
-		"assimp-vc142-mt.lib"
+		"opengl32.lib"
 	}
 
 	filter "system:windows"
 		systemversion "latest"
-		links "Shlwapi.lib"
 
 	filter "configurations:Debug"
 		defines "DEBUG_ENABLED"

@@ -9,7 +9,7 @@ namespace Tunti
 	class OpenGLTexture2D final
 	{
 	public:
-		explicit OpenGLTexture2D();
+		explicit OpenGLTexture2D(const std::array<unsigned char, 4>& color);
 		explicit OpenGLTexture2D(const TextureData& data);
 		~OpenGLTexture2D();
 	private:
@@ -30,6 +30,19 @@ namespace Tunti
 		friend class OpenGLTextureCache;
 	};
 
+	class OpenGLEnvironmentMapTexture final
+	{
+	public:
+		explicit OpenGLEnvironmentMapTexture(const EnvironmentMapData& environmentMapData);
+		~OpenGLEnvironmentMapTexture();
+	private:
+		GLuint m_EnvironmentMapTextureID;
+		GLuint m_IrradianceMapTextureID;
+		GLuint m_BRDFto2DLUTTextureID;
+
+		friend class OpenGLTextureCache;
+	};
+
 	class OpenGLTextureCache final
 	{
 	public:
@@ -37,7 +50,9 @@ namespace Tunti
 
 		Ref<TextureMap> DefaultTextureMap() const { return m_DefaultTextureMap; }
 		Ref<TextureMap> CreateTextureMap(const std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)>& textureFiles);
+
 		CubemapTexture CreateCubemap(const std::array<std::string, 6>& cubemapTextures);
+		EnvironmentMapTexture CreateEnvironmentMap(const std::string& textureFile);
 
 		void Flush();
 
@@ -58,9 +73,12 @@ namespace Tunti
 		uint32_t m_TextureMapCount = 1;
 		GLuint m_TextureMapSSBO;
 
-		OpenGLTexture2D m_DefaultTexture;
+		OpenGLTexture2D m_WhiteTexture;
+		OpenGLTexture2D m_BlackTexture;
 		Ref<TextureMap> m_DefaultTextureMap;
+		Ref<EnvironmentMapTexture> m_DefaultEnvironmentMap;
 		std::unordered_map<std::string, Scope<OpenGLTexture2D>> m_Textures;
+		std::unordered_map<std::string, Scope<OpenGLEnvironmentMapTexture>> m_EnvironmentMaps;
 		std::unordered_map<std::string, Scope<OpenGLCubemapTexture>> m_Cubemaps;
 
 		static inline OpenGLTextureCache* s_Instance = nullptr;

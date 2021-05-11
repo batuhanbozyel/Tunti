@@ -16,10 +16,10 @@ namespace Tunti
 		void PopOverlay(Layer* overlay);
 
 		void OnStart();
-		void OnUpdate();
+		void OnUpdate(double dt);
 
-		inline const std::list<Layer*>& GetLayers() const { return m_Layers; }
-		inline const std::list<Layer*>& GetOverlays() const { return m_Overlays; }
+		const std::list<Layer*>& GetLayers() const { return m_Layers; }
+		const std::list<Layer*>& GetOverlays() const { return m_Overlays; }
 	private:
 		std::list<Layer*> m_Layers;
 		std::list<Layer*> m_Overlays;

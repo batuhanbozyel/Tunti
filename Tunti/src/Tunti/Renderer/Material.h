@@ -1,9 +1,10 @@
 #pragma once
-#include "Shader.h"
 
 namespace Tunti
 {
 	struct Shader;
+	struct Texture2D;
+	enum class TextureType : uint16_t;
 	class MaterialInstance;
 
 	using MaterialProperty = std::variant<float, glm::vec2, glm::vec3, glm::vec4>;

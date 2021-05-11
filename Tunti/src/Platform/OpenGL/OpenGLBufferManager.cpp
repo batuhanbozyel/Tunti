@@ -6,9 +6,9 @@ namespace Tunti
 {
 	// OpenGLBufferManager
 
-	MeshData OpenGLBufferManager::AllocateGraphicsBuffer(const Mesh& mesh, size_t key)
+	MeshRenderer OpenGLBufferManager::AllocateGraphicsBuffer(const Mesh& mesh, size_t key)
 	{
-		MeshData meshData;
+		MeshRenderer meshData;
 		meshData.Count = mesh.Indices.size();
 
 		uint32_t vertexCount = mesh.Position.size();
@@ -30,12 +30,12 @@ namespace Tunti
 
 			// Copy Vertex Data into the Buffer
 			{
-				void* buffPtr = glMapNamedBuffer(openGLBuffer.VertexBuffer, GL_WRITE_ONLY);
+				float* buffPtr = (float*)glMapNamedBuffer(openGLBuffer.VertexBuffer, GL_WRITE_ONLY);
 				memcpy(buffPtr, mesh.Position.data(), mesh.Position.size() * sizeof(glm::vec3));
-				buffPtr = static_cast<int*>(buffPtr) + mesh.Position.size() * 3;
+				buffPtr += mesh.Position.size() * 3;
 
 				memcpy(buffPtr, mesh.Normal.data(), mesh.Normal.size() * sizeof(glm::vec3));
-				buffPtr = static_cast<int*>(buffPtr) + mesh.Normal.size() * 3;
+				buffPtr += mesh.Normal.size() * 3;
 
 				memcpy(buffPtr, mesh.TexCoord.data(), mesh.TexCoord.size() * sizeof(glm::vec2));
 				glUnmapNamedBuffer(openGLBuffer.VertexBuffer);

@@ -6,11 +6,10 @@
 #include "Tunti/Events/KeyEvent.h"
 #include "Tunti/Events/MouseEvent.h"
 
-#include <GLFW/glfw3.h>
-
 namespace Tunti
 {
 #ifdef PLATFORM_WINDOWS
+
 	static void GLFWErrorCallback(int error, const char* description)
 	{
 		Log::Error("Error: {0}", description);
@@ -31,14 +30,13 @@ namespace Tunti
 			glfwSetErrorCallback(GLFWErrorCallback);
 		}
 
-		m_Window = CreateNativeWindow(flag);
-		GLFWwindow* windowContext = static_cast<GLFWwindow*>(m_Window);
-		LOG_ASSERT(windowContext, "Window creation failed");
+		m_Handle = CreateNativeWindow(flag);
+		LOG_ASSERT(m_Handle, "Window creation failed");
 
-		glfwSetWindowUserPointer(windowContext, &m_Props);
+		glfwSetWindowUserPointer(m_Handle, &m_Props);
 
 		// KeyPressed, KeyReleased Events
-		glfwSetKeyCallback(windowContext, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+		glfwSetKeyCallback(m_Handle, [](GLFWwindow* window, int key, int scancode, int action, int mods)
 		{
 			WindowProps& props = *(WindowProps*)glfwGetWindowUserPointer(window);
 
@@ -64,7 +62,7 @@ namespace Tunti
 		});
 
 		// KeyTyped Event
-		glfwSetCharCallback(windowContext, [](GLFWwindow* window, unsigned int keycode)
+		glfwSetCharCallback(m_Handle, [](GLFWwindow* window, unsigned int keycode)
 		{
 			WindowProps& props = *(WindowProps*)glfwGetWindowUserPointer(window);
 
@@ -72,7 +70,7 @@ namespace Tunti
 		});
 
 		// MouseButtonPressed, MouseButtonReleased Events
-		glfwSetMouseButtonCallback(windowContext, [](GLFWwindow* window, int button, int action, int mods)
+		glfwSetMouseButtonCallback(m_Handle, [](GLFWwindow* window, int button, int action, int mods)
 		{
 			WindowProps& props = *(WindowProps*)glfwGetWindowUserPointer(window);
 
@@ -92,7 +90,7 @@ namespace Tunti
 		});
 
 		// MouseMoved Event
-		glfwSetCursorPosCallback(windowContext, [](GLFWwindow* window, double xPos, double yPos)
+		glfwSetCursorPosCallback(m_Handle, [](GLFWwindow* window, double xPos, double yPos)
 		{
 			WindowProps& props = *(WindowProps*)glfwGetWindowUserPointer(window);
 
@@ -100,7 +98,7 @@ namespace Tunti
 		});
 
 		// MouseScrolled Event
-		glfwSetScrollCallback(windowContext, [](GLFWwindow* window, double xOffset, double yOffset)
+		glfwSetScrollCallback(m_Handle, [](GLFWwindow* window, double xOffset, double yOffset)
 		{
 			WindowProps& props = *(WindowProps*)glfwGetWindowUserPointer(window);
 
@@ -108,7 +106,7 @@ namespace Tunti
 		});
 
 		// WindowClose Event
-		glfwSetWindowCloseCallback(windowContext, [](GLFWwindow* window)
+		glfwSetWindowCloseCallback(m_Handle, [](GLFWwindow* window)
 		{
 			WindowProps& props = *(WindowProps*)glfwGetWindowUserPointer(window);
 
@@ -116,7 +114,7 @@ namespace Tunti
 		});
 
 		// WindowResize Event
-		glfwSetWindowSizeCallback(windowContext, [](GLFWwindow* window, int width, int height)
+		glfwSetWindowSizeCallback(m_Handle, [](GLFWwindow* window, int width, int height)
 		{
 			WindowProps& props = *(WindowProps*)glfwGetWindowUserPointer(window);
 			props.Width = static_cast<uint32_t>(width);
@@ -126,7 +124,7 @@ namespace Tunti
 		});
 
 		// WindowFocus and WindowLostFocus Events
-		glfwSetWindowFocusCallback(windowContext, [](GLFWwindow* window, int focused)
+		glfwSetWindowFocusCallback(m_Handle, [](GLFWwindow* window, int focused)
 		{
 			WindowProps& props = *(WindowProps*)glfwGetWindowUserPointer(window);
 
@@ -134,7 +132,7 @@ namespace Tunti
 		});
 
 		// WindowMoved Event
-		glfwSetWindowPosCallback(windowContext, [](GLFWwindow* window, int xPos, int yPos)
+		glfwSetWindowPosCallback(m_Handle, [](GLFWwindow* window, int xPos, int yPos)
 		{
 			WindowProps& props = *(WindowProps*)glfwGetWindowUserPointer(window);
 
@@ -144,7 +142,7 @@ namespace Tunti
 
 	Window::~Window()
 	{
-		glfwDestroyWindow(static_cast<GLFWwindow*>(m_Window));
+		glfwDestroyWindow(m_Handle);
 		s_WindowCount--;
 
 		if (s_WindowCount == 0)
@@ -154,15 +152,19 @@ namespace Tunti
 	void Window::OnUpdate()
 	{
 		glfwPollEvents();
-		if(Renderer::GetAPI() == RendererAPI::OpenGL)
-			glfwSwapBuffers(static_cast<GLFWwindow*>(m_Window));
+		glfwSwapBuffers(m_Handle);
 	}
 
 	void Window::OnWindowResize(WindowResizeEvent& e)
 	{
-		glfwSetWindowSize(static_cast<GLFWwindow*>(m_Window), e.GetWidth(), e.GetHeight());
+		glfwSetWindowSize(static_cast<GLFWwindow*>(m_Handle), e.GetWidth(), e.GetHeight());
 		m_Props.Width = e.GetWidth();
 		m_Props.Height = e.GetHeight();
+	}
+
+	const NativeWindowHandle& Window::GetHandle() const
+	{
+		return m_Handle;
 	}
 
 	void Window::SetVSync(bool enabled)
@@ -176,26 +178,26 @@ namespace Tunti
 
 	void Window::HideCursor()
 	{
-		glfwSetInputMode(static_cast<GLFWwindow*>(m_Window), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		glfwSetInputMode(m_Handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 		if (glfwRawMouseMotionSupported())
-			glfwSetInputMode(static_cast<GLFWwindow*>(m_Window), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+			glfwSetInputMode(m_Handle, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 	}
 
 	void Window::ShowCursor()
 	{
-		glfwSetInputMode(static_cast<GLFWwindow*>(m_Window), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		glfwSetInputMode(m_Handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
 		if (glfwRawMouseMotionSupported())
-			glfwSetInputMode(static_cast<GLFWwindow*>(m_Window), GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
+			glfwSetInputMode(m_Handle, GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
 	}
 
 	void Window::SetCursorPos(float x, float y)
 	{
-		glfwSetCursorPos(static_cast<GLFWwindow*>(m_Window), x, y);
+		glfwSetCursorPos(m_Handle, x, y);
 	}
 
-	void* Window::CreateNativeWindow(const WindowFlag& flag)
+	NativeWindowHandle Window::CreateNativeWindow(const WindowFlag& flag)
 	{
 		switch (flag)
 		{

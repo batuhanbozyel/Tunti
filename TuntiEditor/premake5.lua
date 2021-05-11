@@ -22,7 +22,6 @@ project "TuntiEditor"
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.spdlog}",
-		"%{IncludeDir.assimp}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.ImGui}"
 	}

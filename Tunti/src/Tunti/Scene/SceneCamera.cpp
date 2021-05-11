@@ -1,8 +1,16 @@
 #include "pch.h"
 #include "SceneCamera.h"
+#include "Tunti/Core/Application.h"
 
 namespace Tunti
 {
+	SceneCamera::SceneCamera()
+	{
+		SetViewportSize(
+			Application::GetWindow()->GetWindowProps().Width,
+			Application::GetWindow()->GetWindowProps().Height);
+	}
+
 	SceneCamera::SceneCamera(uint32_t width, uint32_t height)
 	{
 		SetViewportSize(width, height);

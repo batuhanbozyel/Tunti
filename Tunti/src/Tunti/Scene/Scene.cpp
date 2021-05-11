@@ -1,6 +1,11 @@
 #include "pch.h"
-#include "Tunti.h"
 #include "Scene.h"
+#include "Entity.h"
+
+#include "Tunti/Renderer/Renderer.h"
+#include "Tunti/Utility/EditorCamera.h"
+
+#include "Components.h"
 
 namespace Tunti
 {
@@ -12,22 +17,30 @@ namespace Tunti
 		return entity;
 	}
 
-	void Scene::OnUpdate()
+	void Scene::DestroyEntity(Entity entity)
+	{
+		m_Registry.destroy(entity);
+	}
+
+	void Scene::OnUpdateRuntime(double dt)
 	{
 		const Camera* mainCamera = nullptr;
-		glm::mat4 cameraTransform;
+		glm::mat4 cameraView;
 		glm::vec3 cameraPosition;
 		{
-			auto view = m_Registry.view<TransformComponent, CameraComponent>();
+			auto view = m_Registry.view<CameraComponent, TransformComponent>();
 			for (auto entity : view)
 			{
-				auto [transform, camera] = view.get<TransformComponent, CameraComponent>(entity);
+				auto [camera, transform] = view.get<CameraComponent, TransformComponent>(entity);
 
 				if (camera.Primary)
 				{
 					mainCamera = &camera.Camera;
-					cameraTransform = transform;
-					cameraPosition = transform.Translation;
+					cameraView = glm::lookAt(
+						transform.Position,
+						transform.Position + transform.GetFrontDirection(),
+						transform.GetUpDirection());
+					cameraPosition = transform.Position;
 					break;
 				}
 			}
@@ -35,17 +48,53 @@ namespace Tunti
 
 		if (mainCamera)
 		{
-			Renderer::BeginScene(*mainCamera, cameraTransform, cameraPosition);
-
-			auto group = m_Registry.group<TransformComponent>(entt::get<MeshRendererComponent>);
-			for (auto entity : group)
+			Renderer::BeginScene(*mainCamera, cameraView, cameraPosition);
 			{
-				auto& [meshRenderer, transform] = group.get<MeshRendererComponent, TransformComponent>(entity);
+				auto view = m_Registry.view<TransformComponent, LightComponent>();
+				for (auto entity : view)
+				{
+					auto& [light, transform] = view.get<LightComponent, TransformComponent>(entity);
+
+					Renderer::SubmitLight(light, transform.Position, -transform.GetFrontDirection());
+				}
+			}
+
+			{
+				auto view = m_Registry.view<TransformComponent, MeshRendererComponent>();
+				for (auto entity : view)
+				{
+					auto& [meshRenderer, transform] = view.get<MeshRendererComponent, TransformComponent>(entity);
+
+					Renderer::DrawMesh(meshRenderer.MeshBuffer, meshRenderer.MaterialInstanceRef, transform);
+				}
+			}
+			Renderer::EndScene();
+		}
+	}
+
+	void Scene::OnUpdateEditor(double dt, const EditorCamera& camera)
+	{
+		const glm::mat4& cameraView = camera.GetViewMatrix();
+		Renderer::BeginScene(camera, cameraView, camera.GetPosition());
+		{
+			auto view = m_Registry.view<TransformComponent, LightComponent>();
+			for (auto entity : view)
+			{
+				auto& [light, transform] = view.get<LightComponent, TransformComponent>(entity);
+
+				Renderer::SubmitLight(light, transform.Position, -transform.GetFrontDirection());
+			}
+		}
+
+		{
+			auto view = m_Registry.view<TransformComponent, MeshRendererComponent>();
+			for (auto entity : view)
+			{
+				auto& [meshRenderer, transform] = view.get<MeshRendererComponent, TransformComponent>(entity);
 
 				Renderer::DrawMesh(meshRenderer.MeshBuffer, meshRenderer.MaterialInstanceRef, transform);
 			}
-
-			Renderer::EndScene();
 		}
+		Renderer::EndScene();
 	}
 }

@@ -61,13 +61,13 @@ namespace Tunti
 			overlay->OnStart();
 	}
 
-	void LayerStack::OnUpdate()
+	void LayerStack::OnUpdate(double dt)
 	{
 		for (Layer* layer : m_Layers)
-			layer->OnUpdate();
+			layer->OnUpdate(dt);
 
 		for (Layer* overlay : m_Overlays)
-			overlay->OnUpdate();
+			overlay->OnUpdate(dt);
 	}
 
 }

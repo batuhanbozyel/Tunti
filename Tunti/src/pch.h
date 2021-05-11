@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <filesystem>
 #include <memory>
 #include <utility>
 #include <algorithm>
@@ -27,12 +28,15 @@
 
 #ifdef _WIN32
 #include <Windows.h>
-#include <Shlwapi.h>
 #endif
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/euler_angles.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
 
 #include "Tunti/Core/Log.h"
 #include "Tunti/Core/Base.h"

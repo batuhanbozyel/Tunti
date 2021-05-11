@@ -3,8 +3,8 @@
 
 namespace Tunti
 {
+	class EditorCamera;
 	class Entity;
-	class Time;
 
 	class Scene
 	{
@@ -13,8 +13,12 @@ namespace Tunti
 		~Scene() = default;
 
 		Entity CreateEntity(const std::string& name = std::string("Entity"));
+		void DestroyEntity(Entity entity);
 
-		void OnUpdate();
+		void OnUpdateRuntime(double dt);
+		void OnUpdateEditor(double dt, const EditorCamera& editorCamera);
+
+		entt::registry& GetSceneRegistry() { return m_Registry; }
 	private:
 		entt::registry m_Registry;
 

@@ -12,15 +12,14 @@ namespace Tunti
 			s_Instance = this;
 			m_Running = true;
 			Log::Init();
-			m_Timer = CreateScope<Time>();
+
+			Renderer::API = RendererAPI::OpenGL;
 
 			WindowProps windowProps(appName);
-			Window* window = new Window(windowProps, flag);
-			window->SetEventCallbackFn(BIND_EVENT_FN(OnEvent));
-			m_ActiveWindow.reset(window);
-			Renderer::Init(RendererAPI::OpenGL);
+			windowProps.EventCallback = BIND_EVENT_FN(OnEvent);
+			m_Window = CreateScope<Window>(windowProps, flag);
 
-			SetCursorPos(m_ActiveWindow->GetWindowProps().Width / 2.0f, m_ActiveWindow->GetWindowProps().Height / 2.0f);
+			Renderer::Init();
 
 			Log::Trace("Application started running!");
 		}
@@ -37,9 +36,12 @@ namespace Tunti
 		m_LayerStack.OnStart();
 		while (m_Running)
 		{
-			Time::OnTick();
-			m_LayerStack.OnUpdate();
-			m_ActiveWindow->OnUpdate();
+			double time = glfwGetTime();
+			double dt = (time - m_LastFrameTime) * 1000.0;
+			m_LastFrameTime = time;
+
+			m_LayerStack.OnUpdate(dt);
+			m_Window->OnUpdate();
 		}
 	}
 
@@ -99,23 +101,23 @@ namespace Tunti
 
 	bool Application::OnWindowResize(WindowResizeEvent& e)
 	{
-		m_ActiveWindow->OnWindowResize(e);
+		m_Window->OnWindowResize(e);
 		return true;
 	}
 
 	void Application::DisableCursor()
 	{
-		s_Instance->m_ActiveWindow->HideCursor();
+		s_Instance->m_Window->HideCursor();
 	}
 
 	void Application::EnableCursor()
 	{
-		s_Instance->m_ActiveWindow->ShowCursor();
+		s_Instance->m_Window->ShowCursor();
 	}
 
 	void Application::SetCursorPos(float x, float y)
 	{
-		s_Instance->m_ActiveWindow->SetCursorPos(x, y);
+		s_Instance->m_Window->SetCursorPos(x, y);
 	}
 
 	Application* Application::s_Instance = nullptr;
