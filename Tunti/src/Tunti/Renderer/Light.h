@@ -14,7 +14,7 @@ namespace Tunti
 	struct Light
 	{
 		// AttenuationFactors
-		float Intensity = 2.0f;
+		float Intensity = 1.0f;
 		float Constant = 1.0f;
 		float Linear = 0.09f;
 		float Quadratic = 0.032f;
