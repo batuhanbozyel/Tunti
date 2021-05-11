@@ -17,39 +17,58 @@ namespace TEditor
 
 	static void DrawEntity(Tunti::Entity& entity)
 	{
-		auto& tag = entity.GetComponent<Tunti::TagComponent>().Tag;
+		auto& tagComponent = entity.GetComponent<Tunti::TagComponent>();
 
 		ImGuiTreeNodeFlags flags = ((s_Data.SelectedEntity == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
 		flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
-		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, tag.c_str());
-		if (ImGui::IsItemClicked())
+
+		if (tagComponent.Renaming)
 		{
-			s_Data.SelectedEntity = entity;
+			ImGuiWindow* window = ImGui::GetCurrentWindow();
+			const ImVec2 lineStart = ImGui::GetCursorScreenPos();
+			const ImGuiStyle& style = ImGui::GetStyle();
+			float fullWidth = ImGui::GetContentRegionAvail().x;
+			float itemWidth = fullWidth * 0.6f;
+
+			char buffer[256];
+			memset(buffer, 0, sizeof(buffer));
+			std::strncpy(buffer, tagComponent.Tag.c_str(), sizeof(buffer));
+			if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
+				tagComponent.Tag = std::string(buffer);
+
+			if (ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered())
+				tagComponent.Renaming = false;
 		}
 
-		bool entityDeleted = false;
-		if (ImGui::BeginPopupContextItem())
+		else
 		{
-			if (ImGui::MenuItem("Delete Entity"))
-				entityDeleted = true;
+			bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, tagComponent.Tag.c_str());
+			if (ImGui::IsItemClicked())
+				s_Data.SelectedEntity = entity;
 
-			ImGui::EndPopup();
-		}
+			bool entityDeleted = false;
+			if (ImGui::BeginPopupContextItem())
+			{
+				if (ImGui::MenuItem("Rename"))
+					tagComponent.Renaming = true;
 
-		if (opened)
-		{
-			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
-			bool opened = ImGui::TreeNodeEx((void*)9817239, flags, tag.c_str());
+				if (ImGui::MenuItem("Delete Entity"))
+					entityDeleted = true;
+
+				ImGui::EndPopup();
+			}
+
 			if (opened)
+			{
 				ImGui::TreePop();
-			ImGui::TreePop();
-		}
+			}
 
-		if (entityDeleted)
-		{
-			SceneViewport::GetSceneContext().DestroyEntity(entity);
-			if (s_Data.SelectedEntity == entity)
-				s_Data.SelectedEntity = {};
+			if (entityDeleted)
+			{
+				SceneViewport::GetSceneContext().DestroyEntity(entity);
+				if (s_Data.SelectedEntity == entity)
+					s_Data.SelectedEntity = {};
+			}
 		}
 	}
 
@@ -138,5 +157,4 @@ namespace TEditor
 	{
 		return s_Data.SelectedEntity;
 	}
-
 }
