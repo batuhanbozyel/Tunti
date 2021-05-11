@@ -13,6 +13,7 @@
 #include "Panels/SceneViewport.h"
 #include "Panels/SceneHierarchy.h"
 #include "Panels/Inspector.h"
+#include "Panels/Lighting.h"
 
 namespace TEditor
 {
@@ -118,6 +119,7 @@ namespace TEditor
 		SceneViewport::OnImGuiRender();
 		SceneHierarchy::OnImGuiRender();
 		Inspector::OnImGuiRender();
+		Lighting::OnImGuiRender();
 
 		ImGui::Begin("Renderer Stats");
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
