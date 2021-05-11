@@ -167,9 +167,17 @@ void main()
 		vec3 specularIBL = (F0 * specularBRDF.x + specularBRDF.y) * specularIrradiance;
 
 		// Total ambient lighting contribution.
-		ambientLighting = diffuseIBL + specularIBL;
+		ambientLighting = (diffuseIBL + specularIBL) * ambientOcclusion;
 	}
-    outColor = vec4(directionalLighting + ambientLighting, 1.0f);
+
+    vec3 color = directionalLighting + ambientLighting;
+    
+    // HDR tonemapping
+    color = color / (color + vec3(1.0f));
+    // gamma correction
+    color = pow(color, vec3(1.0f / 2.2f));
+
+    outColor = vec4(color, 1.0f);
 }
 
 /*

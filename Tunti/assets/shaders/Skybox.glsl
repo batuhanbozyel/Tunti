@@ -24,7 +24,7 @@ void main()
 #type fragment
 #version 450 core
 
-layout(location = 0) out vec4 color;
+layout(location = 0) out vec4 outColor;
 
 layout(location = 0) in VertexInOut
 {
@@ -35,5 +35,12 @@ uniform samplerCube u_Skybox;
 
 void main()
 {
-    color = textureLod(u_Skybox, VertexIn.WorldPos, 0);
+    vec3 color = texture(u_Skybox, VertexIn.WorldPos).rgb;
+
+    // HDR tonemapping
+    color = color / (color + vec3(1.0f));
+    // gamma correction
+    color = pow(color, vec3(1.0f / 2.2f));
+
+    outColor = vec4(color, 1.0f);
 }
