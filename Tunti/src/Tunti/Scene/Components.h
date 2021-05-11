@@ -12,6 +12,7 @@ namespace Tunti
 	struct TagComponent
 	{
 		std::string Tag;
+		bool Renaming = false;
 
 		TagComponent() = default;
 		TagComponent(const TagComponent&) = default;
@@ -72,9 +73,14 @@ namespace Tunti
 	{
 		MeshRenderer MeshBuffer;
 		Ref<MaterialInstance> MaterialInstanceRef = Material::DefaulMaterialInstance();
-		Ref<Model> ModelRef = nullptr;
+		std::string ModelPath;
 
 		MeshRendererComponent() = default;
+		MeshRendererComponent(const std::string& path)
+			: ModelPath(path)
+		{
+			// TODO:
+		}
 		MeshRendererComponent(const Mesh& mesh, const Ref<MaterialInstance>& materialInstance)
 			: MeshBuffer(BufferManager::AllocateGraphicsBuffer(mesh, std::hash<Ref<MaterialInstance>>{}(materialInstance))),
 			MaterialInstanceRef(materialInstance) {}

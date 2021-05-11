@@ -136,6 +136,7 @@
     <ClInclude Include="src\Editor\EditorAPI.h" />
     <ClInclude Include="src\Editor\EditorLayer.h" />
     <ClInclude Include="src\Editor\Panels\Inspector.h" />
+    <ClInclude Include="src\Editor\Panels\Lighting.h" />
     <ClInclude Include="src\Editor\Panels\SceneHierarchy.h" />
     <ClInclude Include="src\Editor\Panels\SceneViewport.h" />
     <ClInclude Include="src\Editor\Utils.h" />
@@ -144,6 +145,7 @@
   <ItemGroup>
     <ClCompile Include="src\Editor\EditorLayer.cpp" />
     <ClCompile Include="src\Editor\Panels\Inspector.cpp" />
+    <ClCompile Include="src\Editor\Panels\Lighting.cpp" />
     <ClCompile Include="src\Editor\Panels\SceneHierarchy.cpp" />
     <ClCompile Include="src\Editor\Panels\SceneViewport.cpp" />
     <ClCompile Include="src\Editor\Utils.cpp" />
