@@ -63,8 +63,6 @@ namespace Tunti
 
 	OpenGLCubemapTexture::OpenGLCubemapTexture(const std::array<TextureData, 6>& cubemapData)
 	{
-		stbi_set_flip_vertically_on_load(0);
-
 		glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_TextureID);
 
 		glTextureStorage2D(m_TextureID, 1, GL_RGBA8, cubemapData[0].height, cubemapData[0].height);
