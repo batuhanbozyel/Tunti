@@ -12,6 +12,9 @@ namespace Tunti
 		COUNT
 	};
 
+	static constexpr uint32_t MaxTextures = 1024;
+	static constexpr uint32_t SizeofTextureMap = static_cast<uint32_t>(TextureType::COUNT) * sizeof(uint64_t);
+
 	static constexpr uint32_t OffsetofTextureType(TextureType type)
 	{
 		return static_cast<uint32_t>(type) * sizeof(uint64_t);
@@ -25,9 +28,6 @@ namespace Tunti
 		}
 		return levels;
 	}
-
-	static constexpr uint32_t MaxTextures = 1024;
-	static constexpr uint32_t SizeofTextureMap = static_cast<uint32_t>(TextureType::COUNT) * sizeof(uint64_t);
 
 	struct Texture2D
 	{
@@ -54,12 +54,6 @@ namespace Tunti
 	struct TextureData
 	{
 		unsigned char* buffer;
-		int width, height, channel;
-	};
-
-	struct EnvironmentMapData
-	{
-		float* buffer;
 		int width, height, channel;
 	};
 

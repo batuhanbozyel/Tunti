@@ -33,7 +33,7 @@ namespace Tunti
 	class OpenGLEnvironmentMapTexture final
 	{
 	public:
-		explicit OpenGLEnvironmentMapTexture(const EnvironmentMapData& environmentMapData);
+		explicit OpenGLEnvironmentMapTexture(const TextureData& environmentMapData);
 		~OpenGLEnvironmentMapTexture();
 	private:
 		GLuint m_EnvironmentMapTextureID;

@@ -85,7 +85,7 @@ namespace Tunti
 
 	// OpenGLEnvironmentMapTexture
 
-	OpenGLEnvironmentMapTexture::OpenGLEnvironmentMapTexture(const EnvironmentMapData& environmentMapData)
+	OpenGLEnvironmentMapTexture::OpenGLEnvironmentMapTexture(const TextureData& environmentMapData)
 	{
 		static constexpr uint32_t envMapSize = 1024;
 		static constexpr uint32_t irradianceMapSize = 32;
@@ -287,6 +287,7 @@ namespace Tunti
 	EnvironmentMapTexture OpenGLTextureCache::CreateEnvironmentMap(const std::string& textureFile)
 	{
 		EnvironmentMapTexture envMap;
+		TextureData environmentMapData;
 		const auto& envMapIt = m_EnvironmentMaps.find(textureFile);
 
 		if (envMapIt != m_EnvironmentMaps.end())
@@ -296,24 +297,29 @@ namespace Tunti
 			envMap.IrradianceMapTextureID = envMapCached->m_IrradianceMapTextureID;
 			envMap.BRDFto2DLUTTextureID = envMapCached->m_BRDFto2DLUTTextureID;
 		}
-		else if (std::filesystem::path(textureFile).extension().string() == ".hdr")
+		else if (stbi_is_hdr(textureFile.c_str()))
 		{
-			EnvironmentMapData environmentMapData;
-			environmentMapData.buffer = stbi_loadf(textureFile.c_str(), &environmentMapData.width, &environmentMapData.height, &environmentMapData.channel, 3);
+			environmentMapData.buffer = reinterpret_cast<unsigned char*>(stbi_loadf(textureFile.c_str(), &environmentMapData.width, &environmentMapData.height, &environmentMapData.channel, 3));
+		}
+		else
+		{
+			environmentMapData.buffer = stbi_load(textureFile.c_str(), &environmentMapData.width, &environmentMapData.height, &environmentMapData.channel, 3);
+		}
 
-			if (environmentMapData.buffer)
-			{
-				const auto& insertedPairIt = m_EnvironmentMaps.insert(
-					m_EnvironmentMaps.end(),
-					{
-						textureFile,
-						CreateScope<OpenGLEnvironmentMapTexture>(environmentMapData)
-					});
-				const auto& envMapCached = insertedPairIt->second;
-				envMap.EnvironmentMapTextureID = envMapCached->m_EnvironmentMapTextureID;
-				envMap.IrradianceMapTextureID = envMapCached->m_IrradianceMapTextureID;
-				envMap.BRDFto2DLUTTextureID = envMapCached->m_BRDFto2DLUTTextureID;
-			}
+		if (environmentMapData.buffer)
+		{
+			const auto& insertedPairIt = m_EnvironmentMaps.insert(
+				m_EnvironmentMaps.end(),
+				{
+					textureFile,
+					CreateScope<OpenGLEnvironmentMapTexture>(environmentMapData)
+				});
+			const auto& envMapCached = insertedPairIt->second;
+			envMap.EnvironmentMapTextureID = envMapCached->m_EnvironmentMapTextureID;
+			envMap.IrradianceMapTextureID = envMapCached->m_IrradianceMapTextureID;
+			envMap.BRDFto2DLUTTextureID = envMapCached->m_BRDFto2DLUTTextureID;
+
+			stbi_image_free(environmentMapData.buffer);
 		}
 
 		return envMap;
