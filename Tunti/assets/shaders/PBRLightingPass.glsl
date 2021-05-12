@@ -87,14 +87,11 @@ void main()
     // Outgoing light direction (vector from world-space fragment position to the "eye").
     vec3 Lo = normalize(CameraPosition - worldPos);
 
-    // Get current fragment's normal
-    vec3 N = normal;
-
     // Angle between surface normal and outgoing light direction
-    float cosLo = max(0.0f, dot(N, Lo));
+    float cosLo = max(0.0f, dot(normal, Lo));
 
     // Specular reflection vector
-    vec3 Lr = 2.0f * cosLo * N - Lo;
+    vec3 Lr = 2.0f * cosLo * normal - Lo;
 
     // Fresnel reflectance at normal incidence (for metals use albedo color)
     vec3 F0 = mix(Fdielectric, albedo, metalness);
@@ -111,8 +108,8 @@ void main()
         vec3 Lh = normalize(Li + Lo);
 
         // Calculate angles between surface normal and various light vectors
-        float cosLi = max(0.0f, dot(N, Li));
-        float cosLh = max(0.0f, dot(N, Lh));
+        float cosLi = max(0.0f, dot(normal, Li));
+        float cosLh = max(0.0f, dot(normal, Lh));
 
         // Calculate Fresnel term for direct lighting. 
 		vec3 F  = FresnelSchlick(F0, max(0.0, dot(Lh, Lo)));
@@ -142,7 +139,7 @@ void main()
 	vec3 ambientLighting;
 	{
 		// Sample diffuse irradiance at normal direction.
-		vec3 irradiance = texture(u_IrradianceCubemap, N).rgb;
+		vec3 irradiance = texture(u_IrradianceCubemap, normal).rgb;
 
 		// Calculate Fresnel term for ambient lighting.
 		// Since we use pre-filtered cubemap(s) and irradiance is coming from many directions
