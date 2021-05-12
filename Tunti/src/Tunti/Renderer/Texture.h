@@ -61,7 +61,7 @@ namespace Tunti
 	{
 		uint32_t EnvironmentMapTextureID = 0;
 		uint32_t IrradianceMapTextureID = 0;
-		uint32_t BRDFto2DLUTTextureID = 0;
+		uint32_t BRDF_LUTTextureID = 0;
 	};
 
 	struct CubemapTexture

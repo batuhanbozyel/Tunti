@@ -31,7 +31,7 @@ namespace Tunti
 		static constexpr char* EquirectangularToCubemap = "../Tunti/assets/shaders/EquirectangularToCubemap_Compute.glsl";
 		static constexpr char* PrefilteredSpecularEnvironmentMap = "../Tunti/assets/shaders/PrefilteredSpecularEnvironmentMap_Compute.glsl";
 		static constexpr char* IrradianceCubemap = "../Tunti/assets/shaders/IrradianceCubemap_Compute.glsl";
-		static constexpr char* BRDFto2DLUTTexture = "../Tunti/assets/shaders/BRDFto2DLUTTexture_Compute.glsl";
+		static constexpr char* BRDF_LUTTexture = "../Tunti/assets/shaders/BRDF_LUTTexture_Compute.glsl";
 
 		static constexpr char* Skybox = "../Tunti/assets/shaders/Skybox.glsl";
 		static constexpr char* FullscreenTriangle = "../Tunti/assets/shaders/FullscreenTriangle.glsl";

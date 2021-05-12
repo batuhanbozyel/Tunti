@@ -33,12 +33,12 @@ namespace Tunti
 	class OpenGLEnvironmentMapTexture final
 	{
 	public:
-		explicit OpenGLEnvironmentMapTexture(const TextureData& environmentMapData);
+		explicit OpenGLEnvironmentMapTexture(const TextureData& environmentMapData, bool isHDR);
 		~OpenGLEnvironmentMapTexture();
 	private:
 		GLuint m_EnvironmentMapTextureID;
 		GLuint m_IrradianceMapTextureID;
-		GLuint m_BRDFto2DLUTTextureID;
+		GLuint m_BRDF_LUTTextureID;
 
 		friend class OpenGLTextureCache;
 	};

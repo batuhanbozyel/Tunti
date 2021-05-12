@@ -199,7 +199,7 @@ namespace Tunti
 
 			glBindTextureUnit(RendererBindingTable::SkyboxTextureUnit, environmentMap.EnvironmentMapTextureID);
 			glBindTextureUnit(RendererBindingTable::IrradianceCubemapTextureUnit, environmentMap.IrradianceMapTextureID);
-			glBindTextureUnit(RendererBindingTable::BRDFtoLUTCubemapTextureUnit, environmentMap.BRDFto2DLUTTextureID);
+			glBindTextureUnit(RendererBindingTable::BRDFtoLUTCubemapTextureUnit, environmentMap.BRDF_LUTTextureID);
 		};
 
 		ResizeFramebuffers = [&](uint32_t width, uint32_t height)
