@@ -8,8 +8,8 @@ layout(location = 0) out VertexInOut
 
 void main() 
 {
-    float x = -1.0 + float((gl_VertexID & 1) << 2);
-    float y = -1.0 + float((gl_VertexID & 2) << 1);
+    float x = -1.0f + float((gl_VertexID & 1) << 2);
+    float y = -1.0f + float((gl_VertexID & 2) << 1);
 
     gl_Position = vec4(-1.0f + x*2.0f, -1.0f+y*2.0f, 0.0f, 1.0f);
     VertexOut.TexCoord = vec2(x, y);
@@ -20,7 +20,7 @@ void main()
 #extension GL_ARB_bindless_texture : require
 #define MAX_LIGHTS 100
 
-const float Epsilon = 0.00001f;
+const float Epsilon = 1e-5f;
 const float PI = 3.14159265359f;
 const vec3 Fdielectric = vec3(0.04f);
 

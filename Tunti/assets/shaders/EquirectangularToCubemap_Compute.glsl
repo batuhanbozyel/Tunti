@@ -13,6 +13,7 @@ void main()
 {
 	vec3 v = GetSamplingVector();
 
+    // Convert Cartesian direction vector to spherical coordinates
 	float phi   = atan(v.z, v.x);
 	float theta = acos(v.y);
 
@@ -24,14 +25,14 @@ void main()
 vec3 GetSamplingVector()
 {
     vec2 st = gl_GlobalInvocationID.xy / vec2(imageSize(outputTexture));
-    vec2 uv = 2.0 * vec2(st.x, 1.0-st.y) - vec2(1.0);
+    vec2 uv = 2.0f * vec2(st.x, 1.0f - st.y) - vec2(1.0f);
 
     vec3 ret;
-    if     (gl_GlobalInvocationID.z == 0) ret = vec3(1.0,  uv.y, -uv.x);
-    else if(gl_GlobalInvocationID.z == 1) ret = vec3(-1.0, uv.y,  uv.x);
-    else if(gl_GlobalInvocationID.z == 2) ret = vec3(uv.x, 1.0, -uv.y);
-    else if(gl_GlobalInvocationID.z == 3) ret = vec3(uv.x, -1.0, uv.y);
-    else if(gl_GlobalInvocationID.z == 4) ret = vec3(uv.x, uv.y, 1.0);
-    else if(gl_GlobalInvocationID.z == 5) ret = vec3(-uv.x, uv.y, -1.0);
+    if     (gl_GlobalInvocationID.z == 0) ret = vec3( 1.0f, uv.y, -uv.x);
+    else if(gl_GlobalInvocationID.z == 1) ret = vec3(-1.0f, uv.y,  uv.x);
+    else if(gl_GlobalInvocationID.z == 2) ret = vec3( uv.x, 1.0f, -uv.y);
+    else if(gl_GlobalInvocationID.z == 3) ret = vec3( uv.x, -1.0f, uv.y);
+    else if(gl_GlobalInvocationID.z == 4) ret = vec3( uv.x, uv.y,  1.0f);
+    else if(gl_GlobalInvocationID.z == 5) ret = vec3(-uv.x, uv.y, -1.0f);
     return normalize(ret);
 }

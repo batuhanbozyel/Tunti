@@ -1,11 +1,11 @@
 #version 450 core
 
-const float PI = 3.141592;
-const float TwoPI = 2 * PI;
-const float Epsilon = 0.00001;
+const float PI = 3.141592f;
+const float TwoPI = 2.0f * PI;
+const float Epsilon = 1e-5f;
 
 const uint NumSamples = 64 * 1024;
-const float InvNumSamples = 1.0 / float(NumSamples);
+const float InvNumSamples = 1.0f / float(NumSamples);
 
 layout(binding=0) uniform samplerCube inputTexture;
 layout(binding=0, rgba16f) restrict writeonly uniform imageCube outputTexture;
@@ -55,29 +55,30 @@ vec2 SampleHammersley(uint i)
 
 vec3 SampleHemisphere(float u1, float u2)
 {
-	const float u1p = sqrt(max(0.0, 1.0 - u1*u1));
+	const float u1p = sqrt(max(0.0f, 1.0f - u1 * u1));
 	return vec3(cos(TwoPI * u2) * u1p, sin(TwoPI * u2) * u1p, u1);
 }
 
 vec3 GetSamplingVector()
 {
-    vec2 st = gl_GlobalInvocationID.xy/vec2(imageSize(outputTexture));
-    vec2 uv = 2.0 * vec2(st.x, 1.0-st.y) - vec2(1.0);
+    vec2 st = gl_GlobalInvocationID.xy / vec2(imageSize(outputTexture));
+    vec2 uv = 2.0f * vec2(st.x, 1.0f - st.y) - vec2(1.0f);
 
     vec3 ret;
-    if(gl_GlobalInvocationID.z == 0)      ret = vec3(1.0,  uv.y, -uv.x);
-    else if(gl_GlobalInvocationID.z == 1) ret = vec3(-1.0, uv.y,  uv.x);
-    else if(gl_GlobalInvocationID.z == 2) ret = vec3(uv.x, 1.0, -uv.y);
-    else if(gl_GlobalInvocationID.z == 3) ret = vec3(uv.x, -1.0, uv.y);
-    else if(gl_GlobalInvocationID.z == 4) ret = vec3(uv.x, uv.y, 1.0);
-    else if(gl_GlobalInvocationID.z == 5) ret = vec3(-uv.x, uv.y, -1.0);
+    if     (gl_GlobalInvocationID.z == 0) ret = vec3( 1.0f, uv.y, -uv.x);
+    else if(gl_GlobalInvocationID.z == 1) ret = vec3(-1.0f, uv.y,  uv.x);
+    else if(gl_GlobalInvocationID.z == 2) ret = vec3( uv.x, 1.0f, -uv.y);
+    else if(gl_GlobalInvocationID.z == 3) ret = vec3( uv.x, -1.0f, uv.y);
+    else if(gl_GlobalInvocationID.z == 4) ret = vec3( uv.x, uv.y,  1.0f);
+    else if(gl_GlobalInvocationID.z == 5) ret = vec3(-uv.x, uv.y, -1.0f);
     return normalize(ret);
 }
 
 void ComputeBasisVectors(const vec3 N, out vec3 S, out vec3 T)
 {
-	T = cross(N, vec3(0.0, 1.0, 0.0));
-	T = mix(cross(N, vec3(1.0, 0.0, 0.0)), T, step(Epsilon, dot(T, T)));
+	T = cross(N, vec3(0.0f, 1.0f, 0.0f));
+	T = mix(cross(N, vec3(1.0f, 0.0f, 0.0f)), T, step(Epsilon, dot(T, T)));
+
 	T = normalize(T);
 	S = normalize(cross(N, T));
 }

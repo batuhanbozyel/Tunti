@@ -1,19 +1,19 @@
 #version 450 core
 
-const float PI = 3.141592;
-const float TwoPI = 2 * PI;
-const float Epsilon = 0.001;
+const float PI = 3.141592f;
+const float TwoPI = 2.0f * PI;
+const float Epsilon = 1e-5f;
 
 const uint NumSamples = 1024;
-const float InvNumSamples = 1.0 / float(NumSamples);
+const float InvNumSamples = 1.0f / float(NumSamples);
 
 layout(binding = 0, rg16f) restrict writeonly uniform image2D LUT;
 
 float RadicalInverse_VdC(uint bits);
 vec2 SampleHammersley(uint i);
 vec3 SampleGGX(float u1, float u2, float roughness);
-float GeometryAttenuationSchlickG1(float cosTheta, float k);
-float GeometryAttenuationSchlickGGX_IBL(float cosLi, float cosLo, float roughness);
+float GeometrySchlickGGX(float cosTheta, float k);
+float GeometrySmith(float cosLi, float cosLo, float roughness);
 
 layout(local_size_x=32, local_size_y=32, local_size_z=1) in;
 void main()
@@ -23,10 +23,10 @@ void main()
 
 	cosLo = max(cosLo, Epsilon);
 
-	vec3 Lo = vec3(sqrt(1.0 - cosLo*cosLo), 0.0, cosLo);
+	vec3 Lo = vec3(sqrt(1.0f - cosLo * cosLo), 0.0f, cosLo);
 
-	float DFG1 = 0;
-	float DFG2 = 0;
+	float DFG1 = 0.0f;
+	float DFG2 = 0.0f;
 
 	for(uint i=0; i<NumSamples; ++i) 
 	{
@@ -34,19 +34,19 @@ void main()
 
 		vec3 Lh = SampleGGX(u.x, u.y, roughness);
 
-		vec3 Li = 2.0 * dot(Lo, Lh) * Lh - Lo;
+		vec3 Li = 2.0f * dot(Lo, Lh) * Lh - Lo;
 
 		float cosLi   = Li.z;
 		float cosLh   = Lh.z;
-		float cosLoLh = max(dot(Lo, Lh), 0.0);
+		float cosLoLh = max(dot(Lo, Lh), 0.0f);
 
 		if(cosLi > 0.0) 
 		{
-			float G  = GeometryAttenuationSchlickGGX_IBL(cosLi, cosLo, roughness);
+			float G  = GeometrySmith(cosLi, cosLo, roughness);
 			float Gv = G * cosLoLh / (cosLh * cosLo);
-			float Fc = pow(1.0 - cosLoLh, 5);
+			float Fc = pow(1.0f - cosLoLh, 5);
 
-			DFG1 += (1 - Fc) * Gv;
+			DFG1 += (1.0f - Fc) * Gv;
 			DFG2 += Fc * Gv;
 		}
 	}
@@ -73,21 +73,23 @@ vec3 SampleGGX(float u1, float u2, float roughness)
 {
 	float alpha = roughness * roughness;
 
-	float cosTheta = sqrt((1.0 - u2) / (1.0 + (alpha*alpha - 1.0) * u2));
-	float sinTheta = sqrt(1.0 - cosTheta*cosTheta);
+	float cosTheta = sqrt((1.0f - u2) / (1.0f + (alpha * alpha - 1.0f) * u2));
+	float sinTheta = sqrt(1.0f - cosTheta * cosTheta);
 	float phi = TwoPI * u1;
 
 	return vec3(sinTheta * cos(phi), sinTheta * sin(phi), cosTheta);
 }
 
-float GeometryAttenuationSchlickG1(float cosTheta, float k)
+// Single term for separable Schlick-GGX below.
+float GeometrySchlickGGX(float cosTheta, float k)
 {
-	return cosTheta / (cosTheta * (1.0 - k) + k);
+    return cosTheta / (cosTheta * (1.0f - k) + k);
 }
 
-float GeometryAttenuationSchlickGGX_IBL(float cosLi, float cosLo, float roughness)
+// Schlick-GGX approximation of geometric attenuation function using Smith's method.
+float GeometrySmith(float cosLi, float cosLo, float roughness)
 {
-	float r = roughness;
-	float k = (r * r) / 2.0;
-	return GeometryAttenuationSchlickG1(cosLi, k) * GeometryAttenuationSchlickG1(cosLo, k);
+    float r = (roughness + 1.0f);
+    float k = (r * r) / 8.0f;
+    return GeometrySchlickGGX(cosLi, k) * GeometrySchlickGGX(cosLo, k);
 }
