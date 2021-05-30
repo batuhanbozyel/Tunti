@@ -24,21 +24,7 @@ namespace TEditor
 
 	void SceneViewport::OnStart()
 	{
-#if 0
-		Tunti::Ref<Tunti::Model> sponzaModel = Tunti::ModelLibrary::Load("../Sandbox/assets/models/sponza/sponza.obj");
-		for (uint32_t i = 0; i < sponzaModel->Meshes.size(); i++)
-		{
-			Tunti::Entity sponzaSubEntity = s_Data.SceneContext.CreateEntity(sponzaModel->Meshes[i].Name);
-			sponzaSubEntity.AddComponent<Tunti::MeshRendererComponent>(sponzaModel->Meshes[i], sponzaModel->MaterialInstances[i]);
-		}
-#elif 0
-		Tunti::Ref<Tunti::Model> backpackModel = Tunti::ModelLibrary::Load("../Sandbox/assets/models/backpack/backpack.obj");
-		for (uint32_t i = 0; i < backpackModel->Meshes.size(); i++)
-		{
-			Tunti::Entity backpackSubEntity = s_Data.SceneContext.CreateEntity(backpackModel->Meshes[i].Name);
-			backpackSubEntity.AddComponent<Tunti::MeshRendererComponent>(backpackModel->Meshes[i], backpackModel->MaterialInstances[i]);
-		}
-#endif
+
 	}
 
 	void SceneViewport::OnImGuiRender()

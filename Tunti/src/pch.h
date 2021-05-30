@@ -6,10 +6,12 @@
 #include <utility>
 #include <algorithm>
 #include <functional>
+#include <bitset>
 
 #include <thread>
 #include <atomic>
 #include <future>
+#include <mutex>
 
 #include <string>
 #include <sstream>

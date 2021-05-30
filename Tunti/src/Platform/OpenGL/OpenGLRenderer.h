@@ -19,8 +19,5 @@ namespace Tunti
 		static void ConstructScreenBuffer(uint32_t width, uint32_t height);
 		static void ConstructGBuffer();
 		static void ConstructShadowMapBuffer(uint32_t resolution);
-
-		static void SetCommonUniformProperties(const Ref<Material>& material, const Ref<OpenGLShaderProgram>& shader);
-		static void SetUniqueUniformProperties(const Ref<MaterialInstance>& materialInstance, const Ref<OpenGLShaderProgram>& shader);
 	};
 }

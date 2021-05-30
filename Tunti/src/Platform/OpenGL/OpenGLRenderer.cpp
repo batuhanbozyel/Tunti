@@ -2,9 +2,10 @@
 #include <glad/glad.h>
 
 #include "OpenGLShader.h"
+#include "OpenGLBuffer.h"
 #include "OpenGLTexture.h"
 #include "OpenGLRenderer.h"
-#include "OpenGLBufferManager.h"
+#include "OpenGLMaterial.h"
 
 #include "Tunti/Core/Window.h"
 #include "Tunti/Core/Application.h"
@@ -199,7 +200,7 @@ namespace Tunti
 
 			glBindTextureUnit(RendererBindingTable::SkyboxTextureUnit, environmentMap.EnvironmentMapTextureID);
 			glBindTextureUnit(RendererBindingTable::IrradianceCubemapTextureUnit, environmentMap.IrradianceMapTextureID);
-			glBindTextureUnit(RendererBindingTable::BRDFtoLUTCubemapTextureUnit, environmentMap.BRDF_LUTTextureID);
+			glBindTextureUnit(RendererBindingTable::BRDF_LUTCubemapTextureUnit, environmentMap.BRDF_LUTTextureID);
 		};
 
 		ResizeFramebuffers = [&](uint32_t width, uint32_t height)
@@ -237,74 +238,6 @@ namespace Tunti
 		glDeleteTextures(1, &s_Data.ScreenFramebufferColorAttachment);
 	}
 
-	void OpenGLRenderer::SetCommonUniformProperties(const Ref<Material>& material, const Ref<OpenGLShaderProgram>& shader)
-	{
-		for (const auto& [name, prop] : material->GetProperties())
-		{
-			switch (static_cast<MaterialDataIndex>(prop.index()))
-			{
-				case MaterialDataIndex::Float:
-				{
-					float value = std::get<float>(prop);
-					shader->SetUniformFloat(name.c_str(), value);
-					break;
-				}
-				case MaterialDataIndex::Float2:
-				{
-					const glm::vec2& value = std::get<glm::vec2>(prop);
-					shader->SetUniformFloat2(name.c_str(), value);
-					break;
-				}
-				case MaterialDataIndex::Float3:
-				{
-					const glm::vec3& value = std::get<glm::vec3>(prop);
-					shader->SetUniformFloat3(name.c_str(), value);
-					break;
-				}
-				case MaterialDataIndex::Float4:
-				{
-					const glm::vec4& value = std::get<glm::vec4>(prop);
-					shader->SetUniformFloat4(name.c_str(), value);
-					break;
-				}
-			}
-		}
-	}
-
-	void OpenGLRenderer::SetUniqueUniformProperties(const Ref<MaterialInstance>& materialInstance, const Ref<OpenGLShaderProgram>& shader)
-	{
-		for (const auto& [name, prop] : materialInstance->GetModifiedProperties())
-		{
-			switch (static_cast<MaterialDataIndex>(prop.index()))
-			{
-				case MaterialDataIndex::Float:
-				{
-					float value = std::get<float>(prop);
-					shader->SetUniformFloat(name.c_str(), value);
-					break;
-				}
-				case MaterialDataIndex::Float2:
-				{
-					const glm::vec2& value = std::get<glm::vec2>(prop);
-					shader->SetUniformFloat2(name.c_str(), value);
-					break;
-				}
-				case MaterialDataIndex::Float3:
-				{
-					const glm::vec3& value = std::get<glm::vec3>(prop);
-					shader->SetUniformFloat3(name.c_str(), value);
-					break;
-				}
-				case MaterialDataIndex::Float4:
-				{
-					const glm::vec4& value = std::get<glm::vec4>(prop);
-					shader->SetUniformFloat4(name.c_str(), value);
-					break;
-				}
-			}
-		}
-	}
-
 	/************************************************************************/
 	/*					Deferred Render Pipeline                            */
 	/************************************************************************/
@@ -339,42 +272,43 @@ namespace Tunti
 		s_DeferredData.PBRLightingPassShader->SetUniformInt("u_AlbedoSpecularAttachment", RendererBindingTable::GBufferAlbedoSpecularTextureUnit);
 		s_DeferredData.PBRLightingPassShader->SetUniformInt("u_IrradianceCubemap", RendererBindingTable::IrradianceCubemapTextureUnit);
 		s_DeferredData.PBRLightingPassShader->SetUniformInt("u_SpecularCubemap", RendererBindingTable::SkyboxTextureUnit);
-		s_DeferredData.PBRLightingPassShader->SetUniformInt("u_SpecularBRDF_LUT", RendererBindingTable::BRDFtoLUTCubemapTextureUnit);
+		s_DeferredData.PBRLightingPassShader->SetUniformInt("u_SpecularBRDF_LUT", RendererBindingTable::BRDF_LUTCubemapTextureUnit);
 
 		// Shadow Pass
-		RenderPasses.push_back([&]()
-		{
-			glBindFramebuffer(GL_FRAMEBUFFER, s_DeferredData.ShadowPass.Framebuffer);
-			glViewport(0, 0, s_DeferredData.ShadowPass.Resolution, s_DeferredData.ShadowPass.Resolution);
-			glClear(GL_DEPTH_BUFFER_BIT);
-
-			s_DeferredData.ShadowPassShader->Bind();
-
-			glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 2000.0f);
-			glm::mat4 lightView = glm::lookAt(
-				100.0f * glm::vec3(-2.0f, 4.0f, -1.0f),
-				glm::vec3(0.0f, 0.0f, 0.0f),
-				glm::vec3(0.0f, 1.0f, 0.0f));
-			glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-			s_DeferredData.ShadowPassShader->SetUniformMat4("u_LightSpaceMatrix", lightSpaceMatrix);
-
-			for (const auto& [material, materialInstanceMap] : MeshMultiLayerQueue)
-			{
-				for (const auto& [materialInstance, meshArray] : materialInstanceMap)
-				{
-					const OpenGLGraphicsBuffer& buffer = (*OpenGLBufferManager::GetInstance())[std::hash<Ref<MaterialInstance>>{}(materialInstance)];
-					glBindBufferBase(GL_SHADER_STORAGE_BUFFER, RendererBindingTable::VertexBufferShaderStorageBuffer, buffer.VertexBuffer);
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.IndexBuffer);
-
-					for (const auto& [mesh, transform] : meshArray)
-					{
-						s_DeferredData.ShadowPassShader->SetUniformMat4("u_Model", transform);
-						DrawElementsIndirectCommand indirectCmd(mesh.Count, 1, mesh.BaseIndex, mesh.BaseVertex, 0);
-						glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, &indirectCmd);
-					}
-				}
-			}
-		});
+// 		RenderPasses.push_back([&]()
+// 		{
+// 			glBindFramebuffer(GL_FRAMEBUFFER, s_DeferredData.ShadowPass.Framebuffer);
+// 			glViewport(0, 0, s_DeferredData.ShadowPass.Resolution, s_DeferredData.ShadowPass.Resolution);
+// 			glClear(GL_DEPTH_BUFFER_BIT);
+// 
+// 			s_DeferredData.ShadowPassShader->Bind();
+// 
+// 			glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 2000.0f);
+// 			glm::mat4 lightView = glm::lookAt(
+// 				100.0f * glm::vec3(-2.0f, 4.0f, -1.0f),
+// 				glm::vec3(0.0f, 0.0f, 0.0f),
+// 				glm::vec3(0.0f, 1.0f, 0.0f));
+// 			glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+// 			s_DeferredData.ShadowPassShader->SetUniformMat4("u_LightSpaceMatrix", lightSpaceMatrix);
+// 
+// 			for (const auto& [material, meshQueue] : MeshQueue)
+// 			{
+// 				for (const auto& [mesh, submeshQueue] : meshQueue)
+// 				{
+// 					OpenGLBufferCache::GetInstance()->GetOpenGLMeshBufferWithKey(mesh).Bind();
+// 					for (auto& [submeshQueueElementList, transform] : submeshQueue)
+// 					{
+// 						s_DeferredData.ShadowPassShader->SetUniformMat4("u_Model", transform);
+// 						const auto& [submeshes, _] = submeshQueueElementList;
+// 						for (const auto& submesh : submeshes)
+// 						{
+// 							DrawElementsIndirectCommand indirectCmd(submesh.Count, 1, submesh.BaseIndex, submesh.BaseVertex, 0);
+// 							glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, &indirectCmd);
+// 						}
+// 					}
+// 				}
+// 			}
+// 		});
 
 		// Geometry Pass
 		RenderPasses.push_back([&]()
@@ -384,23 +318,45 @@ namespace Tunti
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			s_DeferredData.GeometryPassShader->Bind();
-			for (const auto& [material, materialInstanceMap] : MeshMultiLayerQueue)
+			for (const auto& [material, meshQueue] : MeshQueue)
 			{
-				SetCommonUniformProperties(material, s_DeferredData.GeometryPassShader);
-				for (const auto& [materialInstance, meshArray] : materialInstanceMap)
+				(*OpenGLMaterialCache::GetInstance())[material->Index].Bind();
+				for (const auto& [mesh, submeshQueue] : meshQueue)
 				{
-					SetUniqueUniformProperties(materialInstance, s_DeferredData.GeometryPassShader);
-					const OpenGLGraphicsBuffer& buffer = (*OpenGLBufferManager::GetInstance())[std::hash<Ref<MaterialInstance>>{}(materialInstance)];
-					GLuint buffers[2] = { buffer.TextureMapIndexBuffer, buffer.VertexBuffer };
-					glBindBuffersBase(GL_SHADER_STORAGE_BUFFER, RendererBindingTable::TextureMapIndexShaderStorageBuffer, 2, buffers);
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.IndexBuffer);
-
-					s_DeferredData.GeometryPassShader->SetUniformUInt("u_VertexCount", buffer.VertexCount);
-					for (const auto& [mesh, transform] : meshArray)
+					const OpenGLMeshBuffer& meshBuffer = OpenGLBufferCache::GetInstance()->GetOpenGLMeshBufferWithKey(mesh);
+					meshBuffer.Bind();
+					s_DeferredData.GeometryPassShader->SetUniformUInt("u_VertexCount", meshBuffer.GetVertexCount());
+					for (const auto& [submeshQueueElementList, transform] : submeshQueue)
 					{
 						s_DeferredData.GeometryPassShader->SetUniformMat4("u_Model", transform);
-						DrawElementsIndirectCommand indirectCmd(mesh.Count, 1, mesh.BaseIndex, mesh.BaseVertex, 0);
-						glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, &indirectCmd);
+						const auto& [submeshes, materialInstances] = submeshQueueElementList;
+// 						for (const auto& materialInstance : materialInstances)
+// 						{
+// 							for (const auto& prop : materialInstance->Properties)
+// 							{
+// 								if (prop.Type == ShaderDataType::Texture2D)
+// 								{
+// 									glMakeTextureHandleResidentARB(std::get<Texture2D>(prop.Value));
+// 								}
+// 							}
+// 						}
+
+						for (const auto& submesh : submeshes)
+						{
+							DrawElementsIndirectCommand indirectCmd(submesh.Count, 1, submesh.BaseIndex, submesh.BaseVertex, 0);
+							glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, &indirectCmd);
+						}
+
+// 						for (const auto& materialInstance : materialInstances)
+// 						{
+// 							for (const auto& prop : materialInstance->Properties)
+// 							{
+// 								if (prop.Type == ShaderDataType::Texture2D)
+// 								{
+// 									glMakeTextureHandleNonResidentARB(std::get<Texture2D>(prop.Value));
+// 								}
+// 							}
+// 						}
 					}
 				}
 			}

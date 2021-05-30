@@ -11,14 +11,14 @@ namespace Tunti
 		static constexpr uint8_t GBufferNormalTextureUnit = 2;
 		static constexpr uint8_t GBufferAlbedoSpecularTextureUnit = 3;
 		static constexpr uint8_t IrradianceCubemapTextureUnit = 4;
-		static constexpr uint8_t BRDFtoLUTCubemapTextureUnit = 5;
+		static constexpr uint8_t BRDF_LUTCubemapTextureUnit = 5;
 
 		// Buffer Bindings
 
 		static constexpr uint8_t ViewProjectionUniformBuffer = 0;
-		static constexpr uint8_t TextureMapIndexShaderStorageBuffer = 1;
+		static constexpr uint8_t MaterialIndexBufferShaderStorageBuffer = 1;
 		static constexpr uint8_t VertexBufferShaderStorageBuffer = 2;
-		static constexpr uint8_t TextureMapsShaderStorageBuffer = 3;
+		static constexpr uint8_t MaterialBufferShaderStorageBuffer = 3;
 		static constexpr uint8_t LightsUniformBuffer = 4;
 	}
 
@@ -41,6 +41,6 @@ namespace Tunti
 	namespace RendererConstants
 	{
 		static constexpr uint32_t MaximumLightNumber = 100;
-		static constexpr char* DefaultEnvironmentMap = "../Tunti/assets/textures/environmentmaps/envmap1.hdr";
+		static constexpr char* DefaultEnvironmentMap = "../Tunti/assets/textures/environmentmaps/default.hdr";
 	}
 }

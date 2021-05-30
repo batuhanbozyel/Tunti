@@ -1,109 +1,104 @@
 #include "pch.h"
-#include "Shader.h"
-#include "Texture.h"
-#include "RendererBindingTable.h"
 #include "Material.h"
+#include "Renderer.h"
+
+#include "Platform/OpenGL/OpenGLMaterial.h"
 
 namespace Tunti
 {
-	// Material
-
-	Material::Material(const Shader& shader)
+	Material::Material(const std::initializer_list<MaterialProperty>& props)
+		: Properties(props)
 	{
-		const auto& uniforms = ShaderLibrary::GetMaterialInfo(shader);
-		for (const auto& [name, uniform] : uniforms)
+
+	}
+
+	uint32_t Material::CalculateSize() const
+	{
+		uint32_t size = 0;
+		for (const auto& prop : Properties)
 		{
-			switch (uniform.Type)
-			{
-				case MaterialDataIndex::Float:
-				{
-					m_Properties.insert({ name, MaterialProperty(1.0f) });
-					break;
-				}
-				case MaterialDataIndex::Float2:
-				{
-					m_Properties.insert({ name, MaterialProperty(glm::vec2(1.0f)) });
-					break;
-				}
-				case MaterialDataIndex::Float3:
-				{
-					m_Properties.insert({ name, MaterialProperty(glm::vec3(1.0f)) });
-					break;
-				}
-				case MaterialDataIndex::Float4:
-				{
-					m_Properties.insert({ name, MaterialProperty(glm::vec4(1.0f)) });
-					break;
-				}	
-			}
+			size += prop.ValueSize();
 		}
-	}
-
-	Ref<MaterialInstance> Material::DefaulMaterialInstance()
-	{
-		if (!s_DefaultMaterial)
-			s_DefaultMaterial = CreateRef<Material>(ShaderLibrary::LoadShader(RendererShaders::PBRLightingPass));
-
-		if (!s_DefaultMaterialInstance)
-			s_DefaultMaterialInstance = CreateInstanceFrom(s_DefaultMaterial);
-
-		return s_DefaultMaterialInstance;
-	}
-
-	template<typename T>
-	void Material::ModifyProperty(const std::string& name, const T& value)
-	{
-		auto& propertyIt = m_Properties.find(name);
-		if (propertyIt != m_Properties.end())
-		{
-			T& propValue = std::get<T>(propertyIt->second);
-			propValue = value;
-			return;
-		}
-		Log::Warn("Property does not exist: {0}", name);
-	}
-
-	Ref<MaterialInstance> Material::CreateInstanceFrom(const Ref<Material>& material)
-	{
-		Ref<MaterialInstance> childInstance = CreateRef<MaterialInstance>(material);
-		material->m_ChildInstances.push_back(childInstance);
-		return childInstance;
+		return size;
 	}
 
 	// MaterialInstance
-
-	MaterialInstance::MaterialInstance(const Ref<Material>& parentMaterial)
-		: m_ParentMaterial(parentMaterial)
+	
+	void MaterialInstance::SetValue(uint32_t propertyIdx, const MaterialPropertyValue& value)
 	{
-
-	}
-
-	template<typename T>
-	void MaterialInstance::ModifyProperty(const std::string& name, const T& value)
-	{
-		auto& propertyIt = m_ModifiedProperties.find(name);
-		if (propertyIt != m_ModifiedProperties.end())
+		switch (Renderer::GetAPI())
 		{
-			T& propValue = std::get<T>(propertyIt->second);
-			propValue = value;
-			return;
+			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return;
+			case RendererAPI::OpenGL:
+			{
+				uint32_t offset = Index * BaseMaterial->CalculateSize();
+				for (uint32_t i = 0; i < propertyIdx; i++)
+				{
+					offset += Properties[i].ShaderAlignmentSize();
+				}
+
+				Properties[propertyIdx].Value = value;
+				(*OpenGLMaterialCache::GetInstance())[BaseMaterial->Index].SetValue(offset, Properties[propertyIdx].ValueSize(), &value);
+				return;
+			}
 		}
 
-		propertyIt = m_ParentMaterial->GetProperties().find(name);
-		if (propertyIt != m_ParentMaterial->GetProperties().end())
-		{
-			m_ModifiedProperties.insert({ name, value });
-			return;
-		}
-
-		Log::Warn("Property does not exist: {0}", name);
+		LOG_ASSERT(false, "RendererAPI initialization failed!");
 	}
 
-	void MaterialInstance::SetTexture(Texture2D texture, TextureType type)
+	MaterialInstance::MaterialInstance(const Ref<Material>& baseMaterial)
+		: BaseMaterial(baseMaterial), Properties(baseMaterial->Properties)
 	{
 
 	}
 
-	Ref<Material> Material::s_DefaultMaterial = nullptr;
-	Ref<MaterialInstance> Material::s_DefaultMaterialInstance = nullptr;
+	// MaterialLibrary
+
+	Ref<Material> MaterialLibrary::PBRMaterial()
+	{
+		switch (Renderer::GetAPI())
+		{
+			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
+			case RendererAPI::OpenGL: return OpenGLMaterialCache::GetInstance()->PBRMaterial();
+		}
+
+		LOG_ASSERT(false, "RendererAPI initialization failed!");
+		return nullptr;
+	}
+
+	Ref<Material> MaterialLibrary::CreateMaterial(const std::initializer_list<MaterialProperty>& props)
+	{
+		switch (Renderer::GetAPI())
+		{
+			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
+			case RendererAPI::OpenGL: return OpenGLMaterialCache::GetInstance()->CreateMaterial(props);
+		}
+
+		LOG_ASSERT(false, "RendererAPI initialization failed!");
+		return nullptr;
+	}
+
+	Ref<MaterialInstance> MaterialLibrary::GetDefaultInstanceFrom(const Ref<Material>& material)
+	{
+		switch (Renderer::GetAPI())
+		{
+			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
+			case RendererAPI::OpenGL: return OpenGLMaterialCache::GetInstance()->GetDefaultInstanceFrom(material);
+		}
+
+		LOG_ASSERT(false, "RendererAPI initialization failed!");
+		return nullptr;
+	}
+
+	Ref<MaterialInstance> MaterialLibrary::CreateInstanceFrom(const Ref<Material>& material)
+	{
+		switch (Renderer::GetAPI())
+		{
+			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
+			case RendererAPI::OpenGL: return OpenGLMaterialCache::GetInstance()->CreateInstanceFrom(material);
+		}
+
+		LOG_ASSERT(false, "RendererAPI initialization failed!");
+		return nullptr;
+	}
 }

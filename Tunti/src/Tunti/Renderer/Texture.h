@@ -2,24 +2,6 @@
 
 namespace Tunti
 {
-	enum class TextureType : uint16_t
-	{
-		Albedo = 0,
-		Normal,
-		Metalness,
-		Roughness,
-		AmbientOcclusion,
-		COUNT
-	};
-
-	static constexpr uint32_t MaxTextures = 1024;
-	static constexpr uint32_t SizeofTextureMap = static_cast<uint32_t>(TextureType::COUNT) * sizeof(uint64_t);
-
-	static constexpr uint32_t OffsetofTextureType(TextureType type)
-	{
-		return static_cast<uint32_t>(type) * sizeof(uint64_t);
-	}
-
 	static constexpr uint32_t CalculateMipMapLevels(uint32_t width, uint32_t height)
 	{
 		uint32_t levels = 1;
@@ -35,20 +17,28 @@ namespace Tunti
 
 		operator uint64_t () const { return Handle; }
 
-		Texture2D() = default;
-
-		Texture2D (uint64_t handle)
+		explicit Texture2D() = default;
+		explicit Texture2D (uint64_t handle)
 			: Handle(handle) {}
 	};
 
-	struct TextureMap
+	enum class PBRTextureMap : uint16_t
 	{
-		uint32_t Index = 0;
-		std::array<Texture2D, static_cast<uint32_t>(TextureType::COUNT)> Textures{ 0 };
+		Albedo,
+		Normal,
+		Metalness,
+		Roughness,
+		AmbientOcclusion,
+		COUNT
+	};
 
-		TextureMap() = default;
-
-		operator uint32_t() const { return Index; }
+	struct PBRTextureMaps
+	{
+		Texture2D Albedo;
+		Texture2D Normal;
+		Texture2D Metalness;
+		Texture2D Roughness;
+		Texture2D AmbientOcclusion;
 	};
 
 	struct TextureData
@@ -74,10 +64,10 @@ namespace Tunti
 	class TextureLibrary final
 	{
 	public:
-		static Ref<TextureMap> DefaultTextureMap();
+		static PBRTextureMaps DefaultPBRTextureMaps();
 		static EnvironmentMapTexture DefaultEnvironmentMap();
 
-		static Ref<TextureMap> LoadTextureMap(const std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)>& textureFiles);
+		static PBRTextureMaps LoadTextureMaps(const std::array<std::string, static_cast<uint16_t>(PBRTextureMap::COUNT)>& textureFiles);
 		static EnvironmentMapTexture LoadEnvironmentMap(const std::string& path);
 		static CubemapTexture LoadCubemap(const std::string& folderPath,
 			const std::string& rightFace,

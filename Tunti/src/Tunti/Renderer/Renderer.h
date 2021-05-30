@@ -5,17 +5,21 @@
 namespace Tunti
 {
 	struct Shader;
+	struct Material;
 	struct Texture2D;
+	struct MeshBuffer;
 	struct WindowProps;
-	struct MeshRenderer;
+	struct SubmeshBuffer;
 	struct CubemapTexture;
+	struct MaterialInstance;
 	struct EnvironmentMapTexture;
 
 	class Camera;
-	class Material;
 	class Renderer;
-	class MaterialInstance;
-	
+
+	using SubmeshQueueElementList = std::pair<std::vector<SubmeshBuffer>, std::vector<Ref<MaterialInstance>>>;
+	using MeshRenderQueueElement = std::pair<SubmeshQueueElementList, glm::mat4>;
+
 	class RendererAPI
 	{
 	public:
@@ -44,7 +48,7 @@ namespace Tunti
 			std::array<LightData, RendererConstants::MaximumLightNumber> Lights;
 		} LightQueue;
 #pragma pack(pop)
-		std::unordered_map<Ref<Material>, std::unordered_map<Ref<MaterialInstance>, std::vector<std::tuple<MeshRenderer, glm::mat4>>>> MeshMultiLayerQueue;
+		std::unordered_map<Ref<Material>, std::unordered_map<MeshBuffer, std::vector<MeshRenderQueueElement>>> MeshQueue;
 	};
 
 	class Renderer final
@@ -57,7 +61,7 @@ namespace Tunti
 
 		static void Submit(const std::function<void()>& renderPass);
 		static void SubmitLight(const Light& light, const glm::vec3& position, const glm::vec3& direction);
-		static void DrawMesh(const MeshRenderer& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform);
+		static void DrawMesh(const MeshBuffer& mesh, const SubmeshQueueElementList& submeshes, const glm::mat4& transform);
 
 		static void ResizeFramebuffers(uint32_t width, uint32_t height);
 		static Texture2D GetFramebufferTexture();

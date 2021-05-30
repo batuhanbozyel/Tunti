@@ -71,19 +71,13 @@ namespace Tunti
 
 	struct MeshRendererComponent
 	{
-		MeshRenderer MeshBuffer;
-		Ref<MaterialInstance> MaterialInstanceRef = Material::DefaulMaterialInstance();
-		std::string ModelPath;
+		MeshBuffer _Mesh;
+		std::vector<SubmeshBuffer> Submeshes;
+		std::vector<Ref<MaterialInstance>> Materials;
 
 		MeshRendererComponent() = default;
-		MeshRendererComponent(const std::string& path)
-			: ModelPath(path)
-		{
-			// TODO:
-		}
-		MeshRendererComponent(const Mesh& mesh, const Ref<MaterialInstance>& materialInstance)
-			: MeshBuffer(BufferManager::AllocateGraphicsBuffer(mesh, std::hash<Ref<MaterialInstance>>{}(materialInstance))),
-			MaterialInstanceRef(materialInstance) {}
+		MeshRendererComponent(const Ref<Model>& model)
+			: _Mesh(model->_Mesh), Submeshes(model->Submeshes), Materials(model->Materials) {}
 	};
 
 	struct CameraComponent

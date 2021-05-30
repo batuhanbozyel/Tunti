@@ -1,10 +1,9 @@
 #pragma once
+#include "Tunti/Renderer/BufferManager.h"
 
 namespace Tunti
 {
-	struct Mesh;
-	struct TextureMap;
-	class MaterialInstance;
+	struct MaterialInstance;
 
 	enum class PrimitiveMesh
 	{
@@ -18,21 +17,21 @@ namespace Tunti
 
 	struct Model
 	{
-		std::vector<Mesh> Meshes;
-		std::vector<Ref<TextureMap>> TextureMaps;
-		std::vector<Ref<MaterialInstance>> MaterialInstances;
+		MeshBuffer _Mesh;
+		std::vector<SubmeshBuffer> Submeshes;
+		std::vector<Ref<MaterialInstance>> Materials;
 
 		Model() = default;
-
-		Model(const std::vector<Mesh>& meshes, const std::vector<Ref<MaterialInstance>> materialInstances)
-			: Meshes(meshes), MaterialInstances(materialInstances) {}
+		Model(const MeshBuffer& mesh, const std::vector<SubmeshBuffer>& submeshes, const std::vector<Ref<MaterialInstance>>& materials)
+			: _Mesh(mesh), Submeshes(submeshes), Materials(materials) {}
 	};
 
-	namespace ModelLibrary
+	class ModelLibrary final
 	{
-		Ref<Model> Load(const std::string& filePath);
-		Ref<Model> LoadPrimitive(PrimitiveMesh primitive);
-		std::string GetModelPath(const Ref<Model>& model);
-		void Flush();
+	public:
+		static Ref<Model> Load(const std::string& filePath);
+		static Ref<Model> LoadPrimitive(PrimitiveMesh primitive);
+		static std::string GetModelPath(const Ref<Model>& model);
+		static void Flush();
 	};
 }

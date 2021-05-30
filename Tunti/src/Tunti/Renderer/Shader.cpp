@@ -76,23 +76,4 @@ namespace Tunti
 		LOG_ASSERT(false, "RendererAPI is not specified!");
 		return Shader();
 	}
-
-	std::unordered_map<std::string, UniformProperty> ShaderLibrary::GetMaterialInfo(Shader shader)
-	{
-		switch (Renderer::GetAPI())
-		{
-			case RendererAPI::None:
-			{
-				LOG_ASSERT(false, "RendererAPI is not specified!");
-				return std::unordered_map<std::string, UniformProperty>();
-			}
-			case RendererAPI::OpenGL:
-			{
-				Ref<OpenGLShaderProgram> apiShader = (*OpenGLShaderCache::GetInstance())[shader];
-				return apiShader->GetMaterialInfo();
-			}
-		}
-		LOG_ASSERT(false, "RendererAPI is not specified!");
-		return std::unordered_map<std::string, UniformProperty>();
-	}
 }

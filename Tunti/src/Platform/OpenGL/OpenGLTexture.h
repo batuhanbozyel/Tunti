@@ -46,10 +46,10 @@ namespace Tunti
 	class OpenGLTextureCache final
 	{
 	public:
-		~OpenGLTextureCache();
+		~OpenGLTextureCache() = default;
 
-		Ref<TextureMap> DefaultTextureMap() const { return m_DefaultTextureMap; }
-		Ref<TextureMap> CreateTextureMap(const std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)>& textureFiles);
+		PBRTextureMaps DefaultPBRTextureMaps() const { return m_DefaultPBRTextureMaps; }
+		PBRTextureMaps CreateTextureMaps(const std::array<std::string, static_cast<uint16_t>(PBRTextureMap::COUNT)>& textureFiles);
 
 		CubemapTexture CreateCubemap(const std::array<std::string, 6>& cubemapTextures);
 		EnvironmentMapTexture CreateEnvironmentMap(const std::string& textureFile);
@@ -69,14 +69,8 @@ namespace Tunti
 	private:
 		explicit OpenGLTextureCache();
 	private:
-		// Constructing with a default white texture
-		uint32_t m_TextureMapCount = 1;
-		GLuint m_TextureMapSSBO;
-
 		OpenGLTexture2D m_WhiteTexture;
-		OpenGLTexture2D m_BlackTexture;
-		Ref<TextureMap> m_DefaultTextureMap;
-		Ref<EnvironmentMapTexture> m_DefaultEnvironmentMap;
+		PBRTextureMaps m_DefaultPBRTextureMaps;
 		std::unordered_map<std::string, Scope<OpenGLTexture2D>> m_Textures;
 		std::unordered_map<std::string, Scope<OpenGLEnvironmentMapTexture>> m_EnvironmentMaps;
 		std::unordered_map<std::string, Scope<OpenGLCubemapTexture>> m_Cubemaps;

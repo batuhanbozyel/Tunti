@@ -17,14 +17,18 @@ namespace Tunti
 	};
 #pragma pack(pop)
 
+	struct Submesh
+	{
+		std::vector<glm::vec3> Positions;
+		std::vector<glm::vec3> Normals;
+		std::vector<glm::vec2> TexCoords;
+		std::vector<uint32_t> MaterialIndices;
+		std::vector<uint32_t> Indices;
+	};
+
 	struct Mesh
 	{
-		std::string Name;
-		std::vector<glm::vec3> Position;
-		std::vector<glm::vec3> Normal;
-		std::vector<glm::vec2> TexCoord;
-		std::vector<uint32_t> TexIndex;
-		std::vector<uint32_t> Indices;
+		std::vector<Submesh> Submeshes;
 	};
 }
 

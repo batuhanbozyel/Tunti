@@ -31,48 +31,73 @@ namespace Tunti
 			auto& attrib = reader.GetAttrib();
 			auto& shapes = reader.GetShapes();
 			auto& materials = reader.GetMaterials();
-			
+
 			Ref<Model> model = CreateRef<Model>();
+			Ref<Material> pbrMaterial = MaterialLibrary::PBRMaterial();
+			model->_Mesh = BufferManager::AllocateMeshBufferWithKey(pbrMaterial->Index);
 			std::unordered_map<Vertex, uint32_t> uniqueVertices{};
-			for (const auto& shape : shapes)
+			for (const tinyobj::shape_t& shape : shapes)
 			{
-				Mesh mesh;
-				mesh.Name = shape.name;
-				std::array<std::string, static_cast<uint32_t>(TextureType::COUNT)> texturePaths;
+				Submesh submesh;
+
+				bool shouldCreateNewMaterialInstance = false;
+				std::array<std::string, static_cast<uint32_t>(PBRTextureMap::COUNT)> texturePaths;
 				if (materials.size())
 				{
 					// Albedo
 					if (!materials[shape.mesh.material_ids[0]].diffuse_texname.empty()) {
-						texturePaths[static_cast<uint32_t>(TextureType::Albedo)] = fileDirectory + materials[shape.mesh.material_ids[0]].diffuse_texname;
+						texturePaths[static_cast<uint32_t>(PBRTextureMap::Albedo)] = fileDirectory + materials[shape.mesh.material_ids[0]].diffuse_texname;
+						shouldCreateNewMaterialInstance = true;
 					}
 
 					// Normal
 					if (!materials[shape.mesh.material_ids[0]].normal_texname.empty()) {
-						texturePaths[static_cast<uint32_t>(TextureType::Normal)] = fileDirectory + materials[shape.mesh.material_ids[0]].normal_texname;
+						texturePaths[static_cast<uint32_t>(PBRTextureMap::Normal)] = fileDirectory + materials[shape.mesh.material_ids[0]].normal_texname;
+						shouldCreateNewMaterialInstance = true;
 					}
 					else if (!materials[shape.mesh.material_ids[0]].bump_texname.empty()) {
-						texturePaths[static_cast<uint32_t>(TextureType::Normal)] = fileDirectory + materials[shape.mesh.material_ids[0]].bump_texname;
+						texturePaths[static_cast<uint32_t>(PBRTextureMap::Normal)] = fileDirectory + materials[shape.mesh.material_ids[0]].bump_texname;
+						shouldCreateNewMaterialInstance = true;
 					}
 
 					// Metalness
 					if (!materials[shape.mesh.material_ids[0]].metallic_texname.empty()) {
-						texturePaths[static_cast<uint32_t>(TextureType::Metalness)] = fileDirectory + materials[shape.mesh.material_ids[0]].metallic_texname;
+						texturePaths[static_cast<uint32_t>(PBRTextureMap::Metalness)] = fileDirectory + materials[shape.mesh.material_ids[0]].metallic_texname;
+						shouldCreateNewMaterialInstance = true;
 					}
 					else if (!materials[shape.mesh.material_ids[0]].specular_texname.empty()) {
-						texturePaths[static_cast<uint32_t>(TextureType::Metalness)] = fileDirectory + materials[shape.mesh.material_ids[0]].specular_texname;
+						texturePaths[static_cast<uint32_t>(PBRTextureMap::Metalness)] = fileDirectory + materials[shape.mesh.material_ids[0]].specular_texname;
+						shouldCreateNewMaterialInstance = true;
 					}
 
 					// Roughness
 					if (!materials[shape.mesh.material_ids[0]].roughness_texname.empty()) {
-						texturePaths[static_cast<uint32_t>(TextureType::Roughness)] = fileDirectory + materials[shape.mesh.material_ids[0]].roughness_texname;
+						texturePaths[static_cast<uint32_t>(PBRTextureMap::Roughness)] = fileDirectory + materials[shape.mesh.material_ids[0]].roughness_texname;
+						shouldCreateNewMaterialInstance = true;
 					}
 
 					// Ambient Occlusion
 					if (!materials[shape.mesh.material_ids[0]].ambient_texname.empty()) {
-						texturePaths[static_cast<uint32_t>(TextureType::AmbientOcclusion)] = fileDirectory + materials[shape.mesh.material_ids[0]].ambient_texname;
+						texturePaths[static_cast<uint32_t>(PBRTextureMap::AmbientOcclusion)] = fileDirectory + materials[shape.mesh.material_ids[0]].ambient_texname;
+						shouldCreateNewMaterialInstance = true;
 					}
 				}
-				Ref<TextureMap> textureMap = TextureLibrary::LoadTextureMap(texturePaths);
+
+				Ref<MaterialInstance> materialInstance;
+				if (shouldCreateNewMaterialInstance)
+				{
+					PBRTextureMaps textureMaps = TextureLibrary::LoadTextureMaps(texturePaths);
+					materialInstance = MaterialLibrary::CreateInstanceFrom(pbrMaterial);
+					materialInstance->SetValue(PBRMaterial::AlbedoMap, textureMaps.Albedo);
+					materialInstance->SetValue(PBRMaterial::NormalMap, textureMaps.Normal);
+					materialInstance->SetValue(PBRMaterial::MetalnessMap, textureMaps.Metalness);
+					materialInstance->SetValue(PBRMaterial::RoughnessMap, textureMaps.Roughness);
+					materialInstance->SetValue(PBRMaterial::AmbientOcclusionMap, textureMaps.AmbientOcclusion);
+				}
+				else
+				{
+					materialInstance = MaterialLibrary::GetDefaultInstanceFrom(pbrMaterial);
+				}
 
 				for (const auto& index : shape.mesh.indices)
 				{
@@ -92,22 +117,21 @@ namespace Tunti
 
 					vertex.TexCoord = {
 						attrib.texcoords[2 * index.texcoord_index + 0],
-						1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
+						attrib.texcoords[2 * index.texcoord_index + 1]
 					};
 
 					if (uniqueVertices.count(vertex) == 0)
 					{
-						uniqueVertices[vertex] = static_cast<uint32_t>(mesh.Position.size());
-						mesh.Position.push_back(vertex.Position);
-						mesh.Normal.push_back(vertex.Normal);
-						mesh.TexCoord.push_back(vertex.TexCoord);
-						mesh.TexIndex.push_back(textureMap->Index);
+						uniqueVertices[vertex] = static_cast<uint32_t>(submesh.Positions.size());
+						submesh.Positions.push_back(vertex.Position);
+						submesh.Normals.push_back(vertex.Normal);
+						submesh.TexCoords.push_back(vertex.TexCoord);
+						submesh.MaterialIndices.push_back(materialInstance->Index);
 					}
-					mesh.Indices.push_back(uniqueVertices[vertex]);
+					submesh.Indices.push_back(uniqueVertices[vertex]);
 				}
-				model->Meshes.emplace_back(std::move(mesh));
-				model->TextureMaps.emplace_back(std::move(textureMap));
-				model->MaterialInstances.emplace_back(Material::DefaulMaterialInstance());
+				model->Submeshes.push_back(BufferManager::AllocateSubmeshFromMeshBuffer(model->_Mesh, submesh));
+				model->Materials.push_back(materialInstance);
 			}
 			return model;
 		}
@@ -118,68 +142,64 @@ namespace Tunti
 		static Ref<Model> Load(const std::string& filePath)
 		{
 			Ref<Model> model = CreateRef<Model>();
-
+			/**
+			 * TODO:
+			 */
 			return model;
 		}
 	}
 
-	namespace ModelLibrary
+	std::unordered_map<std::string, Ref<Model>> ModelCache;
+	constexpr std::array<const char*, static_cast<int>(PrimitiveMesh::PRIMITIVE_MESH_COUNT)> PrimitivePaths = {
+		"../Tunti/assets/primitives/cube.obj",
+		"../Tunti/assets/primitives/sphere.obj",
+		"../Tunti/assets/primitives/cone.obj",
+		"../Tunti/assets/primitives/cylinder.obj",
+		"../Tunti/assets/primitives/plane.obj"
+	};
+
+	Ref<Model> ModelLibrary::Load(const std::string& filePath)
 	{
-		static std::unordered_map<std::string, Ref<Model>> s_ModelCache;
-		constexpr std::array<const char*, static_cast<int>(PrimitiveMesh::PRIMITIVE_MESH_COUNT)> PrimitivePaths = {
-			"../Tunti/assets/primitives/cube.obj",
-			"../Tunti/assets/primitives/sphere.obj",
-			"../Tunti/assets/primitives/cone.obj",
-			"../Tunti/assets/primitives/cylinder.obj",
-			"../Tunti/assets/primitives/plane.obj"
-		};
+		const auto& modelCacheIt = ModelCache.find(filePath);
 
-		Ref<Model> Load(const std::string& filePath)
+		if (modelCacheIt == ModelCache.end())
 		{
-			const auto& modelCacheIt = s_ModelCache.find(filePath);
-
-			if (modelCacheIt == s_ModelCache.end())
+			std::string fileExtension = std::filesystem::path(filePath).extension().string();
+			if (fileExtension == ".obj")
 			{
-				std::string fileExtension = std::filesystem::path(filePath).extension().string();
-				if (fileExtension == ".obj")
-				{
-					Ref<Model> model = ObjLoader::Load(filePath);
-
-					return s_ModelCache.insert(s_ModelCache.end(), { filePath, model })->second;
-				}
-				else if (fileExtension == ".gltf")
-				{
-					Ref<Model> model = glTFLoader::Load(filePath);
-
-					return s_ModelCache.insert(s_ModelCache.end(), { filePath, model })->second;
-				}
-
-				Log::Error("Tunti Engine only supports OBJ and glTF model formats!");
-				return Ref<Model>();
+				Ref<Model> model = ObjLoader::Load(filePath);
+				return ModelCache.insert(ModelCache.end(), { filePath, model })->second;
+			}
+			else if (fileExtension == ".gltf")
+			{
+				Ref<Model> model = glTFLoader::Load(filePath);
+				return ModelCache.insert(ModelCache.end(), { filePath, model })->second;
 			}
 
-			return modelCacheIt->second;
+			Log::Error("Tunti Engine only supports OBJ and glTF model formats!");
+			return Ref<Model>();
 		}
 
-		Ref<Model> LoadPrimitive(PrimitiveMesh primitive)
+		return modelCacheIt->second;
+	}
+
+	Ref<Model> ModelLibrary::LoadPrimitive(PrimitiveMesh primitive)
+	{
+		return Load(PrimitivePaths[static_cast<int>(primitive)]);
+	}
+
+	std::string ModelLibrary::GetModelPath(const Ref<Model>& model)
+	{
+		for (const auto& [path, modelRef] : ModelCache)
 		{
-			return Load(PrimitivePaths[static_cast<int>(primitive)]);
+			if (modelRef == model)
+				return path;
 		}
+		return std::string{};
+	}
 
-		std::string GetModelPath(const Ref<Model>& model)
-		{
-			for (const auto& [path, modelRef] : s_ModelCache)
-			{
-				if (modelRef == model)
-					return path;
-			}
-
-			return std::string{};
-		}
-
-		void Flush()
-		{
-			s_ModelCache.clear();
-		}
+	void ModelLibrary::Flush()
+	{
+		ModelCache.clear();
 	}
 }

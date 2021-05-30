@@ -202,42 +202,40 @@ namespace Tunti
 	// OpenGLTextureCache
 
 	OpenGLTextureCache::OpenGLTextureCache()
-		: m_DefaultTextureMap(CreateRef<TextureMap>()),
-		m_DefaultEnvironmentMap(CreateRef<EnvironmentMapTexture>()),
-		m_WhiteTexture(std::array<unsigned char, 4>{255, 255, 255, 255}),
-		m_BlackTexture(std::array<unsigned char, 4>{0, 0, 0, 255})
+		:	m_WhiteTexture(std::array<unsigned char, 4>{255, 255, 255, 255})
 	{
 		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
-		std::fill(m_DefaultTextureMap->Textures.begin(), m_DefaultTextureMap->Textures.end(), m_WhiteTexture.m_TextureHandle);
-		glCreateBuffers(1, &m_TextureMapSSBO);
-		glNamedBufferStorage(m_TextureMapSSBO, SizeofTextureMap * MaxTextures, nullptr, GL_DYNAMIC_STORAGE_BIT);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, RendererBindingTable::TextureMapsShaderStorageBuffer, m_TextureMapSSBO);
-		glNamedBufferSubData(m_TextureMapSSBO, 0, m_DefaultTextureMap->Textures.size() * sizeof(GLuint64), m_DefaultTextureMap->Textures.data());
+		m_DefaultPBRTextureMaps.Albedo = Texture2D(m_WhiteTexture.m_TextureHandle);
+		m_DefaultPBRTextureMaps.Normal = Texture2D(m_WhiteTexture.m_TextureHandle);
+		m_DefaultPBRTextureMaps.Metalness = Texture2D(m_WhiteTexture.m_TextureHandle);
+		m_DefaultPBRTextureMaps.Roughness = Texture2D(m_WhiteTexture.m_TextureHandle);
+		m_DefaultPBRTextureMaps.AmbientOcclusion = Texture2D(m_WhiteTexture.m_TextureHandle);
+
 		m_EnvironmentMaps.emplace("default", Scope<OpenGLEnvironmentMapTexture>());
 	}
 
-	OpenGLTextureCache::~OpenGLTextureCache()
+	PBRTextureMaps OpenGLTextureCache::CreateTextureMaps(const std::array<std::string, static_cast<uint16_t>(PBRTextureMap::COUNT)>& textureFiles)
 	{
-		glDeleteBuffers(1, &m_TextureMapSSBO);
-	}
-
-	Ref<TextureMap> OpenGLTextureCache::CreateTextureMap(const std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)>& textureFiles)
-	{
-		Ref<TextureMap> textureMap = CreateRef<TextureMap>();
-		TextureType type = static_cast<TextureType>(0);
-		for (const auto& textureFile : textureFiles)
+		stbi_set_flip_vertically_on_load(1);
+		PBRTextureMaps textureMaps = m_DefaultPBRTextureMaps;
+		textureMaps.Albedo = Texture2D(m_WhiteTexture.m_TextureHandle);
+		textureMaps.Normal = Texture2D(m_WhiteTexture.m_TextureHandle);
+		textureMaps.Metalness = Texture2D(m_WhiteTexture.m_TextureHandle);
+		textureMaps.Roughness = Texture2D(m_WhiteTexture.m_TextureHandle);
+		textureMaps.AmbientOcclusion = Texture2D(m_WhiteTexture.m_TextureHandle);
 		{
-			uint16_t typeIndex = static_cast<uint16_t>(type);
+			const std::string& textureFile = textureFiles[(uint32_t)PBRTextureMap::Albedo];
 			if (!textureFile.empty())
 			{
 				const auto& textureIt = m_Textures.find(textureFile);
-				// if texture already exists
 				if (textureIt != m_Textures.end())
-					textureMap->Textures[typeIndex] = textureIt->second->m_TextureHandle;
+				{
+					textureMaps.Albedo = Texture2D(textureIt->second->m_TextureHandle);
+				}
 				else
 				{
-					std::filesystem::path(textureFile).extension().string() == ".tga" ? stbi_set_flip_vertically_on_load(0) : stbi_set_flip_vertically_on_load(1);
+					//std::filesystem::path(textureFile).extension().string() == ".tga" ? stbi_set_flip_vertically_on_load(0) : stbi_set_flip_vertically_on_load(1);
 
 					TextureData data;
 					data.buffer = stbi_load(
@@ -250,43 +248,133 @@ namespace Tunti
 					if (data.buffer)
 					{
 						const auto& insertedPairIt = m_Textures.insert(m_Textures.end(), { textureFile, CreateScope<OpenGLTexture2D>(data) });
-						textureMap->Textures[typeIndex] = insertedPairIt->second->m_TextureHandle;
+						textureMaps.Albedo = Texture2D(insertedPairIt->second->m_TextureHandle);
 						stbi_image_free(data.buffer);
 					}
 				}
-				glNamedBufferSubData(
-					m_TextureMapSSBO,
-					SizeofTextureMap * m_TextureMapCount + OffsetofTextureType(type),
-					sizeof(GLuint64),
-					&textureMap->Textures[typeIndex]);
 			}
-			else
+		}
+		{
+			const std::string& textureFile = textureFiles[(uint32_t)PBRTextureMap::Normal];
+			if (!textureFile.empty())
 			{
-				if (type == TextureType::Metalness)
+				const auto& textureIt = m_Textures.find(textureFile);
+				if (textureIt != m_Textures.end())
 				{
-					textureMap->Textures[typeIndex] = m_BlackTexture.m_TextureHandle;
-					glNamedBufferSubData(
-						m_TextureMapSSBO,
-						SizeofTextureMap * m_TextureMapCount + OffsetofTextureType(type),
-						sizeof(GLuint64),
-						&m_BlackTexture.m_TextureHandle);
+					textureMaps.Normal = Texture2D(textureIt->second->m_TextureHandle);
 				}
 				else
 				{
-					textureMap->Textures[typeIndex] = m_WhiteTexture.m_TextureHandle;
-					glNamedBufferSubData(
-						m_TextureMapSSBO,
-						SizeofTextureMap * m_TextureMapCount + OffsetofTextureType(type),
-						sizeof(GLuint64),
-						&m_WhiteTexture.m_TextureHandle);
+					//std::filesystem::path(textureFile).extension().string() == ".tga" ? stbi_set_flip_vertically_on_load(0) : stbi_set_flip_vertically_on_load(1);
+
+					TextureData data;
+					data.buffer = stbi_load(
+						textureFile.c_str(),
+						&data.width,
+						&data.height,
+						&data.channel,
+						4);
+
+					if (data.buffer)
+					{
+						const auto& insertedPairIt = m_Textures.insert(m_Textures.end(), { textureFile, CreateScope<OpenGLTexture2D>(data) });
+						textureMaps.Normal = Texture2D(insertedPairIt->second->m_TextureHandle);
+						stbi_image_free(data.buffer);
+					}
 				}
-				
 			}
-			
-			type = static_cast<TextureType>(typeIndex + 1);
 		}
-		textureMap->Index = m_TextureMapCount++;
-		return textureMap;
+		{
+			const std::string& textureFile = textureFiles[(uint32_t)PBRTextureMap::Metalness];
+			if (!textureFile.empty())
+			{
+				const auto& textureIt = m_Textures.find(textureFile);
+				if (textureIt != m_Textures.end())
+				{
+					textureMaps.Metalness = Texture2D(textureIt->second->m_TextureHandle);
+				}
+				else
+				{
+					//std::filesystem::path(textureFile).extension().string() == ".tga" ? stbi_set_flip_vertically_on_load(0) : stbi_set_flip_vertically_on_load(1);
+
+					TextureData data;
+					data.buffer = stbi_load(
+						textureFile.c_str(),
+						&data.width,
+						&data.height,
+						&data.channel,
+						4);
+
+					if (data.buffer)
+					{
+						const auto& insertedPairIt = m_Textures.insert(m_Textures.end(), { textureFile, CreateScope<OpenGLTexture2D>(data) });
+						textureMaps.Metalness = Texture2D(insertedPairIt->second->m_TextureHandle);
+						stbi_image_free(data.buffer);
+					}
+				}
+			}
+		}
+		{
+			const std::string& textureFile = textureFiles[(uint32_t)PBRTextureMap::Roughness];
+			if (!textureFile.empty())
+			{
+				const auto& textureIt = m_Textures.find(textureFile);
+				if (textureIt != m_Textures.end())
+				{
+					textureMaps.Roughness = Texture2D(textureIt->second->m_TextureHandle);
+				}
+				else
+				{
+					//std::filesystem::path(textureFile).extension().string() == ".tga" ? stbi_set_flip_vertically_on_load(0) : stbi_set_flip_vertically_on_load(1);
+
+					TextureData data;
+					data.buffer = stbi_load(
+						textureFile.c_str(),
+						&data.width,
+						&data.height,
+						&data.channel,
+						4);
+
+					if (data.buffer)
+					{
+						const auto& insertedPairIt = m_Textures.insert(m_Textures.end(), { textureFile, CreateScope<OpenGLTexture2D>(data) });
+						textureMaps.Roughness = Texture2D(insertedPairIt->second->m_TextureHandle);
+						stbi_image_free(data.buffer);
+					}
+				}
+			}
+		}
+		{
+			const std::string& textureFile = textureFiles[(uint32_t)PBRTextureMap::AmbientOcclusion];
+			if (!textureFile.empty())
+			{
+				const auto& textureIt = m_Textures.find(textureFile);
+				if (textureIt != m_Textures.end())
+				{
+					textureMaps.AmbientOcclusion = Texture2D(textureIt->second->m_TextureHandle);
+				}
+				else
+				{
+					//std::filesystem::path(textureFile).extension().string() == ".tga" ? stbi_set_flip_vertically_on_load(0) : stbi_set_flip_vertically_on_load(1);
+
+					TextureData data;
+					data.buffer = stbi_load(
+						textureFile.c_str(),
+						&data.width,
+						&data.height,
+						&data.channel,
+						4);
+
+					if (data.buffer)
+					{
+						const auto& insertedPairIt = m_Textures.insert(m_Textures.end(), { textureFile, CreateScope<OpenGLTexture2D>(data) });
+						textureMaps.AmbientOcclusion = Texture2D(insertedPairIt->second->m_TextureHandle);
+						stbi_image_free(data.buffer);
+					}
+				}
+			}
+		}
+		return textureMaps;
 	}
 
 	EnvironmentMapTexture OpenGLTextureCache::CreateEnvironmentMap(const std::string& textureFile)
@@ -303,10 +391,12 @@ namespace Tunti
 			envMap.IrradianceMapTextureID = envMapCached->m_IrradianceMapTextureID;
 			envMap.BRDF_LUTTextureID = envMapCached->m_BRDF_LUTTextureID;
 		}
-		else if (isHDR) {
+		else if (isHDR)
+		{
 			environmentMapData.buffer = reinterpret_cast<unsigned char*>(stbi_loadf(textureFile.c_str(), &environmentMapData.width, &environmentMapData.height, &environmentMapData.channel, 3));
 		}
-		else {
+		else
+		{
 			environmentMapData.buffer = stbi_load(textureFile.c_str(), &environmentMapData.width, &environmentMapData.height, &environmentMapData.channel, 3);
 		}
 
@@ -379,15 +469,7 @@ namespace Tunti
 
 	void OpenGLTextureCache::Flush()
 	{
-		GLuint64 zero = 0;
-		glNamedBufferSubData(
-			m_TextureMapSSBO,
-			static_cast<uint16_t>(TextureType::COUNT) * sizeof(GLuint64),
-			static_cast<uint16_t>(TextureType::COUNT) * sizeof(GLuint64) * (m_TextureMapCount - 1),
-			&zero);
-
 		m_Textures.clear();
 		m_Cubemaps.clear();
-		m_TextureMapCount = 1;
 	}
 }

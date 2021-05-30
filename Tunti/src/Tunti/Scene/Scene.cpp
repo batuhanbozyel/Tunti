@@ -65,7 +65,10 @@ namespace Tunti
 				{
 					auto& [meshRenderer, transform] = view.get<MeshRendererComponent, TransformComponent>(entity);
 
-					Renderer::DrawMesh(meshRenderer.MeshBuffer, meshRenderer.MaterialInstanceRef, transform);
+					if (meshRenderer._Mesh.IsValid)
+					{
+						Renderer::DrawMesh(meshRenderer._Mesh, { meshRenderer.Submeshes, meshRenderer.Materials }, transform);
+					}
 				}
 			}
 			Renderer::EndScene();
@@ -92,7 +95,10 @@ namespace Tunti
 			{
 				auto& [meshRenderer, transform] = view.get<MeshRendererComponent, TransformComponent>(entity);
 
-				Renderer::DrawMesh(meshRenderer.MeshBuffer, meshRenderer.MaterialInstanceRef, transform);
+				if (meshRenderer._Mesh.IsValid)
+				{
+					Renderer::DrawMesh(meshRenderer._Mesh, { meshRenderer.Submeshes, meshRenderer.Materials }, transform);
+				}
 			}
 		}
 		Renderer::EndScene();

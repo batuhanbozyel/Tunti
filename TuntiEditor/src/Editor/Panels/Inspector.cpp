@@ -83,7 +83,7 @@ namespace TEditor
 
 			Utils::DrawComponent<Tunti::MeshRendererComponent>("Mesh Renderer", selectedEntity, [](auto& component)
 			{
-				ImGui::Text(component.ModelPath.c_str());
+				//ImGui::Text(component.ModelPath.c_str());
 
 				float contentWidth = ImGui::GetContentRegionAvail().x;
 				ImGui::SameLine(contentWidth - contentWidth / 20.0f, 0.0f);

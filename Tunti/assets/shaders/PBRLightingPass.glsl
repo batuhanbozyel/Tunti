@@ -17,7 +17,6 @@ void main()
 
 #type fragment
 #version 450 core
-#extension GL_ARB_bindless_texture : require
 #define MAX_LIGHTS 100
 
 const float Epsilon = 1e-5f;
@@ -36,12 +35,6 @@ struct Light
     vec4 AttenuationFactors; // x: Intensity, y: Constant, z: Linear, w: Quadratic
     vec4 ColorAndType; // rgb: Color, a: Type
     vec3 Position;
-    vec3 Direction;
-};
-
-struct DirectionalLight
-{
-    vec4 ColorAndIntensity;
     vec3 Direction;
 };
 

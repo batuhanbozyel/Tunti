@@ -47,12 +47,10 @@ namespace Tunti
 		s_Instance->LightQueue.Lights[s_Instance->LightQueue.LightCount++] = LightData(light, position, direction);
 	}
 
-	void Renderer::DrawMesh(const MeshRenderer& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform)
+	void Renderer::DrawMesh(const MeshBuffer& mesh, const SubmeshQueueElementList& submeshes, const glm::mat4& transform)
 	{
-		auto& meshMultiLayerQueue = s_Instance->MeshMultiLayerQueue;
-		const Ref<Material>& material = materialInstance->GetParentMaterial();
-
-		((meshMultiLayerQueue[material])[materialInstance]).push_back({ mesh, transform });
+		const auto& [submeshBuffers, materialInstances] = submeshes;
+		s_Instance->MeshQueue[materialInstances[0]->BaseMaterial][mesh].push_back({ submeshes, transform });
 	}
 
 	void Renderer::ResizeFramebuffers(uint32_t width, uint32_t height)
@@ -76,7 +74,7 @@ namespace Tunti
 			renderPass();
 
 		s_Instance->EndScene();
-		s_Instance->MeshMultiLayerQueue.clear();
+		s_Instance->MeshQueue.clear();
 		s_Instance->LightQueue.LightCount = 0;
 	}
 
