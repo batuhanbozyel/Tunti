@@ -217,7 +217,6 @@ namespace Tunti
 
 	PBRTextureMaps OpenGLTextureCache::CreateTextureMaps(const std::array<std::string, static_cast<uint16_t>(PBRTextureMap::COUNT)>& textureFiles)
 	{
-		stbi_set_flip_vertically_on_load(1);
 		PBRTextureMaps textureMaps = m_DefaultPBRTextureMaps;
 		textureMaps.Albedo = Texture2D(m_WhiteTexture.m_TextureHandle);
 		textureMaps.Normal = Texture2D(m_WhiteTexture.m_TextureHandle);
@@ -235,7 +234,7 @@ namespace Tunti
 				}
 				else
 				{
-					//std::filesystem::path(textureFile).extension().string() == ".tga" ? stbi_set_flip_vertically_on_load(0) : stbi_set_flip_vertically_on_load(1);
+					std::filesystem::path(textureFile).extension().string() == ".tga" ? stbi_set_flip_vertically_on_load(1) : stbi_set_flip_vertically_on_load(0);
 
 					TextureData data;
 					data.buffer = stbi_load(
@@ -265,7 +264,7 @@ namespace Tunti
 				}
 				else
 				{
-					//std::filesystem::path(textureFile).extension().string() == ".tga" ? stbi_set_flip_vertically_on_load(0) : stbi_set_flip_vertically_on_load(1);
+					std::filesystem::path(textureFile).extension().string() == ".tga" ? stbi_set_flip_vertically_on_load(1) : stbi_set_flip_vertically_on_load(0);
 
 					TextureData data;
 					data.buffer = stbi_load(
@@ -295,7 +294,7 @@ namespace Tunti
 				}
 				else
 				{
-					//std::filesystem::path(textureFile).extension().string() == ".tga" ? stbi_set_flip_vertically_on_load(0) : stbi_set_flip_vertically_on_load(1);
+					std::filesystem::path(textureFile).extension().string() == ".tga" ? stbi_set_flip_vertically_on_load(1) : stbi_set_flip_vertically_on_load(0);
 
 					TextureData data;
 					data.buffer = stbi_load(
@@ -325,7 +324,7 @@ namespace Tunti
 				}
 				else
 				{
-					//std::filesystem::path(textureFile).extension().string() == ".tga" ? stbi_set_flip_vertically_on_load(0) : stbi_set_flip_vertically_on_load(1);
+					std::filesystem::path(textureFile).extension().string() == ".tga" ? stbi_set_flip_vertically_on_load(1) : stbi_set_flip_vertically_on_load(0);
 
 					TextureData data;
 					data.buffer = stbi_load(
@@ -355,7 +354,7 @@ namespace Tunti
 				}
 				else
 				{
-					//std::filesystem::path(textureFile).extension().string() == ".tga" ? stbi_set_flip_vertically_on_load(0) : stbi_set_flip_vertically_on_load(1);
+					std::filesystem::path(textureFile).extension().string() == ".tga" ? stbi_set_flip_vertically_on_load(1) : stbi_set_flip_vertically_on_load(0);
 
 					TextureData data;
 					data.buffer = stbi_load(

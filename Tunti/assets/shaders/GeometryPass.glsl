@@ -31,15 +31,13 @@ uniform mat4 u_Model;
 
 void main()
 {
-	mat3 model = mat3(u_Model);
-
 	uint posIndex = gl_VertexID * 3;
-	VertexOut.WorldPosition = model * vec3(
+	VertexOut.WorldPosition = vec3(u_Model * vec4(
 		vertexBuffer.data[posIndex], 
 		vertexBuffer.data[posIndex + 1], 
-		vertexBuffer.data[posIndex + 2]);
+		vertexBuffer.data[posIndex + 2], 1.0f));
 
-	mat3 normalMatrix = transpose(inverse(model));
+	mat3 normalMatrix = transpose(inverse(mat3(u_Model)));
 	uint normalIndex = u_VertexCount * 3 + gl_VertexID * 3;
 	VertexOut.Normal = normalMatrix * vec3(
 		vertexBuffer.data[normalIndex], 
