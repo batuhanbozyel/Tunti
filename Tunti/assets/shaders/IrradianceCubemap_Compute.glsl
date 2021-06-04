@@ -7,7 +7,7 @@ const float Epsilon = 1e-5f;
 const uint NumSamples = 64 * 1024;
 const float InvNumSamples = 1.0f / float(NumSamples);
 
-layout(binding=0) uniform samplerCube inputTexture;
+layout(location = 0) uniform samplerCube u_InputTexture;
 layout(binding=0, rgba16f) restrict writeonly uniform imageCube outputTexture;
 
 float RadicalInverse_VdC(uint bits);
@@ -31,7 +31,7 @@ void main()
 		vec2 u  = SampleHammersley(i);
 		vec3 Li = TangentToWorld(SampleHemisphere(u.x, u.y), N, S, T);
 		float cosTheta = max(0.0, dot(Li, N));
-		irradiance += 2.0 * textureLod(inputTexture, Li, 0).rgb * cosTheta;
+		irradiance += 2.0 * textureLod(u_InputTexture, Li, 0).rgb * cosTheta;
 	}
 	irradiance /= vec3(NumSamples);
 

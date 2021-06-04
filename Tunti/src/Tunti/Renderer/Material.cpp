@@ -31,14 +31,17 @@ namespace Tunti
 			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return;
 			case RendererAPI::OpenGL:
 			{
-				uint32_t offset = Index * BaseMaterial->CalculateSize();
-				for (uint32_t i = 0; i < propertyIdx; i++)
+				if (Properties[propertyIdx].Value != value)
 				{
-					offset += Properties[i].ShaderAlignmentSize();
-				}
+					uint32_t offset = Index * BaseMaterial->CalculateSize();
+					for (uint32_t i = 0; i < propertyIdx; i++)
+					{
+						offset += Properties[i].ShaderAlignmentSize();
+					}
 
-				Properties[propertyIdx].Value = value;
-				(*OpenGLMaterialCache::GetInstance())[BaseMaterial->Index].SetValue(offset, Properties[propertyIdx].ValueSize(), &value);
+					Properties[propertyIdx].Value = value;
+					(*OpenGLMaterialCache::GetInstance())[BaseMaterial->Index].SetValue(offset, Properties[propertyIdx].ValueSize(), &value);
+				}
 				return;
 			}
 		}

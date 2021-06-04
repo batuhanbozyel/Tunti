@@ -11,36 +11,28 @@ namespace Tunti
 	};
 
 #pragma pack(push, 1)
-	struct Light
+	struct _DirectionalLight
 	{
-		// AttenuationFactors
-		float Intensity = 1.0f;
-		float Constant = 1.0f;
-		float Linear = 0.09f;
-		float Quadratic = 0.032f;
+		glm::mat4 ViewProjection{ 1.0f };
+		glm::vec4 DirectionAndIntensity{ 1.0f, 1.0f, 1.0f, 0.0f };
+		glm::vec4 Color{ 0.0f };
 
-		glm::vec3 Color{ 1.0f };
-		LightType Type = LightType::DirectionalLight;
-
-		Light() = default;
-		Light(const Light&) = default;
-		Light(LightType type)
-			: Type(type) {}
+		_DirectionalLight() = default;
+		_DirectionalLight(const glm::mat4& viewProj, const glm::vec3& direction, const glm::vec3& color, float intensity)
+			: ViewProjection(viewProj), DirectionAndIntensity(direction, intensity), Color(color, 1.0f) {}
 	};
 #pragma pack(pop)
 
 #pragma pack(push, 1)
-	struct LightData
+	struct _PointLight
 	{
-		Light _Light;
 		glm::vec4 Position{ 0.0f };
-		glm::vec3 Direction{ 0.0f };
-		float _Padding{ 0.0f };
+		glm::vec4 Color{1.0f};
+		glm::vec4 ConstantLinearQuadratic{1.0f, 0.09f, 0.032f, 0.0f};
 
-		LightData() = default;
-
-		LightData(const Light& light, const glm::vec3& position, const glm::vec3& direction)
-			: _Light(light), Position(glm::vec4(position, 0.0f)), Direction(direction) {}
+		_PointLight() = default;
+		_PointLight(const glm::vec3& position, const glm::vec3& color, float constant, float linear, float quadratic)
+			: Position(position, 1.0f), Color(color, 1.0f), ConstantLinearQuadratic(constant, linear, quadratic, 1.0f) {}
 	};
 #pragma pack(pop)
 }

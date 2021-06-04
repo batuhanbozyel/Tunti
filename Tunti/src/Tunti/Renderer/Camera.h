@@ -2,6 +2,20 @@
 
 namespace Tunti
 {
+#pragma pack(push, 1)
+	struct CameraBuffer
+	{
+		glm::mat4 View;
+		glm::mat4 Projection;
+		glm::mat4 InvView;
+		glm::mat4 InvProjection;
+		glm::vec3 Position;
+
+		CameraBuffer(const glm::mat4& view, const glm::mat4& proj, const glm::vec3& position)
+			: View(view), Projection(proj), InvView(glm::inverse(view)), InvProjection(glm::inverse(proj)), Position(position) {}
+	};
+#pragma pack(pop)
+
 	class Camera
 	{
 	public:

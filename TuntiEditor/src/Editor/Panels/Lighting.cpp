@@ -29,7 +29,7 @@ namespace TEditor
 				{
 					currentEnvironmentMapPath = path;
 					auto environmentMap = Tunti::TextureLibrary::LoadEnvironmentMap(currentEnvironmentMapPath);
-					Tunti::Renderer::SetEnvironmentMap(environmentMap);
+					Tunti::Renderer::SubmitEnvironmentMap(environmentMap);
 				}
 			}
 		});

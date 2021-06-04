@@ -116,10 +116,10 @@ namespace Tunti
 
 		if (uniform_count != 0)
 		{
-			GLint     max_name_len = 0;
+			GLint max_name_len = 0;
 			GLsizei length = 0;
 			GLsizei count = 0;
-			GLenum     type = GL_NONE;
+			GLenum type = GL_NONE;
 			glGetProgramiv(m_ShaderProgramHandle, GL_ACTIVE_UNIFORM_MAX_LENGTH, &max_name_len);
 
 			Scope<char[]> uniform_name = CreateScope<char[]>(max_name_len);

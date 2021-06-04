@@ -77,7 +77,7 @@ namespace Tunti
 				MaterialProperty{ShaderDataType::Texture2D, textureMaps.Roughness},
 				MaterialProperty{ShaderDataType::Texture2D, textureMaps.AmbientOcclusion},
 				MaterialProperty{ShaderDataType::Float, 1.0f},
-				MaterialProperty{ShaderDataType::Float, 1.0f}	
+				MaterialProperty{ShaderDataType::Float, 1.0f}
 			});
 		});
 		return material;

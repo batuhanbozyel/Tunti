@@ -36,10 +36,8 @@ namespace Tunti
 				if (camera.Primary)
 				{
 					mainCamera = &camera.Camera;
-					cameraView = glm::lookAt(
-						transform.Position,
-						transform.Position + transform.GetFrontDirection(),
-						transform.GetUpDirection());
+					cameraView = glm::inverse(glm::translate(glm::mat4(1.0f), transform.Position)
+						* glm::toMat4(glm::quat(glm::radians(transform.Rotation))));
 					cameraPosition = transform.Position;
 					break;
 				}
@@ -48,14 +46,26 @@ namespace Tunti
 
 		if (mainCamera)
 		{
-			Renderer::BeginScene(*mainCamera, cameraView, cameraPosition);
 			{
 				auto view = m_Registry.view<TransformComponent, LightComponent>();
 				for (auto entity : view)
 				{
 					auto& [light, transform] = view.get<LightComponent, TransformComponent>(entity);
 
-					Renderer::SubmitLight(light, transform.Position, -transform.GetFrontDirection());
+					if (light.Type == LightType::DirectionalLight)
+					{
+						glm::vec3 direction = transform.GetForwardDirection();
+						glm::mat4 viewProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 1000.0f) * glm::lookAt(
+							-direction * 1000.0f,
+							glm::vec3(0.0f, 0.0f, 0.0f),
+							transform.GetUpDirection()
+						);
+						Renderer::SubmitDirectionalLight(_DirectionalLight{ viewProjection, direction, light.Color, light.Intensity });
+					}
+					else if (light.Type == LightType::PointLight)
+					{
+						Renderer::SubmitPointLight(_PointLight{ transform.Position, light.Color, light.Constant, light.Linear, light.Quadratic });
+					}
 				}
 			}
 
@@ -71,21 +81,33 @@ namespace Tunti
 					}
 				}
 			}
-			Renderer::EndScene();
+			Renderer::DrawScene(*mainCamera, cameraView, cameraPosition);
 		}
 	}
 
 	void Scene::OnUpdateEditor(double dt, const EditorCamera& camera)
 	{
 		const glm::mat4& cameraView = camera.GetViewMatrix();
-		Renderer::BeginScene(camera, cameraView, camera.GetPosition());
 		{
 			auto view = m_Registry.view<TransformComponent, LightComponent>();
 			for (auto entity : view)
 			{
 				auto& [light, transform] = view.get<LightComponent, TransformComponent>(entity);
 
-				Renderer::SubmitLight(light, transform.Position, -transform.GetFrontDirection());
+				if (light.Type == LightType::DirectionalLight)
+				{
+					glm::vec3 direction = transform.GetForwardDirection();
+					glm::mat4 viewProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 1000.0f) * glm::lookAt(
+						-direction * 1000.0f,
+						glm::vec3(0.0f, 0.0f, 0.0f),
+						transform.GetUpDirection()
+					);
+					Renderer::SubmitDirectionalLight(_DirectionalLight{ viewProjection, direction, light.Color, light.Intensity });
+				}
+				else if (light.Type == LightType::PointLight)
+				{
+					Renderer::SubmitPointLight(_PointLight{ transform.Position, light.Color, light.Constant, light.Linear, light.Quadratic });
+				}
 			}
 		}
 
@@ -101,6 +123,6 @@ namespace Tunti
 				}
 			}
 		}
-		Renderer::EndScene();
+		Renderer::DrawScene(camera, cameraView, camera.GetPosition());
 	}
 }

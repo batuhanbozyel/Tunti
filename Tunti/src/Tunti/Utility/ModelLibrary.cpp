@@ -40,64 +40,49 @@ namespace Tunti
 			{
 				Submesh submesh;
 
-				bool shouldCreateNewMaterialInstance = false;
 				std::array<std::string, static_cast<uint32_t>(PBRTextureMap::COUNT)> texturePaths;
 				if (materials.size())
 				{
 					// Albedo
 					if (!materials[shape.mesh.material_ids[0]].diffuse_texname.empty()) {
 						texturePaths[static_cast<uint32_t>(PBRTextureMap::Albedo)] = fileDirectory + materials[shape.mesh.material_ids[0]].diffuse_texname;
-						shouldCreateNewMaterialInstance = true;
 					}
 
 					// Normal
 					if (!materials[shape.mesh.material_ids[0]].normal_texname.empty()) {
 						texturePaths[static_cast<uint32_t>(PBRTextureMap::Normal)] = fileDirectory + materials[shape.mesh.material_ids[0]].normal_texname;
-						shouldCreateNewMaterialInstance = true;
 					}
 					else if (!materials[shape.mesh.material_ids[0]].bump_texname.empty()) {
 						texturePaths[static_cast<uint32_t>(PBRTextureMap::Normal)] = fileDirectory + materials[shape.mesh.material_ids[0]].bump_texname;
-						shouldCreateNewMaterialInstance = true;
 					}
 
 					// Metalness
 					if (!materials[shape.mesh.material_ids[0]].metallic_texname.empty()) {
 						texturePaths[static_cast<uint32_t>(PBRTextureMap::Metalness)] = fileDirectory + materials[shape.mesh.material_ids[0]].metallic_texname;
-						shouldCreateNewMaterialInstance = true;
 					}
 					else if (!materials[shape.mesh.material_ids[0]].specular_texname.empty()) {
 						texturePaths[static_cast<uint32_t>(PBRTextureMap::Metalness)] = fileDirectory + materials[shape.mesh.material_ids[0]].specular_texname;
-						shouldCreateNewMaterialInstance = true;
 					}
 
 					// Roughness
 					if (!materials[shape.mesh.material_ids[0]].roughness_texname.empty()) {
 						texturePaths[static_cast<uint32_t>(PBRTextureMap::Roughness)] = fileDirectory + materials[shape.mesh.material_ids[0]].roughness_texname;
-						shouldCreateNewMaterialInstance = true;
 					}
 
 					// Ambient Occlusion
 					if (!materials[shape.mesh.material_ids[0]].ambient_texname.empty()) {
 						texturePaths[static_cast<uint32_t>(PBRTextureMap::AmbientOcclusion)] = fileDirectory + materials[shape.mesh.material_ids[0]].ambient_texname;
-						shouldCreateNewMaterialInstance = true;
 					}
 				}
 
 				Ref<MaterialInstance> materialInstance;
-				if (shouldCreateNewMaterialInstance)
-				{
-					PBRTextureMaps textureMaps = TextureLibrary::LoadTextureMaps(texturePaths);
-					materialInstance = MaterialLibrary::CreateInstanceFrom(pbrMaterial);
-					materialInstance->SetValue(PBRMaterial::AlbedoMap, textureMaps.Albedo);
-					materialInstance->SetValue(PBRMaterial::NormalMap, textureMaps.Normal);
-					materialInstance->SetValue(PBRMaterial::MetalnessMap, textureMaps.Metalness);
-					materialInstance->SetValue(PBRMaterial::RoughnessMap, textureMaps.Roughness);
-					materialInstance->SetValue(PBRMaterial::AmbientOcclusionMap, textureMaps.AmbientOcclusion);
-				}
-				else
-				{
-					materialInstance = MaterialLibrary::GetDefaultInstanceFrom(pbrMaterial);
-				}
+				PBRTextureMaps textureMaps = TextureLibrary::LoadTextureMaps(texturePaths);
+				materialInstance = MaterialLibrary::CreateInstanceFrom(pbrMaterial);
+				materialInstance->SetValue(PBRMaterial::AlbedoMap, textureMaps.Albedo);
+				materialInstance->SetValue(PBRMaterial::NormalMap, textureMaps.Normal);
+				materialInstance->SetValue(PBRMaterial::MetalnessMap, textureMaps.Metalness);
+				materialInstance->SetValue(PBRMaterial::RoughnessMap, textureMaps.Roughness);
+				materialInstance->SetValue(PBRMaterial::AmbientOcclusionMap, textureMaps.AmbientOcclusion);
 
 				for (const auto& index : shape.mesh.indices)
 				{

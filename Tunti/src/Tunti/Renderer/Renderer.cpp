@@ -42,9 +42,14 @@ namespace Tunti
 		s_Instance->RenderPasses.push_back(renderPass);
 	}
 
-	void Renderer::SubmitLight(const Light& light, const glm::vec3& position, const glm::vec3& direction)
+	void Renderer::SubmitDirectionalLight(const _DirectionalLight& directionalLight)
 	{
-		s_Instance->LightQueue.Lights[s_Instance->LightQueue.LightCount++] = LightData(light, position, direction);
+		s_Instance->LightQueue.DirectionalLight = directionalLight;
+	}
+
+	void Renderer::SubmitPointLight(const _PointLight& pointLight)
+	{
+		s_Instance->LightQueue.PointLights[s_Instance->LightQueue.PointLightCount++] = pointLight;
 	}
 
 	void Renderer::DrawMesh(const MeshBuffer& mesh, const SubmeshQueueElementList& submeshes, const glm::mat4& transform)
@@ -63,27 +68,20 @@ namespace Tunti
 		return s_Instance->GetFramebufferTexture();
 	}
 
-	void Renderer::BeginScene(const Camera& camera, const glm::mat4& view, const glm::vec3& position)
+	void Renderer::DrawScene(const Camera& camera, const glm::mat4& view, const glm::vec3& position)
 	{
 		s_Instance->BeginScene(camera, view, position);
-	}
 
-	void Renderer::EndScene()
-	{
 		for (const auto& renderPass : s_Instance->RenderPasses)
 			renderPass();
 
 		s_Instance->EndScene();
 		s_Instance->MeshQueue.clear();
-		s_Instance->LightQueue.LightCount = 0;
+		s_Instance->LightQueue.DirectionalLight = _DirectionalLight();
+		s_Instance->LightQueue.PointLightCount = 0;
 	}
 
-	void Renderer::SetSkybox(CubemapTexture skybox)
-	{
-		s_Instance->SetSkybox(skybox);
-	}
-
-	void Renderer::SetEnvironmentMap(EnvironmentMapTexture environmentMap)
+	void Renderer::SubmitEnvironmentMap(EnvironmentMapTexture environmentMap)
 	{
 		s_Instance->SetEnvironmentMap(environmentMap);
 	}

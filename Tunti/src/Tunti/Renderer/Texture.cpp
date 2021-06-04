@@ -48,46 +48,4 @@ namespace Tunti
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
 		return EnvironmentMapTexture();
 	}
-
-	CubemapTexture TextureLibrary::LoadCubemap(const std::string& folderPath,
-		const std::string& rightFace,
-		const std::string& leftFace,
-		const std::string& topFace,
-		const std::string& bottomFace,
-		const std::string& frontFace,
-		const std::string& backFace)
-	{
-		std::array<std::string, 6> cubemapTextures;
-		if (*folderPath.rbegin() == '/')
-		{
-			cubemapTextures = {
-				folderPath + rightFace,
-				folderPath + leftFace,
-				folderPath + topFace,
-				folderPath + bottomFace,
-				folderPath + frontFace,
-				folderPath + backFace
-			};
-		}
-		else
-		{
-			cubemapTextures = {
-				folderPath + "/" + rightFace,
-				folderPath + "/" + leftFace,
-				folderPath + "/" + topFace,
-				folderPath + "/" + bottomFace,
-				folderPath + "/" + frontFace,
-				folderPath + "/" + backFace
-			};
-		}
-
-		switch (Renderer::GetAPI())
-		{
-			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return CubemapTexture();
-			case RendererAPI::OpenGL: return OpenGLTextureCache::GetInstance()->CreateCubemap(cubemapTextures);
-		}
-
-		LOG_ASSERT(false, "RendererAPI initialization failed!");
-		return CubemapTexture();
-	}
 }

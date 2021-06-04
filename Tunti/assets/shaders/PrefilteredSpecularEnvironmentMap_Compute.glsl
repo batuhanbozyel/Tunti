@@ -7,11 +7,10 @@ const float Epsilon = 1e-5f;
 const uint NumSamples = 1024;
 const float InvNumSamples = 1.0f / float(NumSamples);
 
-const int NumMipLevels = 1;
-layout(binding = 0) uniform samplerCube inputTexture;
 layout(binding = 0, rgba16f) restrict writeonly uniform imageCube outputTexture;
 
-layout(location = 0) uniform float u_Roughness;
+layout(location = 0) uniform samplerCube u_InputTexture;
+layout(location = 1) uniform float u_Roughness;
 
 float RadicalInverse_VdC(uint bits);
 vec2 SampleHammersley(uint i);
@@ -30,7 +29,7 @@ void main()
 		return;
 	}
 	
-	vec2 inputSize = vec2(textureSize(inputTexture, 0));
+	vec2 inputSize = vec2(textureSize(u_InputTexture, 0));
 	float wt = 4.0 * PI / (6 * inputSize.x * inputSize.y);
 	
 	vec3 N = GetSamplingVector();
@@ -60,7 +59,7 @@ void main()
 
 			float mipLevel = max(0.5f * log2(ws / wt) + 1.0f, 0.0f);
 
-			color  += textureLod(inputTexture, Li, mipLevel).rgb * cosLi;
+			color  += textureLod(u_InputTexture, Li, mipLevel).rgb * cosLi;
 			weight += cosLi;
 		}
 	}

@@ -3,7 +3,7 @@
 const float PI = 3.141592f;
 const float TwoPI = 2.0f * PI;
 
-layout(binding = 0) uniform sampler2D inputTexture;
+layout(location = 0) uniform sampler2D u_InputTexture;
 layout(binding = 0, rgba16f) restrict writeonly uniform imageCube outputTexture;
 
 vec3 GetSamplingVector();
@@ -17,7 +17,7 @@ void main()
 	float phi   = atan(v.z, v.x);
 	float theta = acos(v.y);
 
-	vec4 color = texture(inputTexture, vec2(phi/TwoPI, theta/PI));
+	vec4 color = texture(u_InputTexture, vec2(phi/TwoPI, theta/PI));
 
 	imageStore(outputTexture, ivec3(gl_GlobalInvocationID), color);
 }
