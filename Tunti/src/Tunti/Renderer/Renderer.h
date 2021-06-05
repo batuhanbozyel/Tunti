@@ -47,7 +47,8 @@ namespace Tunti
 			uint32_t PointLightCount;
 		} LightQueue;
 #pragma pack(pop)
-		std::unordered_map<Ref<Material>, std::unordered_map<MeshBuffer, std::vector<MeshRenderQueueElement>>> MeshQueue;
+		using MeshQueueContainer = std::unordered_map<Ref<Material>, std::unordered_map<MeshBuffer, std::vector<MeshRenderQueueElement>>>;
+		MeshQueueContainer MeshQueue;
 	};
 
 	class Renderer final

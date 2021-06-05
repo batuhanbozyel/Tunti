@@ -6,6 +6,7 @@
 #include "OpenGLTexture.h"
 #include "OpenGLRenderer.h"
 #include "OpenGLMaterial.h"
+#include "OpenGLDrawParams.h"
 
 #include "Tunti/Core/Window.h"
 #include "Tunti/Core/Application.h"
@@ -39,35 +40,6 @@ namespace Tunti
 		}
 	}
 
-	struct DrawArraysIndirectCommand
-	{
-		GLuint Count;
-		GLuint PrimCount;
-		GLuint First;
-		GLuint BaseInstance;
-
-		DrawArraysIndirectCommand(GLuint count, GLuint primCount, GLuint first, GLuint baseInstance)
-			: Count(count), PrimCount(primCount), First(first), BaseInstance(baseInstance)
-		{
-
-		}
-	};
-
-	struct DrawElementsIndirectCommand
-	{
-		GLuint Count;
-		GLuint PrimCount;
-		GLuint FirstIndex;
-		GLuint BaseVertex;
-		GLuint BaseInstance;
-
-		DrawElementsIndirectCommand(GLuint count, GLuint primCount, GLuint firstIndex, GLuint baseVertex, GLuint baseInstance)
-			: Count(count), PrimCount(primCount), FirstIndex(firstIndex), BaseVertex(baseVertex), BaseInstance(baseInstance)
-		{
-
-		}
-	};
-
 	struct GeometryBuffer
 	{
 		GLuint Framebuffer;
@@ -87,7 +59,6 @@ namespace Tunti
 
 	struct OpenGLRendererData
 	{
-		GLuint VertexArray;
 		GLuint CameraUniformBuffer;
 		GLuint LightsUniformBuffer;
 
@@ -95,8 +66,8 @@ namespace Tunti
 		GLuint ScreenFramebufferColorAttachment;
 		uint32_t ScreenWidth = 1280, ScreenHeight = 720;
 
-		const DrawArraysIndirectCommand QuadIndirectCommand = DrawArraysIndirectCommand(3, 1, 0, 0);
-		const DrawArraysIndirectCommand CubeIndirectCommand = DrawArraysIndirectCommand(14, 1, 0, 0);
+		const DrawArraysIndirectParams QuadIndirectParams = DrawArraysIndirectParams(3, 1, 0, 0);
+		const DrawArraysIndirectParams CubeIndirectParams = DrawArraysIndirectParams(14, 1, 0, 0);
 	} static s_Data;
 
 	struct OpenGLDeferredRendererData
@@ -129,11 +100,7 @@ namespace Tunti
 
 		Log::Info(glGetString(GL_RENDERER));
 		Log::Info(glGetString(GL_VERSION));
-
 		Log::Trace("Context creation succeed!");
-
-		glCreateVertexArrays(1, &s_Data.VertexArray);
-		glBindVertexArray(s_Data.VertexArray);
 
 		glCreateBuffers(1, &s_Data.LightsUniformBuffer);
 		glNamedBufferStorage(s_Data.LightsUniformBuffer, sizeof(LightQueueContainer), nullptr, GL_DYNAMIC_STORAGE_BIT | GL_MAP_WRITE_BIT);
@@ -192,7 +159,6 @@ namespace Tunti
 	{
 		DestroyDeferredRenderer();
 
-		glDeleteVertexArrays(1, &s_Data.VertexArray);
 		glDeleteBuffers(1, &s_Data.LightsUniformBuffer);
 		glDeleteBuffers(1, &s_Data.CameraUniformBuffer);
 
@@ -278,7 +244,7 @@ namespace Tunti
 							const auto& [submeshes, _] = submeshQueueElementList;
 							for (const auto& submesh : submeshes)
 							{
-								DrawElementsIndirectCommand indirectCmd(submesh.Count, 1, submesh.BaseIndex, submesh.BaseVertex, 0);
+								DrawElementsIndirectParams indirectCmd(submesh.Count, 1, submesh.BaseIndex, submesh.BaseVertex, 0);
 								glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, &indirectCmd);
 							}
 						}
@@ -316,7 +282,7 @@ namespace Tunti
 
 						for (const auto& submesh : submeshes)
 						{
-							DrawElementsIndirectCommand indirectCmd(submesh.Count, 1, submesh.BaseIndex, submesh.BaseVertex, 0);
+							DrawElementsIndirectParams indirectCmd(submesh.Count, 1, submesh.BaseIndex, submesh.BaseVertex, 0);
 							glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, &indirectCmd);
 						}
 					}
@@ -334,7 +300,7 @@ namespace Tunti
 			glDepthMask(GL_FALSE);
 
 			s_DeferredData.PBRLightingPassShader->Bind();
-			glDrawArraysIndirect(GL_TRIANGLE_STRIP, &s_Data.QuadIndirectCommand);
+			glDrawArraysIndirect(GL_TRIANGLE_STRIP, &s_Data.QuadIndirectParams);
 		});
 
 		// Skybox Pass
@@ -349,7 +315,7 @@ namespace Tunti
 			glDepthFunc(GL_EQUAL);
 
 			s_DeferredData.SkyboxPassShader->Bind();
-			glDrawArraysIndirect(GL_TRIANGLE_STRIP, &s_Data.CubeIndirectCommand);
+			glDrawArraysIndirect(GL_TRIANGLE_STRIP, &s_Data.CubeIndirectParams);
 
 			glDepthRange(0.0f, 1.0f);
 			glDepthFunc(GL_LESS);
