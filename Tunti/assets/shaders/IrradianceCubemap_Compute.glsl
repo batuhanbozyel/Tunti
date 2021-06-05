@@ -8,7 +8,7 @@ const uint NumSamples = 64 * 1024;
 const float InvNumSamples = 1.0f / float(NumSamples);
 
 layout(location = 0) uniform samplerCube u_InputTexture;
-layout(binding=0, rgba16f) restrict writeonly uniform imageCube outputTexture;
+layout(binding=0, rgba32f) restrict writeonly uniform imageCube outputTexture;
 
 float RadicalInverse_VdC(uint bits);
 vec2 SampleHammersley(uint i);

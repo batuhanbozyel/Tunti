@@ -89,7 +89,7 @@ namespace Tunti
 
 		GLuint environmentMapTextureID;
 		glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &environmentMapTextureID);
-		glTextureStorage2D(environmentMapTextureID, CalculateMipMapLevels(kEnvMapSize, kEnvMapSize), GL_RGBA16F, kEnvMapSize, kEnvMapSize);
+		glTextureStorage2D(environmentMapTextureID, CalculateMipMapLevels(kEnvMapSize, kEnvMapSize), GL_RGBA32F, kEnvMapSize, kEnvMapSize);
 		glTextureParameteri(environmentMapTextureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTextureParameteri(environmentMapTextureID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTextureParameterf(environmentMapTextureID, GL_TEXTURE_MAX_ANISOTROPY_EXT, MaxAnisotropy);
@@ -103,7 +103,7 @@ namespace Tunti
 			glTextureParameteri(environmentMapEquirectengularTexture, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTextureParameteri(environmentMapEquirectengularTexture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTextureParameterf(environmentMapEquirectengularTexture, GL_TEXTURE_MAX_ANISOTROPY_EXT, MaxAnisotropy);
-			glTextureStorage2D(environmentMapEquirectengularTexture, 1, GL_RGB16F, environmentMapData.width, environmentMapData.height);
+			glTextureStorage2D(environmentMapEquirectengularTexture, 1, GL_RGB32F, environmentMapData.width, environmentMapData.height);
 			if (isHDR) {
 				glTextureSubImage2D(environmentMapEquirectengularTexture, 0, 0, 0, environmentMapData.width, environmentMapData.height, GL_RGB, GL_FLOAT, reinterpret_cast<const float*>(environmentMapData.buffer));
 			}
@@ -114,7 +114,7 @@ namespace Tunti
 			glUseProgram(equirectangularToCubemapShader);
 			glProgramUniform1i(equirectangularToCubemapShader, 0, RendererBindingTable::EmptyTextureUnitBase);
 			glBindTextureUnit(RendererBindingTable::EmptyTextureUnitBase, environmentMapEquirectengularTexture);
-			glBindImageTexture(0, environmentMapTextureID, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
+			glBindImageTexture(0, environmentMapTextureID, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 			glDispatchCompute(kEnvMapSize / 32, kEnvMapSize / 32, 6);
 
 			glDeleteTextures(1, &environmentMapEquirectengularTexture);
@@ -128,7 +128,7 @@ namespace Tunti
 
 			constexpr uint32_t levels = CalculateMipMapLevels(kEnvMapSize, kEnvMapSize);
 			glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_PrefilteredSpecularMapTextureID);
-			glTextureStorage2D(m_PrefilteredSpecularMapTextureID, levels, GL_RGBA16F, kEnvMapSize, kEnvMapSize);
+			glTextureStorage2D(m_PrefilteredSpecularMapTextureID, levels, GL_RGBA32F, kEnvMapSize, kEnvMapSize);
 			glTextureParameteri(m_PrefilteredSpecularMapTextureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 			glTextureParameteri(m_PrefilteredSpecularMapTextureID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTextureParameterf(m_PrefilteredSpecularMapTextureID, GL_TEXTURE_MAX_ANISOTROPY_EXT, MaxAnisotropy);
@@ -145,7 +145,7 @@ namespace Tunti
 			constexpr float deltaRoughness = 1.0f / glm::max(float(levels - 1), 1.0f);
 			for (int level = 1, size = kEnvMapSize / 2; level <= levels; ++level, size /= 2) {
 				const GLuint numGroups = glm::max(1, size / 32);
-				glBindImageTexture(0, m_PrefilteredSpecularMapTextureID, level, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
+				glBindImageTexture(0, m_PrefilteredSpecularMapTextureID, level, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 				glProgramUniform1f(prefilteredSpecularEnvironmentMapShader, 1, level * deltaRoughness);
 				glDispatchCompute(numGroups, numGroups, 6);
 			}
@@ -158,7 +158,7 @@ namespace Tunti
 			GLuint irradianceCubemapShader = OpenGLShaderCache::GetInstance()->LoadComputeShader(ShaderLibrary::ReadFile(RendererShaders::IrradianceCubemap));
 
 			glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_IrradianceMapTextureID);
-			glTextureStorage2D(m_IrradianceMapTextureID, 1, GL_RGBA16F, kIrradianceMapSize, kIrradianceMapSize);
+			glTextureStorage2D(m_IrradianceMapTextureID, 1, GL_RGBA32F, kIrradianceMapSize, kIrradianceMapSize);
 			glTextureParameteri(m_IrradianceMapTextureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTextureParameteri(m_IrradianceMapTextureID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTextureParameterf(m_IrradianceMapTextureID, GL_TEXTURE_MAX_ANISOTROPY_EXT, MaxAnisotropy);
@@ -166,7 +166,7 @@ namespace Tunti
 			glUseProgram(irradianceCubemapShader);
 			glProgramUniform1i(irradianceCubemapShader, 0, RendererBindingTable::EmptyTextureUnitBase);
 			glBindTextureUnit(RendererBindingTable::EmptyTextureUnitBase, m_PrefilteredSpecularMapTextureID);
-			glBindImageTexture(0, m_IrradianceMapTextureID, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
+			glBindImageTexture(0, m_IrradianceMapTextureID, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 			glDispatchCompute(kIrradianceMapSize / 32, kIrradianceMapSize / 32, 6);
 			glDeleteProgram(irradianceCubemapShader);
 		}
@@ -176,7 +176,7 @@ namespace Tunti
 			GLuint brdfLUTTextureShader = OpenGLShaderCache::GetInstance()->LoadComputeShader(ShaderLibrary::ReadFile(RendererShaders::BRDF_LUTTexture));
 
 			glCreateTextures(GL_TEXTURE_2D, 1, &m_BRDF_LUTTextureID);
-			glTextureStorage2D(m_BRDF_LUTTextureID, 1, GL_RG16F, kBRDF_LUTSize, kBRDF_LUTSize);
+			glTextureStorage2D(m_BRDF_LUTTextureID, 1, GL_RG32F, kBRDF_LUTSize, kBRDF_LUTSize);
 			glTextureParameteri(m_BRDF_LUTTextureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTextureParameteri(m_BRDF_LUTTextureID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTextureParameterf(m_BRDF_LUTTextureID, GL_TEXTURE_MAX_ANISOTROPY_EXT, MaxAnisotropy);
@@ -184,7 +184,7 @@ namespace Tunti
 			glTextureParameteri(m_BRDF_LUTTextureID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 			glUseProgram(brdfLUTTextureShader);
-			glBindImageTexture(0, m_BRDF_LUTTextureID, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16F);
+			glBindImageTexture(0, m_BRDF_LUTTextureID, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG32F);
 			glDispatchCompute(kBRDF_LUTSize / 32, kBRDF_LUTSize / 32, 1);
 			glDeleteProgram(brdfLUTTextureShader);
 		}

@@ -4,17 +4,17 @@ namespace Tunti
 {
 	struct ColorRGB
 	{
-		unsigned char Red;
-		unsigned char Green;
-		unsigned char Blue;
+		uint8_t Red;
+		uint8_t Green;
+		uint8_t Blue;
 	};
 
 	struct ColorRGBA
 	{
-		unsigned char Red;
-		unsigned char Green;
-		unsigned char Blue;
-		unsigned char Alpha;
+		uint8_t Red;
+		uint8_t Green;
+		uint8_t Blue;
+		uint8_t Alpha;
 	};
 
 	static constexpr uint32_t CalculateMipMapLevels(uint32_t width, uint32_t height)

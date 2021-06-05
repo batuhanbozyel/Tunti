@@ -24,7 +24,7 @@ namespace Tunti
 
 	void Scene::OnUpdateRuntime(double dt)
 	{
-		const Camera* mainCamera = nullptr;
+		const SceneCamera* mainCamera = nullptr;
 		glm::mat4 cameraView;
 		glm::vec3 cameraPosition;
 		{
@@ -55,11 +55,8 @@ namespace Tunti
 					if (light.Type == LightType::DirectionalLight)
 					{
 						glm::vec3 direction = transform.GetForwardDirection();
-						glm::mat4 viewProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 1000.0f) * glm::lookAt(
-							-direction * 1000.0f,
-							glm::vec3(0.0f, 0.0f, 0.0f),
-							transform.GetUpDirection()
-						);
+						glm::mat4 viewProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 7.5f)
+							* glm::lookAt(-direction * 10.0f, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 						Renderer::SubmitDirectionalLight(_DirectionalLight{ viewProjection, direction, light.Color, light.Intensity });
 					}
 					else if (light.Type == LightType::PointLight)
@@ -97,11 +94,8 @@ namespace Tunti
 				if (light.Type == LightType::DirectionalLight)
 				{
 					glm::vec3 direction = transform.GetForwardDirection();
-					glm::mat4 viewProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 1000.0f) * glm::lookAt(
-						-direction * 1000.0f,
-						glm::vec3(0.0f, 0.0f, 0.0f),
-						transform.GetUpDirection()
-					);
+					glm::mat4 viewProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 7.5f)
+						* glm::lookAt(-direction * 10.0f, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 					Renderer::SubmitDirectionalLight(_DirectionalLight{ viewProjection, direction, light.Color, light.Intensity });
 				}
 				else if (light.Type == LightType::PointLight)

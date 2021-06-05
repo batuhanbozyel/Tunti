@@ -7,7 +7,7 @@ const float Epsilon = 1e-5f;
 const uint NumSamples = 1024;
 const float InvNumSamples = 1.0f / float(NumSamples);
 
-layout(binding = 0, rg16f) restrict writeonly uniform image2D LUT;
+layout(binding = 0, rg32f) restrict writeonly uniform image2D LUT;
 
 float RadicalInverse_VdC(uint bits);
 vec2 SampleHammersley(uint i);

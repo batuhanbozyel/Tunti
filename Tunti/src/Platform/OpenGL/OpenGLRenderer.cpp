@@ -211,6 +211,8 @@ namespace Tunti
 		ConstructGBuffer();
 		ConstructShadowMapBuffer(1024);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glEnable(GL_CULL_FACE);
+		glEnable(GL_DEPTH_TEST);
 
 		glfwSetFramebufferSizeCallback(window, [](GLFWwindow*, int width, int height)
 		{
@@ -249,7 +251,7 @@ namespace Tunti
 		s_DeferredData.PBRLightingPassShader->SetUniformInt("u_SpecularCubemap", RendererBindingTable::PrefilterSpecularCubemapTextureUnit);
 		s_DeferredData.PBRLightingPassShader->SetUniformInt("u_IrradianceCubemap", RendererBindingTable::IrradianceCubemapTextureUnit);
 		s_DeferredData.PBRLightingPassShader->SetUniformInt("u_SpecularBRDF_LUT", RendererBindingTable::BRDF_LUTCubemapTextureUnit);
-		//s_DeferredData.PBRLightingPassShader->SetUniformInt("u_DirectionalLightShadowMap", RendererBindingTable::DirectionalLightShadowMapTextureUnit);
+		s_DeferredData.PBRLightingPassShader->SetUniformInt("u_DirectionalLightShadowMap", RendererBindingTable::DirectionalLightShadowMapTextureUnit);
 
 		s_DeferredData.SkyboxPassShader = shaderCache->LoadShaderProgram(RendererShaders::SkyboxPass);
 		s_DeferredData.SkyboxPassShader->SetUniformInt("u_Skybox", RendererBindingTable::PrefilterSpecularCubemapTextureUnit);
@@ -344,7 +346,6 @@ namespace Tunti
 			glCullFace(GL_FRONT);
 
 			glEnable(GL_DEPTH_TEST);
-			glDepthMask(GL_TRUE);
 			glDepthFunc(GL_EQUAL);
 
 			s_DeferredData.SkyboxPassShader->Bind();
@@ -352,6 +353,8 @@ namespace Tunti
 
 			glDepthRange(0.0f, 1.0f);
 			glDepthFunc(GL_LESS);
+			glDepthMask(GL_TRUE);
+
 			glCullFace(GL_BACK);
 		});
 	}
@@ -375,7 +378,7 @@ namespace Tunti
 		glCreateFramebuffers(1, &s_Data.ScreenFramebuffer);
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &s_Data.ScreenFramebufferColorAttachment);
-		glTextureStorage2D(s_Data.ScreenFramebufferColorAttachment, 1, GL_RGBA32F, s_Data.ScreenWidth, s_Data.ScreenHeight);
+		glTextureStorage2D(s_Data.ScreenFramebufferColorAttachment, 1, GL_RGB32F, s_Data.ScreenWidth, s_Data.ScreenHeight);
 		glTextureParameteri(s_Data.ScreenFramebufferColorAttachment, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTextureParameteri(s_Data.ScreenFramebufferColorAttachment, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glNamedFramebufferTexture(s_Data.ScreenFramebuffer, GL_COLOR_ATTACHMENT0, s_Data.ScreenFramebufferColorAttachment, 0);
@@ -394,21 +397,21 @@ namespace Tunti
 		}
 		glCreateFramebuffers(1, &s_DeferredData.GBuffer.Framebuffer);
 
-		// GBuffer Normal Pass
+		// GBuffer Normal Attachment
 		glCreateTextures(GL_TEXTURE_2D, 1, &s_DeferredData.GBuffer.NormalAttachment);
 		glTextureStorage2D(s_DeferredData.GBuffer.NormalAttachment, 1, GL_RGB16F, s_Data.ScreenWidth, s_Data.ScreenHeight);
 		glTextureParameteri(s_DeferredData.GBuffer.NormalAttachment, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTextureParameteri(s_DeferredData.GBuffer.NormalAttachment, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glNamedFramebufferTexture(s_DeferredData.GBuffer.Framebuffer, GL_COLOR_ATTACHMENT0, s_DeferredData.GBuffer.NormalAttachment, 0);
 
-		// GBuffer Albedo Pass
+		// GBuffer Albedo Attachment
 		glCreateTextures(GL_TEXTURE_2D, 1, &s_DeferredData.GBuffer.AlbedoAttachment);
 		glTextureStorage2D(s_DeferredData.GBuffer.AlbedoAttachment, 1, GL_RGB8, s_Data.ScreenWidth, s_Data.ScreenHeight);
 		glTextureParameteri(s_DeferredData.GBuffer.AlbedoAttachment, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTextureParameteri(s_DeferredData.GBuffer.AlbedoAttachment, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glNamedFramebufferTexture(s_DeferredData.GBuffer.Framebuffer, GL_COLOR_ATTACHMENT1, s_DeferredData.GBuffer.AlbedoAttachment, 0);
 
-		// GBuffer Albedo Pass
+		// GBuffer Material Attachment
 		glCreateTextures(GL_TEXTURE_2D, 1, &s_DeferredData.GBuffer.RoughnessMetalnessAOAttachment);
 		glTextureStorage2D(s_DeferredData.GBuffer.RoughnessMetalnessAOAttachment, 1, GL_RGB8, s_Data.ScreenWidth, s_Data.ScreenHeight);
 		glTextureParameteri(s_DeferredData.GBuffer.RoughnessMetalnessAOAttachment, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -418,6 +421,7 @@ namespace Tunti
 		const GLenum attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
 		glNamedFramebufferDrawBuffers(s_DeferredData.GBuffer.Framebuffer, 3, attachments);
 
+		// GBuffer Position Attachment
 		glCreateRenderbuffers(1, &s_DeferredData.GBuffer.DepthAttachment);
 		glNamedRenderbufferStorage(s_DeferredData.GBuffer.DepthAttachment, GL_DEPTH_COMPONENT32F, s_Data.ScreenWidth, s_Data.ScreenHeight);
 		glNamedFramebufferRenderbuffer(s_DeferredData.GBuffer.Framebuffer, GL_DEPTH_ATTACHMENT,	GL_RENDERBUFFER, s_DeferredData.GBuffer.DepthAttachment);
@@ -440,8 +444,8 @@ namespace Tunti
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &s_DeferredData.ShadowPass.ShadowMap);
 		glTextureStorage2D(s_DeferredData.ShadowPass.ShadowMap, 1, GL_DEPTH_COMPONENT32F, s_DeferredData.ShadowPass.Resolution, s_DeferredData.ShadowPass.Resolution);
-		glTextureParameteri(s_DeferredData.ShadowPass.ShadowMap, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTextureParameteri(s_DeferredData.ShadowPass.ShadowMap, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTextureParameteri(s_DeferredData.ShadowPass.ShadowMap, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTextureParameteri(s_DeferredData.ShadowPass.ShadowMap, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTextureParameteri(s_DeferredData.ShadowPass.ShadowMap, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
 		glTextureParameteri(s_DeferredData.ShadowPass.ShadowMap, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 		glTextureParameteri(s_DeferredData.ShadowPass.ShadowMap, GL_TEXTURE_WRAP_S, GL_REPEAT);

@@ -4,7 +4,7 @@ const float PI = 3.141592f;
 const float TwoPI = 2.0f * PI;
 
 layout(location = 0) uniform sampler2D u_InputTexture;
-layout(binding = 0, rgba16f) restrict writeonly uniform imageCube outputTexture;
+layout(binding = 0, rgba32f) restrict writeonly uniform imageCube outputTexture;
 
 vec3 GetSamplingVector();
 

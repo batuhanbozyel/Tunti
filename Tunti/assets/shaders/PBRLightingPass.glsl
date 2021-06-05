@@ -116,7 +116,7 @@ void main()
 	vec3 ambientLighting = CalculateAmbientLighting(R, NdotV, normal, F0, albedo, roughness, metalness);
 
     float shadow = CalculateDirectionalShadow(WorldToFragSpace(fragPos, directionalLight.ViewProjection));
-    vec3 color = ambientLighting * ambientOcclusion + directionalLighting; // * (1.0f - shadow);
+    vec3 color = ambientLighting * ambientOcclusion + directionalLighting * (1.0f - shadow);
     
     // HDR tonemapping
     color = color / (color + vec3(1.0f));
@@ -280,7 +280,7 @@ vec3 CalculateAmbientLighting(vec3 R, float NdotV, vec3 normal, vec3 F0, vec3 al
     vec2 specularBRDF = texture(u_SpecularBRDF_LUT, vec2(NdotV, roughness)).rg;
 
     // Total specular IBL contribution.
-    vec3 specularIBL = specularIrradiance * (F0 * specularBRDF.x + specularBRDF.y) ;
+    vec3 specularIBL = specularIrradiance * (F * specularBRDF.x + specularBRDF.y) ;
 
     // Total ambient lighting contribution.
     return (diffuseIBL + specularIBL);

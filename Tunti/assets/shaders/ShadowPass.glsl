@@ -36,7 +36,7 @@ void main()
     gl_Position = directionalLight.ViewProjection * u_Model * vec4(
 		vertexBuffer.data[posIndex], 
 		vertexBuffer.data[posIndex + 1], 
-		vertexBuffer.data[posIndex + 2], 1.0);
+		vertexBuffer.data[posIndex + 2], 1.0f);
 }
 
 #type fragment

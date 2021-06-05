@@ -18,8 +18,7 @@ layout(location = 0) out VertexInOut
 void main()
 {
     uint b = 1 << gl_VertexID;
-    vec3 pos = vec3((0x287a & b) != 0, (0x02af & b) != 0, (0x31e3 & b) != 0);
-    pos = pos - vec3(0.5f);
+    vec3 pos = vec3((0x287a & b) != 0, (0x02af & b) != 0, (0x31e3 & b) != 0) - vec3(0.5f);
     gl_Position = Camera.Projection * Camera.View * vec4(pos + Camera.Position, 1.0f);
     VertexOut.WorldPosition = pos;
 }

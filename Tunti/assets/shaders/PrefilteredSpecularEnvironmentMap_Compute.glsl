@@ -7,7 +7,7 @@ const float Epsilon = 1e-5f;
 const uint NumSamples = 1024;
 const float InvNumSamples = 1.0f / float(NumSamples);
 
-layout(binding = 0, rgba16f) restrict writeonly uniform imageCube outputTexture;
+layout(binding = 0, rgba32f) restrict writeonly uniform imageCube outputTexture;
 
 layout(location = 0) uniform samplerCube u_InputTexture;
 layout(location = 1) uniform float u_Roughness;
