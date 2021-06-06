@@ -11,7 +11,7 @@ void main()
     float x = -1.0f + float((gl_VertexID & 1) << 2);
 	float y = -1.0f + float((gl_VertexID & 2) << 1);
     VertexOut.TexCoord = vec2((x + 1.0f) * 0.5f, (y + 1.0f) * 0.5f);
-	gl_Position = vec4(x, -y, 0.0f, 1.0f);
+	gl_Position = vec4(x, y, 0.0f, 1.0f);
 }
 
 #type fragment

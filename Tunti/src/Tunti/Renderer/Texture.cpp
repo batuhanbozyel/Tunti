@@ -1,8 +1,10 @@
 #include "pch.h"
+#include <glad/glad.h>
+
 #include "Texture.h"
 #include "Renderer.h"
 
-#include <glad/glad.h>
+#include "Tunti/Core/Application.h"
 #include "Platform/OpenGL/OpenGLTexture.h"
 
 namespace Tunti
@@ -10,10 +12,10 @@ namespace Tunti
 
 	PBRTextureMaps TextureLibrary::DefaultPBRTextureMaps()
 	{
-		switch (Renderer::GetAPI())
+		switch (Application::GetRenderAPI())
 		{
-			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return PBRTextureMaps();
-			case RendererAPI::OpenGL: return OpenGLTextureCache::GetInstance()->DefaultPBRTextureMaps();
+			case RenderAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return PBRTextureMaps();
+			case RenderAPI::OpenGL: return OpenGLTextureCache::GetInstance()->DefaultPBRTextureMaps();
 		}
 
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
@@ -27,10 +29,10 @@ namespace Tunti
 
 	PBRTextureMaps TextureLibrary::LoadTextureMaps(const std::array<std::string, static_cast<uint16_t>(PBRTextureMap::COUNT)>& textureFiles)
 	{
-		switch (Renderer::GetAPI())
+		switch (Application::GetRenderAPI())
 		{
-			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return PBRTextureMaps();
-			case RendererAPI::OpenGL: return OpenGLTextureCache::GetInstance()->CreateTextureMaps(textureFiles);
+			case RenderAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return PBRTextureMaps();
+			case RenderAPI::OpenGL: return OpenGLTextureCache::GetInstance()->CreateTextureMaps(textureFiles);
 		}
 
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
@@ -39,10 +41,10 @@ namespace Tunti
 
 	EnvironmentMapTexture TextureLibrary::LoadEnvironmentMap(const std::string& path)
 	{
-		switch (Renderer::GetAPI())
+		switch (Application::GetRenderAPI())
 		{
-			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return EnvironmentMapTexture();
-			case RendererAPI::OpenGL: return OpenGLTextureCache::GetInstance()->CreateEnvironmentMap(path);
+			case RenderAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return EnvironmentMapTexture();
+			case RenderAPI::OpenGL: return OpenGLTextureCache::GetInstance()->CreateEnvironmentMap(path);
 		}
 
 		LOG_ASSERT(false, "RendererAPI initialization failed!");

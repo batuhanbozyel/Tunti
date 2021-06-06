@@ -2,6 +2,7 @@
 #include "Material.h"
 #include "Renderer.h"
 
+#include "Tunti/Core/Application.h"
 #include "Platform/OpenGL/OpenGLMaterial.h"
 
 namespace Tunti
@@ -26,10 +27,10 @@ namespace Tunti
 	
 	void MaterialInstance::SetValue(uint32_t propertyIdx, const MaterialPropertyValue& value)
 	{
-		switch (Renderer::GetAPI())
+		switch (Application::GetRenderAPI())
 		{
-			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return;
-			case RendererAPI::OpenGL:
+			case RenderAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return;
+			case RenderAPI::OpenGL:
 			{
 				if (Properties[propertyIdx].Value != value)
 				{
@@ -59,10 +60,10 @@ namespace Tunti
 
 	Ref<Material> MaterialLibrary::PBRMaterial()
 	{
-		switch (Renderer::GetAPI())
+		switch (Application::GetRenderAPI())
 		{
-			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
-			case RendererAPI::OpenGL: return OpenGLMaterialCache::GetInstance()->PBRMaterial();
+			case RenderAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
+			case RenderAPI::OpenGL: return OpenGLMaterialCache::GetInstance()->PBRMaterial();
 		}
 
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
@@ -71,10 +72,10 @@ namespace Tunti
 
 	Ref<Material> MaterialLibrary::CreateMaterial(const std::initializer_list<MaterialProperty>& props)
 	{
-		switch (Renderer::GetAPI())
+		switch (Application::GetRenderAPI())
 		{
-			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
-			case RendererAPI::OpenGL: return OpenGLMaterialCache::GetInstance()->CreateMaterial(props);
+			case RenderAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
+			case RenderAPI::OpenGL: return OpenGLMaterialCache::GetInstance()->CreateMaterial(props);
 		}
 
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
@@ -83,10 +84,10 @@ namespace Tunti
 
 	Ref<MaterialInstance> MaterialLibrary::GetDefaultInstanceFrom(const Ref<Material>& material)
 	{
-		switch (Renderer::GetAPI())
+		switch (Application::GetRenderAPI())
 		{
-			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
-			case RendererAPI::OpenGL: return OpenGLMaterialCache::GetInstance()->GetDefaultInstanceFrom(material);
+			case RenderAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
+			case RenderAPI::OpenGL: return OpenGLMaterialCache::GetInstance()->GetDefaultInstanceFrom(material);
 		}
 
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
@@ -95,10 +96,10 @@ namespace Tunti
 
 	Ref<MaterialInstance> MaterialLibrary::CreateInstanceFrom(const Ref<Material>& material)
 	{
-		switch (Renderer::GetAPI())
+		switch (Application::GetRenderAPI())
 		{
-			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
-			case RendererAPI::OpenGL: return OpenGLMaterialCache::GetInstance()->CreateInstanceFrom(material);
+			case RenderAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
+			case RenderAPI::OpenGL: return OpenGLMaterialCache::GetInstance()->CreateInstanceFrom(material);
 		}
 
 		LOG_ASSERT(false, "RendererAPI initialization failed!");

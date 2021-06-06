@@ -71,10 +71,10 @@ namespace TEditor
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 		}
 
-		switch (Tunti::Renderer::GetAPI())
+		switch (Tunti::Application::GetRenderAPI())
 		{
-			case Tunti::RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); break;
-			case Tunti::RendererAPI::OpenGL:
+			case Tunti::RenderAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); break;
+			case Tunti::RenderAPI::OpenGL:
 			{
 				m_EditorAPI = Tunti::CreateScope<OpenGLEditor>();
 				break;

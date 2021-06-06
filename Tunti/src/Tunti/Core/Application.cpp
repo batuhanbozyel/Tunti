@@ -13,8 +13,6 @@ namespace Tunti
 			m_Running = true;
 			Log::Init();
 
-			Renderer::API = RendererAPI::OpenGL;
-
 			WindowProps windowProps(appName);
 			windowProps.EventCallback = BIND_EVENT_FN(OnEvent);
 			m_Window = CreateScope<Window>(windowProps, flag);
@@ -28,6 +26,7 @@ namespace Tunti
 	Application::~Application()
 	{
 		Log::Trace("Application terminating!");
+		Renderer::Destroy();
 		s_Instance = nullptr;
 	}
 
@@ -102,6 +101,7 @@ namespace Tunti
 	bool Application::OnWindowResize(WindowResizeEvent& e)
 	{
 		m_Window->OnWindowResize(e);
+		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
 		return true;
 	}
 
@@ -121,4 +121,5 @@ namespace Tunti
 	}
 
 	Application* Application::s_Instance = nullptr;
+	RenderAPI Application::s_RenderAPI = RenderAPI::OpenGL;
 }

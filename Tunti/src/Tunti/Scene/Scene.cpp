@@ -57,11 +57,11 @@ namespace Tunti
 						glm::vec3 direction = transform.GetForwardDirection();
 						glm::mat4 viewProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 7.5f)
 							* glm::lookAt(-direction * 10.0f, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-						Renderer::SubmitDirectionalLight(_DirectionalLight{ viewProjection, direction, light.Color, light.Intensity });
+						Renderer::GetRenderPipeline()->SubmitDirectionalLight(_DirectionalLight{ viewProjection, direction, light.Color, light.Intensity });
 					}
 					else if (light.Type == LightType::PointLight)
 					{
-						Renderer::SubmitPointLight(_PointLight{ transform.Position, light.Color, light.Constant, light.Linear, light.Quadratic });
+						Renderer::GetRenderPipeline()->SubmitPointLight(_PointLight{ transform.Position, light.Color, light.Constant, light.Linear, light.Quadratic });
 					}
 				}
 			}
@@ -74,17 +74,17 @@ namespace Tunti
 
 					if (meshRenderer._Mesh.IsValid)
 					{
-						Renderer::DrawMesh(meshRenderer._Mesh, { meshRenderer.Submeshes, meshRenderer.Materials }, transform);
+						Renderer::GetRenderPipeline()->SubmitMesh(meshRenderer._Mesh, { meshRenderer.Submeshes, meshRenderer.Materials }, transform);
 					}
 				}
 			}
-			Renderer::DrawScene(*mainCamera, cameraView, cameraPosition);
+			Texture2D frame = Renderer::GetRenderPipeline()->Execute(ShaderCameraContainer{ cameraView, mainCamera->GetProjection(), cameraPosition });
+			Renderer::OutputToScreenFramebuffer(frame);
 		}
 	}
 
-	void Scene::OnUpdateEditor(double dt, const EditorCamera& camera)
+	Texture2D Scene::OnUpdateEditor(double dt, const EditorCamera& camera)
 	{
-		const glm::mat4& cameraView = camera.GetViewMatrix();
 		{
 			auto view = m_Registry.view<TransformComponent, LightComponent>();
 			for (auto entity : view)
@@ -96,11 +96,11 @@ namespace Tunti
 					glm::vec3 direction = transform.GetForwardDirection();
 					glm::mat4 viewProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 7.5f)
 						* glm::lookAt(-direction * 10.0f, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-					Renderer::SubmitDirectionalLight(_DirectionalLight{ viewProjection, direction, light.Color, light.Intensity });
+					Renderer::GetRenderPipeline()->SubmitDirectionalLight(_DirectionalLight{ viewProjection, direction, light.Color, light.Intensity });
 				}
 				else if (light.Type == LightType::PointLight)
 				{
-					Renderer::SubmitPointLight(_PointLight{ transform.Position, light.Color, light.Constant, light.Linear, light.Quadratic });
+					Renderer::GetRenderPipeline()->SubmitPointLight(_PointLight{ transform.Position, light.Color, light.Constant, light.Linear, light.Quadratic });
 				}
 			}
 		}
@@ -113,10 +113,10 @@ namespace Tunti
 
 				if (meshRenderer._Mesh.IsValid)
 				{
-					Renderer::DrawMesh(meshRenderer._Mesh, { meshRenderer.Submeshes, meshRenderer.Materials }, transform);
+					Renderer::GetRenderPipeline()->SubmitMesh(meshRenderer._Mesh, { meshRenderer.Submeshes, meshRenderer.Materials }, transform);
 				}
 			}
 		}
-		Renderer::DrawScene(camera, cameraView, camera.GetPosition());
+		return Renderer::GetRenderPipeline()->Execute(ShaderCameraContainer{ camera.GetViewMatrix(), camera.GetProjection(), camera.GetPosition() });
 	}
 }

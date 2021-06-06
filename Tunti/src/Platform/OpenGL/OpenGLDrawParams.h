@@ -30,4 +30,7 @@ namespace Tunti
 
 		}
 	};
+
+	const DrawArraysIndirectParams QuadIndirectParams = DrawArraysIndirectParams(3, 1, 0, 0);
+	const DrawArraysIndirectParams CubeIndirectParams = DrawArraysIndirectParams(14, 1, 0, 0);
 }

@@ -40,6 +40,7 @@ namespace Tunti
 
 		PBRTextureMaps DefaultPBRTextureMaps() const { return m_DefaultPBRTextureMaps; }
 		PBRTextureMaps CreateTextureMaps(const std::array<std::string, static_cast<uint16_t>(PBRTextureMap::COUNT)>& textureFiles);
+
 		EnvironmentMapTexture CreateEnvironmentMap(const std::string& textureFile);
 
 		void Flush();
@@ -60,8 +61,8 @@ namespace Tunti
 		OpenGLTexture2D m_WhiteTexture;
 		OpenGLTexture2D m_NormalTexture;
 		PBRTextureMaps m_DefaultPBRTextureMaps;
-		std::unordered_map<std::string, Scope<OpenGLTexture2D>> m_Textures;
-		std::unordered_map<std::string, Scope<OpenGLEnvironmentMapTexture>> m_EnvironmentMaps;
+		std::unordered_map<std::string, Ref<OpenGLTexture2D>> m_Textures;
+		std::unordered_map<std::string, Ref<OpenGLEnvironmentMapTexture>> m_EnvironmentMaps;
 
 		static inline OpenGLTextureCache* s_Instance = nullptr;
 	};

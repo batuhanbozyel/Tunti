@@ -27,6 +27,7 @@ namespace Tunti
 
 	namespace RendererShaders
 	{
+		static constexpr char* FullscreenTriangle = "../Tunti/assets/shaders/FullscreenTriangle.glsl";
 		static constexpr char* ShadowPass = "../Tunti/assets/shaders/ShadowPass.glsl";
 		static constexpr char* GeometryPass = "../Tunti/assets/shaders/GeometryPass.glsl";
 		static constexpr char* PBRLightingPass = "../Tunti/assets/shaders/PBRLightingPass.glsl";

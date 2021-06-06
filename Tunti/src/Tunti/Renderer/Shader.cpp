@@ -4,8 +4,7 @@
 
 #include <glad/glad.h>
 #include "Platform/OpenGL/OpenGLShader.h"
-
-#include <fstream>
+#include "Tunti/Core/Application.h"
 
 namespace Tunti
 {
@@ -41,10 +40,10 @@ namespace Tunti
 	{
 		const std::string& source = ReadFile(filePath);
 
-		switch (Renderer::GetAPI())
+		switch (Application::GetRenderAPI())
 		{
-			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return Shader();
-			case RendererAPI::OpenGL: return OpenGLShaderCache::GetInstance()->LoadShaderProgram(filePath, source);
+			case RenderAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return Shader();
+			case RenderAPI::OpenGL: return OpenGLShaderCache::GetInstance()->LoadShaderProgram(filePath, source);
 		}
 
 		LOG_ASSERT(false, "RendererAPI is not specified!");
@@ -53,10 +52,10 @@ namespace Tunti
 
 	Shader ShaderLibrary::LoadShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
 	{
-		switch (Renderer::GetAPI())
+		switch (Application::GetRenderAPI())
 		{
-			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return Shader();
-			case RendererAPI::OpenGL: return OpenGLShaderCache::GetInstance()->LoadShaderProgram(name, vertexSrc, fragmentSrc);
+			case RenderAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return Shader();
+			case RenderAPI::OpenGL: return OpenGLShaderCache::GetInstance()->LoadShaderProgram(name, vertexSrc, fragmentSrc);
 		}
 
 		LOG_ASSERT(false, "RendererAPI is not specified!");
@@ -67,10 +66,10 @@ namespace Tunti
 	{
 		const std::string& source = ReadFile(filePath);
 
-		switch (Renderer::GetAPI())
+		switch (Application::GetRenderAPI())
 		{
-			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return Shader();
-			case RendererAPI::OpenGL: return OpenGLShaderCache::GetInstance()->LoadComputeShader(source);
+			case RenderAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return Shader();
+			case RenderAPI::OpenGL: return OpenGLShaderCache::GetInstance()->LoadComputeShader(source);
 		}
 
 		LOG_ASSERT(false, "RendererAPI is not specified!");
