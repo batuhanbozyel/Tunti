@@ -35,27 +35,10 @@ namespace Tunti
 			return ShaderDataType::Size(Type);
 		}
 
-		constexpr const void* GetPropertyValue() const
+		template<class T>
+		constexpr T GetValue() const
 		{
-			switch (Type)
-			{
-				case ShaderDataType::Float:		return &std::get<float>(Value);
-				case ShaderDataType::Float2:	return &std::get<glm::vec2>(Value);
-				case ShaderDataType::Float3:	return &std::get<glm::vec3>(Value);
-				case ShaderDataType::Float4:	return &std::get<glm::vec4>(Value);
-				case ShaderDataType::Mat3:		return &std::get<glm::mat3>(Value);
-				case ShaderDataType::Mat4:		return &std::get<glm::mat4>(Value);
-				case ShaderDataType::Int:		return &std::get<int>(Value);
-				case ShaderDataType::Int2:		return &std::get<glm::ivec2>(Value);
-				case ShaderDataType::Int3:		return &std::get<glm::ivec3>(Value);
-				case ShaderDataType::Int4:		return &std::get<glm::ivec4>(Value);
-				case ShaderDataType::UInt:		return &std::get<uint32_t>(Value);
-				case ShaderDataType::UInt2:		return &std::get<glm::uvec2>(Value);
-				case ShaderDataType::UInt3:		return &std::get<glm::uvec3>(Value);
-				case ShaderDataType::UInt4:		return &std::get<glm::uvec4>(Value);
-				case ShaderDataType::Bool:		return &std::get<bool>(Value);
-				case ShaderDataType::Texture2D:	return &std::get<uint64_t>(Value);
-			}
+			return std::get<T>(Value);
 		}
 
 		explicit constexpr MaterialProperty(decltype(ShaderDataType::Float) type, const MaterialPropertyValue& defaultValue)

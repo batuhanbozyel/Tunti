@@ -83,12 +83,15 @@ namespace TEditor
 
 			Utils::DrawComponent<Tunti::MeshRendererComponent>("Mesh Renderer", selectedEntity, [](auto& component)
 			{
-				float metalness = *(float*)(component.Materials[0]->Properties[(uint32_t)Tunti::PBRMaterial::Metalness].GetPropertyValue());
-				float roughness = *(float*)(component.Materials[0]->Properties[(uint32_t)Tunti::PBRMaterial::Roughness].GetPropertyValue());
+				glm::vec4 albedo = component.Materials[0]->Properties[(uint32_t)Tunti::PBRMaterial::Albedo].GetValue<glm::vec4>();
+				float metalness = component.Materials[0]->Properties[(uint32_t)Tunti::PBRMaterial::Metalness].GetValue<float>();
+				float roughness = component.Materials[0]->Properties[(uint32_t)Tunti::PBRMaterial::Roughness].GetValue<float>();
 
+				ImGui::ColorEdit4("Albedo", glm::value_ptr(albedo));
 				Utils::DrawFloatControl("Metalness", metalness, 1.0f, { 0.0f, 1.0f }, 0.005f);
 				Utils::DrawFloatControl("Roughness", roughness, 1.0f, { 0.0f, 1.0f }, 0.005f);
 
+				component.Materials[0]->SetValue((uint32_t)Tunti::PBRMaterial::Albedo, albedo);
 				component.Materials[0]->SetValue((uint32_t)Tunti::PBRMaterial::Metalness, metalness);
 				component.Materials[0]->SetValue((uint32_t)Tunti::PBRMaterial::Roughness, roughness);
 			});

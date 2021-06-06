@@ -36,7 +36,7 @@ namespace Tunti
 			std::byte* instanceBufferIt = reinterpret_cast<std::byte*>(instanceBuffer);
 			for (const auto& prop : m_Material->Properties)
 			{
-				memcpy(instanceBufferIt + offset, prop.GetPropertyValue(), prop.ValueSize());
+				memcpy(instanceBufferIt + offset, &prop.Value, prop.ValueSize());
 				offset += prop.ValueSize();
 			}
 			glNamedBufferSubData(m_Buffer, m_InstanceCount * materialSize, materialSize, instanceBuffer);
