@@ -34,7 +34,26 @@ namespace Tunti
 		glMakeTextureHandleResidentARB(m_TextureHandle);
 	}
 
-	OpenGLTexture2D::OpenGLTexture2D(const std::array<unsigned char, 4>& color)
+	OpenGLTexture2D::OpenGLTexture2D(const ColorRGB& color)
+	{
+		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &MaxAnisotropy);
+		glCreateTextures(GL_TEXTURE_2D, 1, &m_TextureID);
+
+		glTextureParameteri(m_TextureID, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTextureParameteri(m_TextureID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		glTextureParameteri(m_TextureID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTextureParameteri(m_TextureID, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+		glTextureParameterf(m_TextureID, GL_TEXTURE_MAX_ANISOTROPY_EXT, MaxAnisotropy);
+
+		glTextureStorage2D(m_TextureID, 1, GL_RGB8, 1, 1);
+		glTextureSubImage2D(m_TextureID, 0, 0, 0, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, &color);
+
+		m_TextureHandle = glGetTextureHandleARB(m_TextureID);
+		glMakeTextureHandleResidentARB(m_TextureHandle);
+	}
+
+	OpenGLTexture2D::OpenGLTexture2D(const ColorRGBA& color)
 	{
 		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &MaxAnisotropy);
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_TextureID);
@@ -47,7 +66,7 @@ namespace Tunti
 		glTextureParameterf(m_TextureID, GL_TEXTURE_MAX_ANISOTROPY_EXT, MaxAnisotropy);
 
 		glTextureStorage2D(m_TextureID, 1, GL_RGBA8, 1, 1);
-		glTextureSubImage2D(m_TextureID, 0, 0, 0, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color.data());
+		glTextureSubImage2D(m_TextureID, 0, 0, 0, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &color);
 
 		m_TextureHandle = glGetTextureHandleARB(m_TextureID);
 		glMakeTextureHandleResidentARB(m_TextureHandle);
@@ -59,45 +78,21 @@ namespace Tunti
 		glDeleteTextures(1, &m_TextureID);
 	}
 
-	// OpenGLCubemapTexture
-
-	OpenGLCubemapTexture::OpenGLCubemapTexture(const std::array<TextureData, 6>& cubemapData)
-	{
-		glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_TextureID);
-
-		glTextureStorage2D(m_TextureID, 1, GL_RGBA8, cubemapData[0].height, cubemapData[0].height);
-
-		glTextureParameteri(m_TextureID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTextureParameteri(m_TextureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-		glTextureParameteri(m_TextureID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTextureParameteri(m_TextureID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTextureParameteri(m_TextureID, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-		for (uint32_t i = 0; i < 6; i++)
-			glTextureSubImage3D(m_TextureID, 0, 0, 0, i, cubemapData[i].height, cubemapData[i].height, 1, GL_RGBA, GL_UNSIGNED_BYTE, cubemapData[i].buffer);
-	}
-
-	OpenGLCubemapTexture::~OpenGLCubemapTexture()
-	{
-		glDeleteTextures(1, &m_TextureID);
-	}
-
 	// OpenGLEnvironmentMapTexture
 
-	OpenGLEnvironmentMapTexture::OpenGLEnvironmentMapTexture(const EnvironmentMapData& environmentMapData)
+	OpenGLEnvironmentMapTexture::OpenGLEnvironmentMapTexture(const TextureData& environmentMapData, bool isHDR)
 	{
-		static constexpr uint32_t envMapSize = 1024;
-		static constexpr uint32_t irradianceMapSize = 32;
-		static constexpr uint32_t brdfToLUTSize = 256;
-		static constexpr uint32_t mipmapLevels = CalculateMipMapLevels(envMapSize, envMapSize);
+		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+		static constexpr uint32_t kEnvMapSize = 1024;
+		static constexpr uint32_t kIrradianceMapSize = 32;
+		static constexpr uint32_t kBRDF_LUTSize = 256;
 
-		GLuint environmentMapTextureUnfiltered;
-		glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &environmentMapTextureUnfiltered);
-		glTextureStorage2D(environmentMapTextureUnfiltered, mipmapLevels, GL_RGBA16F, envMapSize, envMapSize);
-		glTextureParameteri(environmentMapTextureUnfiltered, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTextureParameteri(environmentMapTextureUnfiltered, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTextureParameterf(environmentMapTextureUnfiltered, GL_TEXTURE_MAX_ANISOTROPY_EXT, MaxAnisotropy);
+		GLuint environmentMapTextureID;
+		glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &environmentMapTextureID);
+		glTextureStorage2D(environmentMapTextureID, CalculateMipMapLevels(kEnvMapSize, kEnvMapSize), GL_RGBA32F, kEnvMapSize, kEnvMapSize);
+		glTextureParameteri(environmentMapTextureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTextureParameteri(environmentMapTextureID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTextureParameterf(environmentMapTextureID, GL_TEXTURE_MAX_ANISOTROPY_EXT, MaxAnisotropy);
 
 		// Load & convert equirectangular environment map to a cubemap texture.
 		{
@@ -105,134 +100,138 @@ namespace Tunti
 
 			GLuint environmentMapEquirectengularTexture;
 			glCreateTextures(GL_TEXTURE_2D, 1, &environmentMapEquirectengularTexture);
-			glTextureParameteri(environmentMapEquirectengularTexture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTextureParameteri(environmentMapEquirectengularTexture, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTextureParameteri(environmentMapEquirectengularTexture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTextureParameterf(environmentMapEquirectengularTexture, GL_TEXTURE_MAX_ANISOTROPY_EXT, MaxAnisotropy);
-			glTextureStorage2D(environmentMapEquirectengularTexture, 1, GL_RGB16F, environmentMapData.width, environmentMapData.height);
-			glTextureSubImage2D(environmentMapEquirectengularTexture, 0, 0, 0, environmentMapData.width, environmentMapData.height, GL_RGB, GL_FLOAT, environmentMapData.buffer);
+			glTextureStorage2D(environmentMapEquirectengularTexture, 1, GL_RGB32F, environmentMapData.width, environmentMapData.height);
+			if (isHDR) {
+				glTextureSubImage2D(environmentMapEquirectengularTexture, 0, 0, 0, environmentMapData.width, environmentMapData.height, GL_RGB, GL_FLOAT, reinterpret_cast<const float*>(environmentMapData.buffer));
+			}
+			else {
+				glTextureSubImage2D(environmentMapEquirectengularTexture, 0, 0, 0, environmentMapData.width, environmentMapData.height, GL_RGB, GL_UNSIGNED_BYTE, environmentMapData.buffer);
+			}
 
 			glUseProgram(equirectangularToCubemapShader);
-			glBindTextureUnit(0, environmentMapEquirectengularTexture);
-			glBindImageTexture(0, environmentMapTextureUnfiltered, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
-			glDispatchCompute(environmentMapData.width / 32, environmentMapData.height / 32, 6);
+			glProgramUniform1i(equirectangularToCubemapShader, 0, RendererBindingTable::EmptyTextureUnitBase);
+			glBindTextureUnit(RendererBindingTable::EmptyTextureUnitBase, environmentMapEquirectengularTexture);
+			glBindImageTexture(0, environmentMapTextureID, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+			glDispatchCompute(kEnvMapSize / 32, kEnvMapSize / 32, 6);
 
 			glDeleteTextures(1, &environmentMapEquirectengularTexture);
 			glDeleteProgram(equirectangularToCubemapShader);
 		}
-		glGenerateTextureMipmap(environmentMapTextureUnfiltered);
+		glGenerateTextureMipmap(environmentMapTextureID);
 
 		// Compute pre-filtered specular environment map.
 		{
 			GLuint prefilteredSpecularEnvironmentMapShader = OpenGLShaderCache::GetInstance()->LoadComputeShader(ShaderLibrary::ReadFile(RendererShaders::PrefilteredSpecularEnvironmentMap));
 
-			glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_EnvironmentMapTextureID);
-			glTextureStorage2D(m_EnvironmentMapTextureID, mipmapLevels, GL_RGBA16F, envMapSize, envMapSize);
-			glTextureParameteri(m_EnvironmentMapTextureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-			glTextureParameteri(m_EnvironmentMapTextureID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTextureParameteri(m_EnvironmentMapTextureID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTextureParameteri(m_EnvironmentMapTextureID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			glTextureParameterf(m_EnvironmentMapTextureID, GL_TEXTURE_MAX_ANISOTROPY_EXT, MaxAnisotropy);
+			constexpr uint32_t levels = CalculateMipMapLevels(kEnvMapSize, kEnvMapSize);
+			glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_PrefilteredSpecularMapTextureID);
+			glTextureStorage2D(m_PrefilteredSpecularMapTextureID, levels, GL_RGBA32F, kEnvMapSize, kEnvMapSize);
+			glTextureParameteri(m_PrefilteredSpecularMapTextureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glTextureParameteri(m_PrefilteredSpecularMapTextureID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTextureParameterf(m_PrefilteredSpecularMapTextureID, GL_TEXTURE_MAX_ANISOTROPY_EXT, MaxAnisotropy);
 
 			// Copy 0th mipmap level into destination environment map.
-			glCopyImageSubData(environmentMapTextureUnfiltered, GL_TEXTURE_CUBE_MAP, 0, 0, 0, 0,
-				m_EnvironmentMapTextureID, GL_TEXTURE_CUBE_MAP, 0, 0, 0, 0, envMapSize, envMapSize, 6);
+			glCopyImageSubData(environmentMapTextureID, GL_TEXTURE_CUBE_MAP, 0, 0, 0, 0,
+				m_PrefilteredSpecularMapTextureID, GL_TEXTURE_CUBE_MAP, 0, 0, 0, 0, kEnvMapSize, kEnvMapSize, 6);
 
 			glUseProgram(prefilteredSpecularEnvironmentMapShader);
-			glBindTextureUnit(0, environmentMapTextureUnfiltered);
+			glProgramUniform1i(prefilteredSpecularEnvironmentMapShader, 0, RendererBindingTable::EmptyTextureUnitBase);
+			glBindTextureUnit(RendererBindingTable::EmptyTextureUnitBase, environmentMapTextureID);
 
 			// Pre-filter rest of the mip chain.
-			constexpr float deltaRoughness = 1.0f / glm::max(float(mipmapLevels - 1), 1.0f);
-			for (int level = 1, size = envMapSize / 2; level <= mipmapLevels; ++level, size /= 2) {
+			constexpr float deltaRoughness = 1.0f / glm::max(float(levels - 1), 1.0f);
+			for (int level = 1, size = kEnvMapSize / 2; level <= levels; ++level, size /= 2) {
 				const GLuint numGroups = glm::max(1, size / 32);
-				glBindImageTexture(0, m_EnvironmentMapTextureID, level, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
-				glProgramUniform1f(prefilteredSpecularEnvironmentMapShader, 0, level * deltaRoughness);
+				glBindImageTexture(0, m_PrefilteredSpecularMapTextureID, level, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+				glProgramUniform1f(prefilteredSpecularEnvironmentMapShader, 1, level * deltaRoughness);
 				glDispatchCompute(numGroups, numGroups, 6);
 			}
 			glDeleteProgram(prefilteredSpecularEnvironmentMapShader);
 		}
-		glDeleteTextures(1, &environmentMapTextureUnfiltered);
+		glDeleteTextures(1, &environmentMapTextureID);
 
 		// Compute diffuse irradiance cubemap.
 		{
 			GLuint irradianceCubemapShader = OpenGLShaderCache::GetInstance()->LoadComputeShader(ShaderLibrary::ReadFile(RendererShaders::IrradianceCubemap));
 
 			glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_IrradianceMapTextureID);
-			glTextureStorage2D(m_IrradianceMapTextureID, 1, GL_RGBA16F, irradianceMapSize, irradianceMapSize);
+			glTextureStorage2D(m_IrradianceMapTextureID, 1, GL_RGBA32F, kIrradianceMapSize, kIrradianceMapSize);
 			glTextureParameteri(m_IrradianceMapTextureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTextureParameteri(m_IrradianceMapTextureID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTextureParameterf(m_IrradianceMapTextureID, GL_TEXTURE_MAX_ANISOTROPY_EXT, MaxAnisotropy);
 
 			glUseProgram(irradianceCubemapShader);
-			glBindTextureUnit(0, m_EnvironmentMapTextureID);
-			glBindImageTexture(0, m_EnvironmentMapTextureID, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
-			glDispatchCompute(irradianceMapSize / 32, irradianceMapSize / 32, 6);
+			glProgramUniform1i(irradianceCubemapShader, 0, RendererBindingTable::EmptyTextureUnitBase);
+			glBindTextureUnit(RendererBindingTable::EmptyTextureUnitBase, m_PrefilteredSpecularMapTextureID);
+			glBindImageTexture(0, m_IrradianceMapTextureID, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+			glDispatchCompute(kIrradianceMapSize / 32, kIrradianceMapSize / 32, 6);
 			glDeleteProgram(irradianceCubemapShader);
 		}
 
 		// Compute Cook-Torrance BRDF 2D LUT for split-sum approximation.
 		{
-			GLuint brdfto2DLUTTextureShader = OpenGLShaderCache::GetInstance()->LoadComputeShader(ShaderLibrary::ReadFile(RendererShaders::BRDFto2DLUTTexture));
+			GLuint brdfLUTTextureShader = OpenGLShaderCache::GetInstance()->LoadComputeShader(ShaderLibrary::ReadFile(RendererShaders::BRDF_LUTTexture));
 
-			glCreateTextures(GL_TEXTURE_2D, 1, &m_BRDFto2DLUTTextureID);
-			glTextureStorage2D(m_BRDFto2DLUTTextureID, 1, GL_RG16F, brdfToLUTSize, brdfToLUTSize);
-			glTextureParameteri(m_BRDFto2DLUTTextureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTextureParameteri(m_BRDFto2DLUTTextureID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTextureParameterf(m_BRDFto2DLUTTextureID, GL_TEXTURE_MAX_ANISOTROPY_EXT, MaxAnisotropy);
-			glTextureParameteri(m_BRDFto2DLUTTextureID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTextureParameteri(m_BRDFto2DLUTTextureID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glCreateTextures(GL_TEXTURE_2D, 1, &m_BRDF_LUTTextureID);
+			glTextureStorage2D(m_BRDF_LUTTextureID, 1, GL_RG32F, kBRDF_LUTSize, kBRDF_LUTSize);
+			glTextureParameteri(m_BRDF_LUTTextureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTextureParameteri(m_BRDF_LUTTextureID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTextureParameterf(m_BRDF_LUTTextureID, GL_TEXTURE_MAX_ANISOTROPY_EXT, MaxAnisotropy);
+			glTextureParameteri(m_BRDF_LUTTextureID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTextureParameteri(m_BRDF_LUTTextureID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-			glUseProgram(brdfto2DLUTTextureShader);
-			glBindImageTexture(0, m_BRDFto2DLUTTextureID, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16F);
-			glDispatchCompute(brdfToLUTSize / 32, brdfToLUTSize / 32, 1);
-			glDeleteProgram(brdfto2DLUTTextureShader);
+			glUseProgram(brdfLUTTextureShader);
+			glBindImageTexture(0, m_BRDF_LUTTextureID, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG32F);
+			glDispatchCompute(kBRDF_LUTSize / 32, kBRDF_LUTSize / 32, 1);
+			glDeleteProgram(brdfLUTTextureShader);
 		}
 		glFinish();
+		glBindTextureUnit(RendererBindingTable::EmptyTextureUnitBase, 0);
 	}
 
 	OpenGLEnvironmentMapTexture::~OpenGLEnvironmentMapTexture()
 	{
-		glDeleteTextures(1, &m_EnvironmentMapTextureID);
+		glDeleteTextures(1, &m_PrefilteredSpecularMapTextureID);
 		glDeleteTextures(1, &m_IrradianceMapTextureID);
-		glDeleteTextures(1, &m_BRDFto2DLUTTextureID);
+		glDeleteTextures(1, &m_BRDF_LUTTextureID);
 	}
 
 	// OpenGLTextureCache
 
 	OpenGLTextureCache::OpenGLTextureCache()
-		: m_DefaultTextureMap(CreateRef<TextureMap>()),
-		m_DefaultEnvironmentMap(CreateRef<EnvironmentMapTexture>()),
-		m_WhiteTexture(std::array<unsigned char, 4>{255, 255, 255, 255}),
-		m_BlackTexture(std::array<unsigned char, 4>{0, 0, 0, 255})
+		:	m_WhiteTexture(ColorRGBA{ 255, 255, 255, 255 }),
+		m_NormalTexture(ColorRGB{ 128, 128, 255 })
 	{
-		std::fill(m_DefaultTextureMap->Textures.begin(), m_DefaultTextureMap->Textures.end(), m_WhiteTexture.m_TextureHandle);
-		glCreateBuffers(1, &m_TextureMapSSBO);
-		glNamedBufferStorage(m_TextureMapSSBO, SizeofTextureMap * MaxTextures, nullptr, GL_DYNAMIC_STORAGE_BIT);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, RendererBindingTable::TextureMapsShaderStorageBuffer, m_TextureMapSSBO);
-		glNamedBufferSubData(m_TextureMapSSBO, 0, m_DefaultTextureMap->Textures.size() * sizeof(GLuint64), m_DefaultTextureMap->Textures.data());
-		m_EnvironmentMaps.emplace("default", Scope<OpenGLEnvironmentMapTexture>());
+		m_DefaultPBRTextureMaps.Albedo = Texture2D(m_WhiteTexture.m_TextureHandle);
+		m_DefaultPBRTextureMaps.Normal = Texture2D(m_NormalTexture.m_TextureHandle);
+		m_DefaultPBRTextureMaps.Metalness = Texture2D(m_WhiteTexture.m_TextureHandle);
+		m_DefaultPBRTextureMaps.Roughness = Texture2D(m_WhiteTexture.m_TextureHandle);
+		m_DefaultPBRTextureMaps.AmbientOcclusion = Texture2D(m_WhiteTexture.m_TextureHandle);
 	}
 
-	OpenGLTextureCache::~OpenGLTextureCache()
+	PBRTextureMaps OpenGLTextureCache::CreateTextureMaps(const std::array<std::string, static_cast<uint16_t>(PBRTextureMap::COUNT)>& textureFiles)
 	{
-		glDeleteBuffers(1, &m_TextureMapSSBO);
-	}
-
-	Ref<TextureMap> OpenGLTextureCache::CreateTextureMap(const std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)>& textureFiles)
-	{
-		Ref<TextureMap> textureMap = CreateRef<TextureMap>();
-		TextureType type = static_cast<TextureType>(0);
-		for (const auto& textureFile : textureFiles)
+		PBRTextureMaps textureMaps = m_DefaultPBRTextureMaps;
+		textureMaps.Albedo = Texture2D(m_WhiteTexture.m_TextureHandle);
+		textureMaps.Normal = Texture2D(m_NormalTexture.m_TextureHandle);
+		textureMaps.Metalness = Texture2D(m_WhiteTexture.m_TextureHandle);
+		textureMaps.Roughness = Texture2D(m_WhiteTexture.m_TextureHandle);
+		textureMaps.AmbientOcclusion = Texture2D(m_WhiteTexture.m_TextureHandle);
 		{
-			uint16_t typeIndex = static_cast<uint16_t>(type);
+			const std::string& textureFile = textureFiles[(uint32_t)PBRTextureMap::Albedo];
 			if (!textureFile.empty())
 			{
 				const auto& textureIt = m_Textures.find(textureFile);
-				// if texture already exists
 				if (textureIt != m_Textures.end())
-					textureMap->Textures[typeIndex] = textureIt->second->m_TextureHandle;
+				{
+					textureMaps.Albedo = Texture2D(textureIt->second->m_TextureHandle);
+				}
 				else
 				{
-					std::filesystem::path(textureFile).extension().string() == ".tga" ? stbi_set_flip_vertically_on_load(0) : stbi_set_flip_vertically_on_load(1);
+					std::filesystem::path(textureFile).extension().string() == ".tga" ? stbi_set_flip_vertically_on_load(1) : stbi_set_flip_vertically_on_load(0);
 
 					TextureData data;
 					data.buffer = stbi_load(
@@ -245,139 +244,180 @@ namespace Tunti
 					if (data.buffer)
 					{
 						const auto& insertedPairIt = m_Textures.insert(m_Textures.end(), { textureFile, CreateScope<OpenGLTexture2D>(data) });
-						textureMap->Textures[typeIndex] = insertedPairIt->second->m_TextureHandle;
+						textureMaps.Albedo = Texture2D(insertedPairIt->second->m_TextureHandle);
 						stbi_image_free(data.buffer);
 					}
 				}
-				glNamedBufferSubData(
-					m_TextureMapSSBO,
-					SizeofTextureMap * m_TextureMapCount + OffsetofTextureType(type),
-					sizeof(GLuint64),
-					&textureMap->Textures[typeIndex]);
 			}
-			else
+		}
+		{
+			const std::string& textureFile = textureFiles[(uint32_t)PBRTextureMap::Normal];
+			if (!textureFile.empty())
 			{
-				if (type == TextureType::Metalness)
+				const auto& textureIt = m_Textures.find(textureFile);
+				if (textureIt != m_Textures.end())
 				{
-					textureMap->Textures[typeIndex] = m_BlackTexture.m_TextureHandle;
-					glNamedBufferSubData(
-						m_TextureMapSSBO,
-						SizeofTextureMap * m_TextureMapCount + OffsetofTextureType(type),
-						sizeof(GLuint64),
-						&m_BlackTexture.m_TextureHandle);
+					textureMaps.Normal = Texture2D(textureIt->second->m_TextureHandle);
 				}
 				else
 				{
-					textureMap->Textures[typeIndex] = m_WhiteTexture.m_TextureHandle;
-					glNamedBufferSubData(
-						m_TextureMapSSBO,
-						SizeofTextureMap * m_TextureMapCount + OffsetofTextureType(type),
-						sizeof(GLuint64),
-						&m_WhiteTexture.m_TextureHandle);
+					std::filesystem::path(textureFile).extension().string() == ".tga" ? stbi_set_flip_vertically_on_load(1) : stbi_set_flip_vertically_on_load(0);
+
+					TextureData data;
+					data.buffer = stbi_load(
+						textureFile.c_str(),
+						&data.width,
+						&data.height,
+						&data.channel,
+						4);
+
+					if (data.buffer)
+					{
+						const auto& insertedPairIt = m_Textures.insert(m_Textures.end(), { textureFile, CreateScope<OpenGLTexture2D>(data) });
+						textureMaps.Normal = Texture2D(insertedPairIt->second->m_TextureHandle);
+						stbi_image_free(data.buffer);
+					}
 				}
-				
 			}
-			
-			type = static_cast<TextureType>(typeIndex + 1);
 		}
-		textureMap->Index = m_TextureMapCount++;
-		return textureMap;
+		{
+			const std::string& textureFile = textureFiles[(uint32_t)PBRTextureMap::Metalness];
+			if (!textureFile.empty())
+			{
+				const auto& textureIt = m_Textures.find(textureFile);
+				if (textureIt != m_Textures.end())
+				{
+					textureMaps.Metalness = Texture2D(textureIt->second->m_TextureHandle);
+				}
+				else
+				{
+					std::filesystem::path(textureFile).extension().string() == ".tga" ? stbi_set_flip_vertically_on_load(1) : stbi_set_flip_vertically_on_load(0);
+
+					TextureData data;
+					data.buffer = stbi_load(
+						textureFile.c_str(),
+						&data.width,
+						&data.height,
+						&data.channel,
+						4);
+
+					if (data.buffer)
+					{
+						const auto& insertedPairIt = m_Textures.insert(m_Textures.end(), { textureFile, CreateScope<OpenGLTexture2D>(data) });
+						textureMaps.Metalness = Texture2D(insertedPairIt->second->m_TextureHandle);
+						stbi_image_free(data.buffer);
+					}
+				}
+			}
+		}
+		{
+			const std::string& textureFile = textureFiles[(uint32_t)PBRTextureMap::Roughness];
+			if (!textureFile.empty())
+			{
+				const auto& textureIt = m_Textures.find(textureFile);
+				if (textureIt != m_Textures.end())
+				{
+					textureMaps.Roughness = Texture2D(textureIt->second->m_TextureHandle);
+				}
+				else
+				{
+					std::filesystem::path(textureFile).extension().string() == ".tga" ? stbi_set_flip_vertically_on_load(1) : stbi_set_flip_vertically_on_load(0);
+
+					TextureData data;
+					data.buffer = stbi_load(
+						textureFile.c_str(),
+						&data.width,
+						&data.height,
+						&data.channel,
+						4);
+
+					if (data.buffer)
+					{
+						const auto& insertedPairIt = m_Textures.insert(m_Textures.end(), { textureFile, CreateScope<OpenGLTexture2D>(data) });
+						textureMaps.Roughness = Texture2D(insertedPairIt->second->m_TextureHandle);
+						stbi_image_free(data.buffer);
+					}
+				}
+			}
+		}
+		{
+			const std::string& textureFile = textureFiles[(uint32_t)PBRTextureMap::AmbientOcclusion];
+			if (!textureFile.empty())
+			{
+				const auto& textureIt = m_Textures.find(textureFile);
+				if (textureIt != m_Textures.end())
+				{
+					textureMaps.AmbientOcclusion = Texture2D(textureIt->second->m_TextureHandle);
+				}
+				else
+				{
+					std::filesystem::path(textureFile).extension().string() == ".tga" ? stbi_set_flip_vertically_on_load(1) : stbi_set_flip_vertically_on_load(0);
+
+					TextureData data;
+					data.buffer = stbi_load(
+						textureFile.c_str(),
+						&data.width,
+						&data.height,
+						&data.channel,
+						4);
+
+					if (data.buffer)
+					{
+						const auto& insertedPairIt = m_Textures.insert(m_Textures.end(), { textureFile, CreateScope<OpenGLTexture2D>(data) });
+						textureMaps.AmbientOcclusion = Texture2D(insertedPairIt->second->m_TextureHandle);
+						stbi_image_free(data.buffer);
+					}
+				}
+			}
+		}
+		return textureMaps;
 	}
 
 	EnvironmentMapTexture OpenGLTextureCache::CreateEnvironmentMap(const std::string& textureFile)
 	{
 		EnvironmentMapTexture envMap;
-		const auto& envMapIt = m_EnvironmentMaps.find(textureFile);
+		TextureData environmentMapData;
+		bool isHDR = stbi_is_hdr(textureFile.c_str());
 
+		const auto& envMapIt = m_EnvironmentMaps.find(textureFile);
 		if (envMapIt != m_EnvironmentMaps.end())
 		{
 			const auto& envMapCached = envMapIt->second;
-			envMap.EnvironmentMapTextureID = envMapCached->m_EnvironmentMapTextureID;
+			envMap.PrefilteredSpecularMapTextureID = envMapCached->m_PrefilteredSpecularMapTextureID;
 			envMap.IrradianceMapTextureID = envMapCached->m_IrradianceMapTextureID;
-			envMap.BRDFto2DLUTTextureID = envMapCached->m_BRDFto2DLUTTextureID;
+			envMap.BRDF_LUTTextureID = envMapCached->m_BRDF_LUTTextureID;
 		}
-		else if (std::filesystem::path(textureFile).extension().string() == ".hdr")
+		else if (isHDR)
 		{
-			EnvironmentMapData environmentMapData;
-			environmentMapData.buffer = stbi_loadf(textureFile.c_str(), &environmentMapData.width, &environmentMapData.height, &environmentMapData.channel, 3);
+			environmentMapData.buffer = reinterpret_cast<unsigned char*>(stbi_loadf(textureFile.c_str(), &environmentMapData.width, &environmentMapData.height, &environmentMapData.channel, 3));
+		}
+		else
+		{
+			environmentMapData.buffer = stbi_load(textureFile.c_str(), &environmentMapData.width, &environmentMapData.height, &environmentMapData.channel, 3);
+		}
 
-			if (environmentMapData.buffer)
-			{
-				const auto& insertedPairIt = m_EnvironmentMaps.insert(
-					m_EnvironmentMaps.end(),
-					{
-						textureFile,
-						CreateScope<OpenGLEnvironmentMapTexture>(environmentMapData)
-					});
-				const auto& envMapCached = insertedPairIt->second;
-				envMap.EnvironmentMapTextureID = envMapCached->m_EnvironmentMapTextureID;
-				envMap.IrradianceMapTextureID = envMapCached->m_IrradianceMapTextureID;
-				envMap.BRDFto2DLUTTextureID = envMapCached->m_BRDFto2DLUTTextureID;
-			}
+		if (environmentMapData.buffer)
+		{
+			const auto& insertedPairIt = m_EnvironmentMaps.insert(
+				m_EnvironmentMaps.end(),
+				{
+					textureFile,
+					CreateScope<OpenGLEnvironmentMapTexture>(environmentMapData, isHDR)
+				});
+			const auto& envMapCached = insertedPairIt->second;
+			envMap.PrefilteredSpecularMapTextureID = envMapCached->m_PrefilteredSpecularMapTextureID;
+			envMap.IrradianceMapTextureID = envMapCached->m_IrradianceMapTextureID;
+			envMap.BRDF_LUTTextureID = envMapCached->m_BRDF_LUTTextureID;
+
+			stbi_image_free(environmentMapData.buffer);
 		}
 
 		return envMap;
 	}
 
-	CubemapTexture OpenGLTextureCache::CreateCubemap(const std::array<std::string, 6>& cubemapTextures)
-	{
-		CubemapTexture cubemap;
-		const auto& cubemapIt = m_Cubemaps.find(cubemapTextures[0]);
-
-		if (cubemapIt != m_Cubemaps.end())
-			cubemap.TextureID = cubemapIt->second->m_TextureID;
-		else
-		{
-			bool loadFailed = false;
-			std::array<TextureData, 6> cubemapData;
-			for (uint32_t i = 0; i < 6; i++)
-			{
-				cubemapData[i].buffer = stbi_load(
-					cubemapTextures[i].c_str(),
-					&cubemapData[i].width,
-					&cubemapData[i].height,
-					&cubemapData[i].channel,
-					4);
-
-				if (cubemapData[i].buffer == nullptr)
-				{
-					for (uint32_t j = 0; j < i; j++)
-						stbi_image_free(cubemapData[j].buffer);
-
-					loadFailed = true;
-					break;
-				}
-			}
-			
-			if (!loadFailed)
-			{
-				const auto& insertedPairIt = m_Cubemaps.insert(
-					m_Cubemaps.end(),
-					{
-						cubemapTextures[0],
-						CreateScope<OpenGLCubemapTexture>(cubemapData)
-					});
-				cubemap.TextureID = insertedPairIt->second->m_TextureID;
-
-				for (uint32_t i = 0; i < 6; i++)
-					stbi_image_free(cubemapData[i].buffer);
-			}
-		}
-
-		return cubemap;
-	}
-
 	void OpenGLTextureCache::Flush()
 	{
-		GLuint64 zero = 0;
-		glNamedBufferSubData(
-			m_TextureMapSSBO,
-			static_cast<uint16_t>(TextureType::COUNT) * sizeof(GLuint64),
-			static_cast<uint16_t>(TextureType::COUNT) * sizeof(GLuint64) * (m_TextureMapCount - 1),
-			&zero);
-
 		m_Textures.clear();
-		m_Cubemaps.clear();
-		m_TextureMapCount = 1;
+		m_EnvironmentMaps.clear();
 	}
 }

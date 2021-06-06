@@ -37,7 +37,7 @@ namespace Tunti
 		operator glm::mat4() const
 		{
 			return glm::translate(glm::mat4(1.0f), Position)
-				* glm::toMat4(glm::quat(glm::radians(Rotation)))
+				* glm::toMat4(GetOrientation())
 				* glm::scale(glm::mat4(1.0f), Scale);
 		}
 
@@ -63,7 +63,7 @@ namespace Tunti
 			return glm::rotate(GetOrientation(), glm::vec3(1.0f, 0.0f, 0.0f));
 		}
 
-		glm::vec3 GetFrontDirection() const
+		glm::vec3 GetForwardDirection() const
 		{
 			return glm::rotate(GetOrientation(), glm::vec3(0.0f, 0.0f, -1.0f));
 		}
@@ -71,19 +71,13 @@ namespace Tunti
 
 	struct MeshRendererComponent
 	{
-		MeshRenderer MeshBuffer;
-		Ref<MaterialInstance> MaterialInstanceRef = Material::DefaulMaterialInstance();
-		std::string ModelPath;
+		MeshBuffer _Mesh;
+		std::vector<SubmeshBuffer> Submeshes;
+		std::vector<Ref<MaterialInstance>> Materials;
 
 		MeshRendererComponent() = default;
-		MeshRendererComponent(const std::string& path)
-			: ModelPath(path)
-		{
-			// TODO:
-		}
-		MeshRendererComponent(const Mesh& mesh, const Ref<MaterialInstance>& materialInstance)
-			: MeshBuffer(BufferManager::AllocateGraphicsBuffer(mesh, std::hash<Ref<MaterialInstance>>{}(materialInstance))),
-			MaterialInstanceRef(materialInstance) {}
+		MeshRendererComponent(const Ref<Model>& model)
+			: _Mesh(model->_Mesh), Submeshes(model->Submeshes), Materials(model->Materials) {}
 	};
 
 	struct CameraComponent
@@ -100,16 +94,21 @@ namespace Tunti
 
 	struct LightComponent
 	{
-		Light _Light;
+		LightType Type = LightType::DirectionalLight;
+
+		glm::vec3 Color = glm::vec3(1.0f, 1.0f, 1.0f);
+
+		// Directional Light
+		float Intensity = 1.0f;
+
+		// Point Light
+		float Constant = 1.0f;
+		float Linear = 0.09f;
+		float Quadratic = 0.032f;
 
 		LightComponent() = default;
 		LightComponent(const LightComponent&) = default;
 		LightComponent(LightType type)
-			: _Light(type) {}
-
-		operator const Light& () const
-		{
-			return _Light;
-		}
+			: Type(type) {}
 	};
 }

@@ -1,23 +1,25 @@
 #include "pch.h"
+#include <glad/glad.h>
+
 #include "Texture.h"
 #include "Renderer.h"
 
-#include <glad/glad.h>
+#include "Tunti/Core/Application.h"
 #include "Platform/OpenGL/OpenGLTexture.h"
 
 namespace Tunti
 {
 
-	Ref<TextureMap> TextureLibrary::DefaultTextureMap()
+	PBRTextureMaps TextureLibrary::DefaultPBRTextureMaps()
 	{
-		switch (Renderer::GetAPI())
+		switch (Application::GetRenderAPI())
 		{
-			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
-			case RendererAPI::OpenGL: return OpenGLTextureCache::GetInstance()->DefaultTextureMap();
+			case RenderAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return PBRTextureMaps();
+			case RenderAPI::OpenGL: return OpenGLTextureCache::GetInstance()->DefaultPBRTextureMaps();
 		}
 
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
-		return nullptr;
+		return PBRTextureMaps();
 	}
 
 	EnvironmentMapTexture TextureLibrary::DefaultEnvironmentMap()
@@ -25,69 +27,27 @@ namespace Tunti
 		return LoadEnvironmentMap(RendererConstants::DefaultEnvironmentMap);
 	}
 
-	Ref<TextureMap> TextureLibrary::LoadTextureMap(const std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)>& textureFiles)
+	PBRTextureMaps TextureLibrary::LoadTextureMaps(const std::array<std::string, static_cast<uint16_t>(PBRTextureMap::COUNT)>& textureFiles)
 	{
-		switch (Renderer::GetAPI())
+		switch (Application::GetRenderAPI())
 		{
-			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return nullptr;
-			case RendererAPI::OpenGL: return OpenGLTextureCache::GetInstance()->CreateTextureMap(textureFiles);
+			case RenderAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return PBRTextureMaps();
+			case RenderAPI::OpenGL: return OpenGLTextureCache::GetInstance()->CreateTextureMaps(textureFiles);
 		}
 
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
-		return nullptr;
+		return PBRTextureMaps();
 	}
 
 	EnvironmentMapTexture TextureLibrary::LoadEnvironmentMap(const std::string& path)
 	{
-		switch (Renderer::GetAPI())
+		switch (Application::GetRenderAPI())
 		{
-			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return EnvironmentMapTexture();
-			case RendererAPI::OpenGL: return OpenGLTextureCache::GetInstance()->CreateEnvironmentMap(path);
+			case RenderAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return EnvironmentMapTexture();
+			case RenderAPI::OpenGL: return OpenGLTextureCache::GetInstance()->CreateEnvironmentMap(path);
 		}
 
 		LOG_ASSERT(false, "RendererAPI initialization failed!");
 		return EnvironmentMapTexture();
-	}
-
-	CubemapTexture TextureLibrary::LoadCubemap(const std::string& folderPath,
-		const std::string& rightFace,
-		const std::string& leftFace,
-		const std::string& topFace,
-		const std::string& bottomFace,
-		const std::string& frontFace,
-		const std::string& backFace)
-	{
-		std::array<std::string, 6> cubemapTextures;
-		if (*folderPath.rbegin() == '/')
-		{
-			cubemapTextures = {
-				folderPath + rightFace,
-				folderPath + leftFace,
-				folderPath + topFace,
-				folderPath + bottomFace,
-				folderPath + frontFace,
-				folderPath + backFace
-			};
-		}
-		else
-		{
-			cubemapTextures = {
-				folderPath + "/" + rightFace,
-				folderPath + "/" + leftFace,
-				folderPath + "/" + topFace,
-				folderPath + "/" + bottomFace,
-				folderPath + "/" + frontFace,
-				folderPath + "/" + backFace
-			};
-		}
-
-		switch (Renderer::GetAPI())
-		{
-			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); return CubemapTexture();
-			case RendererAPI::OpenGL: return OpenGLTextureCache::GetInstance()->CreateCubemap(cubemapTextures);
-		}
-
-		LOG_ASSERT(false, "RendererAPI initialization failed!");
-		return CubemapTexture();
 	}
 }

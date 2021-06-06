@@ -3,8 +3,10 @@
 
 namespace Tunti
 {
-	class EditorCamera;
+	struct Texture2D;
+
 	class Entity;
+	class EditorCamera;
 
 	class Scene
 	{
@@ -16,7 +18,7 @@ namespace Tunti
 		void DestroyEntity(Entity entity);
 
 		void OnUpdateRuntime(double dt);
-		void OnUpdateEditor(double dt, const EditorCamera& editorCamera);
+		Texture2D OnUpdateEditor(double dt, const EditorCamera& editorCamera);
 
 		entt::registry& GetSceneRegistry() { return m_Registry; }
 	private:

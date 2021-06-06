@@ -83,35 +83,46 @@ namespace TEditor
 
 			Utils::DrawComponent<Tunti::MeshRendererComponent>("Mesh Renderer", selectedEntity, [](auto& component)
 			{
-				ImGui::Text(component.ModelPath.c_str());
+				glm::vec4 albedo = component.Materials[0]->Properties[(uint32_t)Tunti::PBRMaterial::Albedo].GetValue<glm::vec4>();
+				float metalness = component.Materials[0]->Properties[(uint32_t)Tunti::PBRMaterial::Metalness].GetValue<float>();
+				float roughness = component.Materials[0]->Properties[(uint32_t)Tunti::PBRMaterial::Roughness].GetValue<float>();
 
-				float contentWidth = ImGui::GetContentRegionAvail().x;
-				ImGui::SameLine(contentWidth - contentWidth / 20.0f, 0.0f);
-				if (ImGui::Button("...", { 30, 20 }))
-				{
-					std::string filePath = Utils::OpenFileDialog();
-				}
+				ImGui::ColorEdit4("Albedo", glm::value_ptr(albedo));
+				Utils::DrawFloatControl("Metalness", metalness, 1.0f, { 0.0f, 1.0f }, 0.005f);
+				Utils::DrawFloatControl("Roughness", roughness, 1.0f, { 0.0f, 1.0f }, 0.005f);
+
+				component.Materials[0]->SetValue((uint32_t)Tunti::PBRMaterial::Albedo, albedo);
+				component.Materials[0]->SetValue((uint32_t)Tunti::PBRMaterial::Metalness, metalness);
+				component.Materials[0]->SetValue((uint32_t)Tunti::PBRMaterial::Roughness, roughness);
 			});
 
 			Utils::DrawComponent<Tunti::LightComponent>("Light", selectedEntity, [](auto& component)
 			{
 				ImGui::PushID("Type");
 				Utils::SetLabel("Type");
-				if (ImGui::BeginCombo("Type", LightTypeNames[static_cast<int>(component._Light.Type)]))
+				if (ImGui::BeginCombo("Type", LightTypeNames[static_cast<int>(component.Type)]))
 				{
-					for (int32_t i = 0; i < LightTypeNames.size(); i++) {
-						if (ImGui::Selectable(LightTypeNames[i])) {
-							component._Light.Type = static_cast<Tunti::LightType>(i);
+					for (int32_t i = 0; i < LightTypeNames.size(); i++)
+					{
+						if (ImGui::Selectable(LightTypeNames[i]))
+						{
+							component.Type = static_cast<Tunti::LightType>(i);
 						}
 					}
 					ImGui::EndCombo();
 				}
 				ImGui::PopID();
 
-				Utils::DrawFloatControl("Intensity", component._Light.Intensity, 1.0f, { 0.0f, 10.0f }, 0.05f);
-				Utils::DrawFloatControl("Constant", component._Light.Constant, 1.0f, { 0.0f, 10.0f }, 0.05f);
-				Utils::DrawFloatControl("Linear", component._Light.Linear, 0.09f, { 0.0f, 1.0f }, 0.001f);
-				Utils::DrawFloatControl("Quadratic", component._Light.Quadratic, 0.032f, { 0.0f, 1.0f }, 0.001f, "%.3f");
+				if (component.Type == Tunti::LightType::DirectionalLight)
+				{
+					Utils::DrawFloatControl("Intensity", component.Intensity, 1.0f, { 0.0f, 10.0f }, 0.05f);
+				}
+				else if (component.Type == Tunti::LightType::PointLight)
+				{
+					Utils::DrawFloatControl("Constant", component.Constant, 1.0f, { 0.0f, 10.0f }, 0.05f);
+					Utils::DrawFloatControl("Linear", component.Linear, 0.09f, { 0.0f, 1.0f }, 0.01f);
+					Utils::DrawFloatControl("Quadratic", component.Quadratic, 0.032f, { 0.0f, 1.0f }, 0.01f);
+				}
 			});
 		}
 

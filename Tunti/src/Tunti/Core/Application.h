@@ -11,6 +11,13 @@ int main(int argc, char** argv);
 
 namespace Tunti
 {
+	enum class RenderAPI
+	{
+		None = 0,
+		OpenGL,
+		Vulkan
+	};
+
 	class Application
 	{
 	public:
@@ -27,6 +34,8 @@ namespace Tunti
 
 		static const Scope<Window>& GetWindow() { return s_Instance->m_Window; }
 		static Application* GetInstance() { return s_Instance; }
+
+		static RenderAPI GetRenderAPI() { return s_RenderAPI; };
 	protected:
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);
@@ -46,6 +55,7 @@ namespace Tunti
 		bool m_Running = false;
 	private:
 		static Application* s_Instance;
+		static RenderAPI s_RenderAPI;
 		friend int ::main(int argc, char** argv);
 	};
 

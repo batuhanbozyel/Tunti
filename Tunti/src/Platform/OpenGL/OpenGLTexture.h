@@ -9,7 +9,8 @@ namespace Tunti
 	class OpenGLTexture2D final
 	{
 	public:
-		explicit OpenGLTexture2D(const std::array<unsigned char, 4>& color);
+		explicit OpenGLTexture2D(const ColorRGB& color);
+		explicit OpenGLTexture2D(const ColorRGBA& color);
 		explicit OpenGLTexture2D(const TextureData& data);
 		~OpenGLTexture2D();
 	private:
@@ -19,26 +20,15 @@ namespace Tunti
 		friend class OpenGLTextureCache;
 	};
 
-	class OpenGLCubemapTexture final
-	{
-	public:
-		explicit OpenGLCubemapTexture(const std::array<TextureData, 6>& cubemapData);
-		~OpenGLCubemapTexture();
-	private:
-		GLuint m_TextureID;
-
-		friend class OpenGLTextureCache;
-	};
-
 	class OpenGLEnvironmentMapTexture final
 	{
 	public:
-		explicit OpenGLEnvironmentMapTexture(const EnvironmentMapData& environmentMapData);
+		explicit OpenGLEnvironmentMapTexture(const TextureData& environmentMapData, bool isHDR);
 		~OpenGLEnvironmentMapTexture();
 	private:
-		GLuint m_EnvironmentMapTextureID;
+		GLuint m_PrefilteredSpecularMapTextureID;
 		GLuint m_IrradianceMapTextureID;
-		GLuint m_BRDFto2DLUTTextureID;
+		GLuint m_BRDF_LUTTextureID;
 
 		friend class OpenGLTextureCache;
 	};
@@ -46,12 +36,11 @@ namespace Tunti
 	class OpenGLTextureCache final
 	{
 	public:
-		~OpenGLTextureCache();
+		~OpenGLTextureCache() = default;
 
-		Ref<TextureMap> DefaultTextureMap() const { return m_DefaultTextureMap; }
-		Ref<TextureMap> CreateTextureMap(const std::array<std::string, static_cast<uint16_t>(TextureType::COUNT)>& textureFiles);
+		PBRTextureMaps DefaultPBRTextureMaps() const { return m_DefaultPBRTextureMaps; }
+		PBRTextureMaps CreateTextureMaps(const std::array<std::string, static_cast<uint16_t>(PBRTextureMap::COUNT)>& textureFiles);
 
-		CubemapTexture CreateCubemap(const std::array<std::string, 6>& cubemapTextures);
 		EnvironmentMapTexture CreateEnvironmentMap(const std::string& textureFile);
 
 		void Flush();
@@ -69,17 +58,11 @@ namespace Tunti
 	private:
 		explicit OpenGLTextureCache();
 	private:
-		// Constructing with a default white texture
-		uint32_t m_TextureMapCount = 1;
-		GLuint m_TextureMapSSBO;
-
 		OpenGLTexture2D m_WhiteTexture;
-		OpenGLTexture2D m_BlackTexture;
-		Ref<TextureMap> m_DefaultTextureMap;
-		Ref<EnvironmentMapTexture> m_DefaultEnvironmentMap;
-		std::unordered_map<std::string, Scope<OpenGLTexture2D>> m_Textures;
-		std::unordered_map<std::string, Scope<OpenGLEnvironmentMapTexture>> m_EnvironmentMaps;
-		std::unordered_map<std::string, Scope<OpenGLCubemapTexture>> m_Cubemaps;
+		OpenGLTexture2D m_NormalTexture;
+		PBRTextureMaps m_DefaultPBRTextureMaps;
+		std::unordered_map<std::string, Ref<OpenGLTexture2D>> m_Textures;
+		std::unordered_map<std::string, Ref<OpenGLEnvironmentMapTexture>> m_EnvironmentMaps;
 
 		static inline OpenGLTextureCache* s_Instance = nullptr;
 	};

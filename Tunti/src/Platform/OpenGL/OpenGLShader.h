@@ -52,8 +52,6 @@ namespace Tunti
 		{
 			return m_ShaderProgramHandle != shader.m_ShaderProgramHandle;
 		}
-
-		std::unordered_map<std::string, UniformProperty> GetMaterialInfo() const;
 	private:
 		void CalculateUniformLocations();
 		uint32_t GetUniformLocation(const char* name) const;
@@ -61,7 +59,7 @@ namespace Tunti
 		std::unordered_map<uint32_t, std::string> ParseShaderSource(const std::string& source);
 	private:
 		GLuint m_ShaderProgramHandle;
-		std::unordered_map<std::string, UniformProperty> m_UniformCache;
+		std::unordered_map<std::string, uint32_t> m_UniformCache;
 
 		friend class OpenGLShaderCache;
 	};

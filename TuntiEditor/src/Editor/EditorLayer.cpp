@@ -71,10 +71,10 @@ namespace TEditor
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 		}
 
-		switch (Tunti::Renderer::GetAPI())
+		switch (Tunti::Application::GetRenderAPI())
 		{
-			case Tunti::RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); break;
-			case Tunti::RendererAPI::OpenGL:
+			case Tunti::RenderAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); break;
+			case Tunti::RenderAPI::OpenGL:
 			{
 				m_EditorAPI = Tunti::CreateScope<OpenGLEditor>();
 				break;
@@ -127,31 +127,6 @@ namespace TEditor
 		ImGui::End();
 
 		End();
-	}
-
-	std::string EditorLayer::OpenFileDialog()
-	{
-		OPENFILENAMEA ofn;
-		CHAR szFile[260] = { 0 };
-		CHAR currentDir[256] = { 0 };
-		ZeroMemory(&ofn, sizeof(OPENFILENAME));
-		ofn.lStructSize = sizeof(OPENFILENAME);
-		ofn.hwndOwner = glfwGetWin32Window(Tunti::Application::GetWindow()->GetHandle());
-		ofn.lpstrFile = szFile;
-		ofn.nMaxFile = sizeof(szFile);
-
-		if (GetCurrentDirectoryA(256, currentDir))
-			ofn.lpstrInitialDir = currentDir;
-
-		ofn.lpstrFilter = "All Files (*.*)\0*.*\0";
-		ofn.nFilterIndex = 1;
-		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
-
-		std::string fileName;
-		if (GetOpenFileNameA(&ofn))
-			fileName = ofn.lpstrFile;
-
-		return fileName;
 	}
 
 	void EditorLayer::Begin()

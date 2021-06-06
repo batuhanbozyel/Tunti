@@ -1,93 +1,55 @@
 #include "pch.h"
-#include "Mesh.h"
-#include "Light.h"
-#include "Camera.h"
-#include "Shader.h"
-#include "Texture.h"
-#include "Material.h"
 #include "Renderer.h"
-#include "BufferManager.h"
 
+#include "Tunti/Core/Application.h"
 #include "Platform/OpenGL/OpenGLRenderer.h"
-
-#include "Tunti/Core/Window.h"
 
 namespace Tunti
 {
 	void Renderer::Init()
 	{
-		if (s_Instance)
+		std::call_once(s_Context, []()
 		{
-			Log::Warn("Renderer has been already initialized!");
-			return;
+			switch (Application::GetRenderAPI())
+			{
+				case RenderAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); break;
+				case RenderAPI::OpenGL: s_Renderer = new OpenGLRenderer; break;
+			}
+
+			Log::Trace("Renderer has initialized successfully!");
+		});
+	}
+
+	void Renderer::Destroy()
+	{
+		if (s_Renderer)
+		{
+			delete s_Renderer;
 		}
 
-		switch (API)
+		if (s_RenderPipeline)
 		{
-			case RendererAPI::None: LOG_ASSERT(false, "RendererAPI is not specified!"); break;
-			case RendererAPI::OpenGL: s_Instance = new OpenGLRenderer(); break;
+			delete s_RenderPipeline;
+		}
+	}
+
+	void Renderer::OutputToScreenFramebuffer(Texture2D texture)
+	{
+		s_Renderer->OutputToScreenFramebufferImpl(texture);
+	}
+
+	void Renderer::OnWindowResize(uint32_t width, uint32_t height)
+	{
+		s_RenderPipeline->OnWindowResize(width, height);
+	}
+
+	void Renderer::SetRenderPipeline(ScriptableRenderPipeline* renderPipeline)
+	{
+		if (s_RenderPipeline)
+		{
+			delete s_RenderPipeline;
 		}
 
-		Log::Trace("Renderer has initialized successfully!");
+		s_RenderPipeline = renderPipeline;
 	}
-
-	void Renderer::Shutdown()
-	{
-		if (s_Instance)
-			delete s_Instance;
-	}
-
-	void Renderer::Submit(const std::function<void()>& renderPass)
-	{
-		s_Instance->RenderPasses.push_back(renderPass);
-	}
-
-	void Renderer::SubmitLight(const Light& light, const glm::vec3& position, const glm::vec3& direction)
-	{
-		s_Instance->LightQueue.Lights[s_Instance->LightQueue.LightCount++] = LightData(light, position, direction);
-	}
-
-	void Renderer::DrawMesh(const MeshRenderer& mesh, const Ref<MaterialInstance>& materialInstance, const glm::mat4& transform)
-	{
-		auto& meshMultiLayerQueue = s_Instance->MeshMultiLayerQueue;
-		const Ref<Material>& material = materialInstance->GetParentMaterial();
-
-		((meshMultiLayerQueue[material])[materialInstance]).push_back({ mesh, transform });
-	}
-
-	void Renderer::ResizeFramebuffers(uint32_t width, uint32_t height)
-	{
-		s_Instance->ResizeFramebuffers(width, height);
-	}
-
-	Texture2D Renderer::GetFramebufferTexture()
-	{
-		return s_Instance->GetFramebufferTexture();
-	}
-
-	void Renderer::BeginScene(const Camera& camera, const glm::mat4& view, const glm::vec3& position)
-	{
-		s_Instance->BeginScene(camera, view, position);
-	}
-
-	void Renderer::EndScene()
-	{
-		for (const auto& renderPass : s_Instance->RenderPasses)
-			renderPass();
-
-		s_Instance->EndScene();
-		s_Instance->MeshMultiLayerQueue.clear();
-		s_Instance->LightQueue.LightCount = 0;
-	}
-
-	void Renderer::SetSkybox(CubemapTexture skybox)
-	{
-		s_Instance->SetSkybox(skybox);
-	}
-
-	void Renderer::SetEnvironmentMap(EnvironmentMapTexture environmentMap)
-	{
-		s_Instance->SetEnvironmentMap(environmentMap);
-	}
-
 }

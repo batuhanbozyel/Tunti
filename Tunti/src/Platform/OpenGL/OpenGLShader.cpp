@@ -102,22 +102,11 @@ namespace Tunti
 		glProgramUniformMatrix4fv(m_ShaderProgramHandle, GetUniformLocation(name), 1, GL_FALSE, &value[0][0]);
 	}
 
-	std::unordered_map<std::string, UniformProperty> OpenGLShaderProgram::GetMaterialInfo() const
-	{
-		std::unordered_map<std::string, UniformProperty> uniforms;
-
-		for (const auto& uniform : m_UniformCache)
-			if(uniform.second.Type != MaterialDataIndex::NONE)
-				uniforms.insert(uniform);
-
-		return uniforms;
-	}
-
 	uint32_t OpenGLShaderProgram::GetUniformLocation(const char* name) const
 	{
 		auto& mapLocation = m_UniformCache.find(name);
 		LOG_ASSERT(mapLocation != m_UniformCache.end(), std::string(name) + ": Uniform could not found!");
-		return mapLocation->second.Location;
+		return mapLocation->second;
 	}
 
 	void OpenGLShaderProgram::CalculateUniformLocations()
@@ -127,10 +116,10 @@ namespace Tunti
 
 		if (uniform_count != 0)
 		{
-			GLint 	max_name_len = 0;
+			GLint max_name_len = 0;
 			GLsizei length = 0;
 			GLsizei count = 0;
-			GLenum 	type = GL_NONE;
+			GLenum type = GL_NONE;
 			glGetProgramiv(m_ShaderProgramHandle, GL_ACTIVE_UNIFORM_MAX_LENGTH, &max_name_len);
 
 			Scope<char[]> uniform_name = CreateScope<char[]>(max_name_len);
@@ -138,36 +127,10 @@ namespace Tunti
 			for (GLint i = 0; i < uniform_count; ++i)
 			{
 				glGetActiveUniform(m_ShaderProgramHandle, i, max_name_len, &length, &count, &type, uniform_name.get());
-				
-				UniformProperty prop;
-				prop.Location = glGetUniformLocation(m_ShaderProgramHandle, uniform_name.get());
-				prop.Type = MaterialDataIndex::NONE;
+				uint32_t location = glGetUniformLocation(m_ShaderProgramHandle, uniform_name.get());
 
-				switch (type)
-				{
-					case GL_FLOAT:
-					{
-						prop.Type = MaterialDataIndex::Float;
-						break;
-					}
-					case GL_FLOAT_VEC2:
-					{
-						prop.Type = MaterialDataIndex::Float2;
-						break;
-					}
-					case GL_FLOAT_VEC3:
-					{
-						prop.Type = MaterialDataIndex::Float3;
-						break;
-					}
-					case GL_FLOAT_VEC4:
-					{
-						prop.Type = MaterialDataIndex::Float4;
-						break;
-					}
-				}
-				if(uniform_name[0] == 'u')
-					m_UniformCache.emplace(std::make_pair(std::string(uniform_name.get(), length), prop));
+				if (uniform_name[0] == 'u')
+					m_UniformCache.emplace(std::make_pair(std::string(uniform_name.get(), length), location));
 			}
 		}
 	}

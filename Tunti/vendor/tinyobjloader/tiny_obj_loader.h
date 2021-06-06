@@ -347,6 +347,13 @@ struct index_t {
   int vertex_index;
   int normal_index;
   int texcoord_index;
+
+  bool operator==(const index_t& other) const
+  {
+	  return this->vertex_index == other.vertex_index
+		  && this->texcoord_index == other.texcoord_index
+		  && this->normal_index == other.normal_index;
+  }
 };
 
 struct mesh_t {

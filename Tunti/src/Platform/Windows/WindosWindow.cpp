@@ -1,6 +1,7 @@
 #include "pch.h"
-#include "Tunti/Core/Platform.h"
 #include "Tunti/Core/Window.h"
+#include "Tunti/Core/Platform.h"
+#include "Tunti/Core/Application.h"
 
 #include "Tunti/Renderer/Renderer.h"
 #include "Tunti/Events/KeyEvent.h"
@@ -24,7 +25,7 @@ namespace Tunti
 			LOG_ASSERT(glfw, "GLFW initialization failed!");
 
 #ifdef DEBUG_ENABLED
-			if (Renderer::GetAPI() == RendererAPI::OpenGL)
+			if (Application::GetRenderAPI() == RenderAPI::OpenGL)
 				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
 			glfwSetErrorCallback(GLFWErrorCallback);

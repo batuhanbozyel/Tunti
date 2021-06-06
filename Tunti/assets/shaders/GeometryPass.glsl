@@ -6,20 +6,22 @@ layout(location = 0) out VertexInOut
 	vec3 WorldPosition;
 	vec3 Normal;
 	vec2 TexCoord;
-	flat uint TexIndex;
+	flat uint MaterialIndex;
 } VertexOut;
 
-layout(std140, binding = 0) uniform ViewProjectionUniform
+layout(std140, binding = 0) uniform CameraUniform
 {
     mat4 View;
 	mat4 Projection;
-	vec3 CameraPosition;
-};
+	mat4 InvView;
+	mat4 InvProjection;
+	vec3 Position;
+} Camera;
 
-layout(std430, binding = 1) readonly buffer TextureMapIndexBuffer
+layout(std430, binding = 1) readonly buffer MaterialIndexBuffer
 {
 	uint indices[];
-} textureMapIndexArray;
+} materialIndexBuffer;
 
 layout(std430, binding = 2) readonly buffer VertexBuffer
 {
@@ -33,77 +35,79 @@ void main()
 {
 	uint posIndex = gl_VertexID * 3;
 	VertexOut.WorldPosition = vec3(u_Model * vec4(
-		vertexBuffer.data[posIndex], 
-		vertexBuffer.data[posIndex + 1], 
+		vertexBuffer.data[posIndex],
+		vertexBuffer.data[posIndex + 1],
 		vertexBuffer.data[posIndex + 2], 1.0f));
 
 	mat3 normalMatrix = transpose(inverse(mat3(u_Model)));
 	uint normalIndex = u_VertexCount * 3 + gl_VertexID * 3;
 	VertexOut.Normal = normalMatrix * vec3(
-		vertexBuffer.data[normalIndex], 
-		vertexBuffer.data[normalIndex + 1], 
+		vertexBuffer.data[normalIndex],
+		vertexBuffer.data[normalIndex + 1],
 		vertexBuffer.data[normalIndex + 2]);
 
 	uint texCoordIndex = u_VertexCount * 6 + gl_VertexID * 2;
 	VertexOut.TexCoord = vec2(
-		vertexBuffer.data[texCoordIndex], 
+		vertexBuffer.data[texCoordIndex],
 		vertexBuffer.data[texCoordIndex + 1]);
 
-	VertexOut.TexIndex = textureMapIndexArray.indices[gl_VertexID];
+	VertexOut.MaterialIndex = materialIndexBuffer.indices[gl_VertexID];
 
-	gl_Position = Projection * View * vec4(VertexOut.WorldPosition, 1.0f);
+	gl_Position = Camera.Projection * Camera.View * vec4(VertexOut.WorldPosition, 1.0f);
 }
 
 #type fragment
 #version 450 core
 #extension GL_ARB_bindless_texture : require
 
-layout(location = 0) out vec4 g_Position;
-layout(location = 1) out vec4 g_Normal;
-layout(location = 2) out vec4 g_AlbedoSpec;
+layout(location = 0) out vec3 g_Normal;
+layout(location = 1) out vec3 g_Albedo;
+layout(location = 2) out vec3 g_RoughnessMetalnessAO;
 
 layout(location = 0) in VertexInOut
 {
 	vec3 WorldPosition;
 	vec3 Normal;
 	vec2 TexCoord;
-	flat uint TexIndex;
+	flat uint MaterialIndex;
 } VertexIn;
 
-struct TextureMap
+struct Material
 {
-	uvec2 Albedo;
-	uvec2 Normal;
-	uvec2 Metalness;
-	uvec2 Roughness;
-	uvec2 AmbientOcclusion;
+	vec4 Albedo;
+	uvec2 AlbedoMap;
+	uvec2 NormalMap;
+	uvec2 MetalnessMap;
+	uvec2 RoughnessMap;
+	uvec2 AmbientOcclusionMap;
+	float Metalness;
+	float Roughness;
 };
 
-layout(std430, binding = 3) readonly buffer TextureMaps
+layout(std430, binding = 3) readonly buffer MaterialBuffer
 {
-	TextureMap textures[];
-} textureArray;
+	Material materials[];
+} materialBuffer;
 
-vec3 computeNormal();
+vec3 computeNormal(vec3 normalMap);
 
 void main()
 {
-	g_Position = vec4(
-		VertexIn.WorldPosition,
-		texture(sampler2D(textureArray.textures[VertexIn.TexIndex].AmbientOcclusion), VertexIn.TexCoord).r);
+	Material material = materialBuffer.materials[VertexIn.MaterialIndex];
 
-	g_Normal = vec4(
-		computeNormal(), 
-		texture(sampler2D(textureArray.textures[VertexIn.TexIndex].Roughness), VertexIn.TexCoord).r);
+	g_Normal = computeNormal(texture(sampler2D(material.NormalMap), VertexIn.TexCoord).rgb);
 
-	g_AlbedoSpec = vec4(
-		texture(sampler2D(textureArray.textures[VertexIn.TexIndex].Albedo), VertexIn.TexCoord).rgb, 
-		texture(sampler2D(textureArray.textures[VertexIn.TexIndex].Metalness), VertexIn.TexCoord).r);
+	g_Albedo = texture(sampler2D(material.AlbedoMap), VertexIn.TexCoord).rgb * material.Albedo.rgb;
+
+	g_RoughnessMetalnessAO = vec3(
+		texture(sampler2D(material.RoughnessMap), VertexIn.TexCoord).r * material.Roughness,
+		texture(sampler2D(material.MetalnessMap), VertexIn.TexCoord).r * material.Metalness,
+		texture(sampler2D(material.AmbientOcclusionMap), VertexIn.TexCoord).r);
 }
 
-vec3 computeNormal()
+vec3 computeNormal(vec3 normalMap)
 {
-	vec3 texNormal = texture(sampler2D(textureArray.textures[VertexIn.TexIndex].Normal), VertexIn.TexCoord).rgb * 2.0f - 1.0f;
+	vec3 texNormal = normalMap * 2.0f - 1.0f;
 
 	vec3 dPosX  = dFdx(VertexIn.WorldPosition);
     vec3 dPosY  = dFdy(VertexIn.WorldPosition);

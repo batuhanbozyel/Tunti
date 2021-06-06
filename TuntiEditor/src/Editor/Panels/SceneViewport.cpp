@@ -7,6 +7,7 @@ namespace TEditor
 	struct SceneData
 	{
 		Tunti::Scene SceneContext;
+		Tunti::Texture2D LastFrame;
 		Tunti::EditorCamera SceneEditorCamera{ 90.0f, 16.0f / 9.0f, 0.1f, 10000.0f };
 		Tunti::FirstPersonCameraController FPSCamera;
 
@@ -24,21 +25,7 @@ namespace TEditor
 
 	void SceneViewport::OnStart()
 	{
-#if 0
-		Tunti::Ref<Tunti::Model> sponzaModel = Tunti::ModelLibrary::Load("../Sandbox/assets/models/sponza/sponza.obj");
-		for (uint32_t i = 0; i < sponzaModel->Meshes.size(); i++)
-		{
-			Tunti::Entity sponzaSubEntity = s_Data.SceneContext.CreateEntity(sponzaModel->Meshes[i].Name);
-			sponzaSubEntity.AddComponent<Tunti::MeshRendererComponent>(sponzaModel->Meshes[i], sponzaModel->MaterialInstances[i]);
-		}
-#elif 0
-		Tunti::Ref<Tunti::Model> backpackModel = Tunti::ModelLibrary::Load("../Sandbox/assets/models/backpack/backpack.obj");
-		for (uint32_t i = 0; i < backpackModel->Meshes.size(); i++)
-		{
-			Tunti::Entity backpackSubEntity = s_Data.SceneContext.CreateEntity(backpackModel->Meshes[i].Name);
-			backpackSubEntity.AddComponent<Tunti::MeshRendererComponent>(backpackModel->Meshes[i], backpackModel->MaterialInstances[i]);
-		}
-#endif
+
 	}
 
 	void SceneViewport::OnImGuiRender()
@@ -47,9 +34,8 @@ namespace TEditor
 		ImGui::Begin("Scene Viewport");
 		ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 
-		uint64_t sceneFrame = Tunti::Renderer::GetFramebufferTexture();
-		ImGui::Image(reinterpret_cast<void*>(sceneFrame), viewportSize, ImVec2(0, 1), ImVec2(1, 0));
-		Tunti::Renderer::ResizeFramebuffers(viewportSize.x, viewportSize.y);
+		ImGui::Image(reinterpret_cast<void*>((uint64_t)s_Data.LastFrame), viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+		Tunti::Renderer::OnWindowResize(viewportSize.x, viewportSize.y);
 		s_Data.SceneEditorCamera.SetViewportSize(viewportSize.x, viewportSize.y);
 
 		s_Data.IsSceneHovered = ImGui::IsItemHovered();
@@ -65,7 +51,7 @@ namespace TEditor
 		if (s_Data.IsSceneHovered)
 			s_Data.SceneEditorCamera.OnUpdate(dt);
 		
-		s_Data.SceneContext.OnUpdateEditor(dt, s_Data.SceneEditorCamera);
+		s_Data.LastFrame = s_Data.SceneContext.OnUpdateEditor(dt, s_Data.SceneEditorCamera);
 	}
 
 	void SceneViewport::OnPlay(double dt)
