@@ -14,7 +14,6 @@ namespace TEditor
 		virtual void OnEvent(Tunti::Event& e) override;
 		virtual void OnUpdate(double dt) override;
 	private:
-		std::string OpenFileDialog();
 		void Begin();
 		void End();
 	private:

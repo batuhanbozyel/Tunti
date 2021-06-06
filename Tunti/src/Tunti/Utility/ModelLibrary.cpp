@@ -35,7 +35,43 @@ namespace Tunti
 			Ref<Model> model = CreateRef<Model>();
 			Ref<Material> pbrMaterial = MaterialLibrary::PBRMaterial();
 			model->_Mesh = BufferManager::AllocateMeshBufferWithKey(pbrMaterial->Index);
-			std::unordered_map<Vertex, uint32_t> uniqueVertices{};
+
+			auto HashIndices = [](const tinyobj::index_t& val)
+			{
+				int seed = 0xa5a8ae1e;
+				const void* key = &val;
+				int len = sizeof(val);
+
+				const uint32_t m = 0x5bd1e995;
+				const int32_t r = 24;
+				uint32_t h = seed ^ len;
+				const uint8_t* data = (const uint8_t*)key;
+
+				while (len >= 4) {
+					uint32_t k = *(uint32_t*)data;
+					k *= m;
+					k ^= k >> r;
+					k *= m;
+					h *= m;
+					h ^= k;
+					data += 4;
+					len -= 4;
+				}
+
+				switch (len) {
+					case 3: h ^= data[2] << 16;
+					case 2: h ^= data[1] << 8;
+					case 1: h ^= data[0];
+					h *= m;
+				};
+
+				h ^= h >> 13;
+				h *= m;
+				h ^= h >> 15;
+
+				return h;
+			};
+			std::unordered_map<tinyobj::index_t, uint32_t, decltype(HashIndices)> uniqueVertices(10, HashIndices);
 			for (const tinyobj::shape_t& shape : shapes)
 			{
 				Submesh submesh;
@@ -86,34 +122,29 @@ namespace Tunti
 
 				for (const auto& index : shape.mesh.indices)
 				{
-					Vertex vertex{};
-
-					vertex.Position = {
-						attrib.vertices[3 * index.vertex_index + 0],
-						attrib.vertices[3 * index.vertex_index + 1],
-						attrib.vertices[3 * index.vertex_index + 2]
-					};
-
-					vertex.Normal = {
-						attrib.normals[3 * index.normal_index + 0],
-						attrib.normals[3 * index.normal_index + 1],
-						attrib.normals[3 * index.normal_index + 2]
-					};
-
-					vertex.TexCoord = {
-						attrib.texcoords[2 * index.texcoord_index + 0],
-						attrib.texcoords[2 * index.texcoord_index + 1]
-					};
-
-					if (uniqueVertices.count(vertex) == 0)
+					if (uniqueVertices.count(index) == 0)
 					{
-						uniqueVertices[vertex] = static_cast<uint32_t>(submesh.Positions.size());
-						submesh.Positions.push_back(vertex.Position);
-						submesh.Normals.push_back(vertex.Normal);
-						submesh.TexCoords.push_back(vertex.TexCoord);
+						uniqueVertices[index] = static_cast<uint32_t>(submesh.Positions.size());
+
+						submesh.Positions.push_back({
+							attrib.vertices[3 * index.vertex_index + 0],
+							attrib.vertices[3 * index.vertex_index + 1],
+							attrib.vertices[3 * index.vertex_index + 2]
+						});
+
+						submesh.Normals.push_back({attrib.normals[3 * index.normal_index + 0],
+							attrib.normals[3 * index.normal_index + 1],
+							attrib.normals[3 * index.normal_index + 2]
+						});
+
+						submesh.TexCoords.push_back({
+							attrib.texcoords[2 * index.texcoord_index + 0],
+							attrib.texcoords[2 * index.texcoord_index + 1]
+						});
+
 						submesh.MaterialIndices.push_back(materialInstance->Index);
 					}
-					submesh.Indices.push_back(uniqueVertices[vertex]);
+					submesh.Indices.push_back(uniqueVertices[index]);
 				}
 				model->Submeshes.push_back(BufferManager::AllocateSubmeshFromMeshBuffer(model->_Mesh, submesh));
 				model->Materials.push_back(materialInstance);

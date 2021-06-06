@@ -52,19 +52,10 @@ namespace Tunti
 }
 
 template<>
-struct std::hash<Tunti::Vertex>
-{
-	size_t operator()(Tunti::Vertex const& vertex) const
-	{
-		return ((std::hash<glm::vec3>()(vertex.Position) ^ (std::hash<glm::vec3>()(vertex.Normal) << 1)) >> 1) ^ (std::hash<glm::vec2>()(vertex.TexCoord) << 1);
-	}
-};
-
-template<>
 struct std::hash<Tunti::MeshBuffer>
 {
-	size_t operator()(Tunti::MeshBuffer const& buffer) const
+	size_t operator()(const Tunti::MeshBuffer& buffer) const
 	{
-		return std::hash<uint32_t>()(buffer.Index);
+		return std::hash<uint32_t>()(buffer.Key);
 	}
 };

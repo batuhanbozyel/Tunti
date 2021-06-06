@@ -6,6 +6,8 @@
 #include "SceneHierarchy.h"
 #include "SceneViewport.h"
 
+#include "Editor/Utils.h"
+
 namespace TEditor
 {
 	struct SceneHierarchyData
@@ -132,6 +134,14 @@ namespace TEditor
 			if (ImGui::MenuItem("Directional Light"))
 			{
 				context.CreateEntity("Directional Light").AddComponent<Tunti::LightComponent>();
+			}
+
+			if (ImGui::MenuItem("Import Model"))
+			{
+				std::string modelPath = Utils::OpenFileDialog();
+				Tunti::Ref<Tunti::Model> model = Tunti::ModelLibrary::Load(modelPath);
+				Tunti::Entity modelEntity = context.CreateEntity("New Model");
+				modelEntity.AddComponent<Tunti::MeshRendererComponent>(model);
 			}
 
 			ImGui::EndPopup();
