@@ -9,6 +9,7 @@
 
 #include "Tunti/Core/Window.h"
 #include "Tunti/Core/Application.h"
+#include "Tunti/Scene/SceneSettings.h"
 
 namespace Tunti
 {
@@ -28,7 +29,7 @@ namespace Tunti
 
 		ConstructOutputBuffer();
 		ConstructGBuffer();
-		ConstructShadowMapBuffer(1024);
+		ConstructShadowMapBuffer(SceneSettings::ShadowMap::Resolution);
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glEnable(GL_CULL_FACE);
@@ -114,6 +115,7 @@ namespace Tunti
 	{
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);
 		glDepthMask(GL_TRUE);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, m_ShadowPass.Framebuffer);
@@ -150,6 +152,8 @@ namespace Tunti
 
 	void OpenGLDeferredRenderPipeline::GeometryPass() const
 	{
+		glCullFace(GL_BACK);
+
 		glBindFramebuffer(GL_FRAMEBUFFER, m_GBuffer.Framebuffer);
 		glViewport(0, 0, m_OutputWidth, m_OutputHeight);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -188,6 +192,7 @@ namespace Tunti
 		glDepthMask(GL_FALSE);
 
 		m_PBRLightingPassShader->Bind();
+		m_PBRLightingPassShader->SetUniformFloat("u_EnvironmentMapIntensity", SceneSettings::Lighting::EnvironmentMapIntensity);
 		glDrawArraysIndirect(GL_TRIANGLE_STRIP, &QuadIndirectParams);
 	}
 
@@ -205,8 +210,6 @@ namespace Tunti
 
 		glDepthRange(0.0f, 1.0f);
 		glDepthFunc(GL_LESS);
-
-		glCullFace(GL_BACK);
 	}
 
 	void OpenGLDeferredRenderPipeline::ConstructOutputBuffer()
@@ -286,12 +289,12 @@ namespace Tunti
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_ShadowPass.ShadowMap);
 		glTextureStorage2D(m_ShadowPass.ShadowMap, 1, GL_DEPTH_COMPONENT32F, m_ShadowPass.Resolution, m_ShadowPass.Resolution);
-		glTextureParameteri(m_ShadowPass.ShadowMap, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTextureParameteri(m_ShadowPass.ShadowMap, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteri(m_ShadowPass.ShadowMap, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTextureParameteri(m_ShadowPass.ShadowMap, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTextureParameteri(m_ShadowPass.ShadowMap, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
 		glTextureParameteri(m_ShadowPass.ShadowMap, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-		glTextureParameteri(m_ShadowPass.ShadowMap, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTextureParameteri(m_ShadowPass.ShadowMap, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTextureParameteri(m_ShadowPass.ShadowMap, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTextureParameteri(m_ShadowPass.ShadowMap, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glNamedFramebufferTexture(m_ShadowPass.Framebuffer, GL_DEPTH_ATTACHMENT, m_ShadowPass.ShadowMap, 0);
 
 		glNamedFramebufferDrawBuffer(m_ShadowPass.Framebuffer, GL_NONE);

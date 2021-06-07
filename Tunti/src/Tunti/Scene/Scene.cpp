@@ -1,11 +1,11 @@
 #include "pch.h"
 #include "Scene.h"
 #include "Entity.h"
+#include "Components.h"
+#include "SceneSettings.h"
 
 #include "Tunti/Renderer/Renderer.h"
 #include "Tunti/Utility/EditorCamera.h"
-
-#include "Components.h"
 
 namespace Tunti
 {
@@ -55,7 +55,10 @@ namespace Tunti
 					if (light.Type == LightType::DirectionalLight)
 					{
 						glm::vec3 direction = transform.GetForwardDirection();
-						glm::mat4 viewProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 7.5f)
+						glm::mat4 viewProjection = glm::ortho(
+							SceneSettings::ShadowMap::CascadeNearPlaneOffset, SceneSettings::ShadowMap::CascadeFarPlaneOffset,
+							SceneSettings::ShadowMap::CascadeNearPlaneOffset, SceneSettings::ShadowMap::CascadeFarPlaneOffset,
+							1.0f, SceneSettings::ShadowMap::MaxShadowDistance)
 							* glm::lookAt(-direction * 10.0f, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 						Renderer::GetRenderPipeline()->SubmitDirectionalLight(_DirectionalLight{ viewProjection, direction, light.Color, light.Intensity });
 					}
@@ -94,7 +97,9 @@ namespace Tunti
 				if (light.Type == LightType::DirectionalLight)
 				{
 					glm::vec3 direction = transform.GetForwardDirection();
-					glm::mat4 viewProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 7.5f)
+					float shadowDistance = SceneSettings::ShadowMap::MaxShadowDistance;
+					float halfShadowDistance = shadowDistance * 0.5f;
+					glm::mat4 viewProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, -10.0f, 20.0f)
 						* glm::lookAt(-direction * 10.0f, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 					Renderer::GetRenderPipeline()->SubmitDirectionalLight(_DirectionalLight{ viewProjection, direction, light.Color, light.Intensity });
 				}

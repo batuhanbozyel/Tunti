@@ -39,7 +39,7 @@ namespace Tunti
 			uint32_t width = 1280, uint32_t height = 720,
 			void* monitor = nullptr,
 			void* share = nullptr,
-			bool vsync = false)
+			bool vsync = true)
 			: Title(title), Width(width), Height(height), Monitor(monitor), Share(share), VSync(vsync)
 		{
 
@@ -70,7 +70,7 @@ namespace Tunti
 		void SetCursorPos(float x, float y);
 
 		void SetEventCallbackFn(std::function<void(Event&)> callback) { m_Props.EventCallback = callback; }
-		bool VSync() const { return m_Props.VSync; }
+		bool IsVSync() const { return m_Props.VSync; }
 
 		const WindowProps& GetWindowProps() const { return m_Props; }
 		const NativeWindowHandle& GetHandle() const;
