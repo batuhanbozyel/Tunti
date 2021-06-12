@@ -12,7 +12,7 @@ namespace Tunti
 		static constexpr uint8_t GBufferDepthTextureUnit = 3;
 		static constexpr uint8_t GBufferNormalTextureUnit = 4;
 		static constexpr uint8_t GBufferAlbedoTextureUnit = 5;
-		static constexpr uint8_t GBufferRoughnessMetalnessAOTextureUnit = 6;
+		static constexpr uint8_t GBufferLightSpacePositionTextureUnit = 6;
 		static constexpr uint8_t DirectionalLightShadowMapTextureUnit = 7;
 		static constexpr uint8_t EmptyTextureUnitBase = 8;
 

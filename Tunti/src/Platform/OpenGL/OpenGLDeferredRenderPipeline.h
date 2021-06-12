@@ -12,7 +12,7 @@ namespace Tunti
 		GLuint Framebuffer = 0;
 		GLuint NormalAttachment = 0;
 		GLuint AlbedoAttachment = 0;
-		GLuint RoughnessMetalnessAOAttachment = 0;
+		GLuint LightSpacePositionAttachment = 0;
 		GLuint DepthAttachment = 0;
 	};
 
@@ -35,14 +35,19 @@ namespace Tunti
 		OpenGLDeferredRenderPipeline();
 		~OpenGLDeferredRenderPipeline();
 
-		virtual Texture2D ExecuteImpl(const ShaderCameraContainer& shaderCamera) const override;
+		virtual Texture2D GetDebugOutputTexture(uint32_t idx = 0) const override;
 		virtual void OnWindowResize(uint32_t width, uint32_t height) override;
 	private:
+		virtual Texture2D ExecuteImpl(const ShaderCameraContainer& shaderCamera) const override;
+
 		void UpdateBuffers(const ShaderCameraContainer& shaderCamera) const;
 		void ShadowPass() const;
 		void GeometryPass() const;
 		void LightingPass() const;
 		void SkyboxPass() const;
+
+		void DrawSceneGeometry(const Ref<OpenGLShaderProgram>& shader) const;
+		void DrawSceneGeometryWithMaterials(const Ref<OpenGLShaderProgram>& shader) const;
 
 		void ConstructOutputBuffer();
 		void ConstructGBuffer();

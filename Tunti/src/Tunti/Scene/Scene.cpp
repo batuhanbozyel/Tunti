@@ -59,7 +59,7 @@ namespace Tunti
 							SceneSettings::ShadowMap::CascadeNearPlaneOffset, SceneSettings::ShadowMap::CascadeFarPlaneOffset,
 							SceneSettings::ShadowMap::CascadeNearPlaneOffset, SceneSettings::ShadowMap::CascadeFarPlaneOffset,
 							1.0f, SceneSettings::ShadowMap::MaxShadowDistance)
-							* glm::lookAt(-direction * 10.0f, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+							* glm::lookAt(-direction * 10000.0f, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 						Renderer::GetRenderPipeline()->SubmitDirectionalLight(_DirectionalLight{ viewProjection, direction, light.Color, light.Intensity });
 					}
 					else if (light.Type == LightType::PointLight)
@@ -99,8 +99,8 @@ namespace Tunti
 					glm::vec3 direction = transform.GetForwardDirection();
 					float shadowDistance = SceneSettings::ShadowMap::MaxShadowDistance;
 					float halfShadowDistance = shadowDistance * 0.5f;
-					glm::mat4 viewProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, -10.0f, 20.0f)
-						* glm::lookAt(-direction * 10.0f, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+					glm::mat4 viewProjection = glm::ortho(-25.0f, 25.0f, -25.0f, 25.0f, 1.0f, 10000.0f)
+						* glm::lookAt(-direction * 8000.0f, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 					Renderer::GetRenderPipeline()->SubmitDirectionalLight(_DirectionalLight{ viewProjection, direction, light.Color, light.Intensity });
 				}
 				else if (light.Type == LightType::PointLight)

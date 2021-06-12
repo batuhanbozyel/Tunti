@@ -137,6 +137,8 @@ namespace TEditor
 			Utils::DrawFloatControl("Max Shadow Distance", Tunti::SceneSettings::ShadowMap::MaxShadowDistance, 100.0f, glm::vec2{ 0.0f, 1000.0f }, 1.0f, "%.1f");
 			Utils::DrawFloatControl("Cascade NearPlane Offset", Tunti::SceneSettings::ShadowMap::CascadeNearPlaneOffset, -15.0f, glm::vec2{ -100.0f,  Tunti::SceneSettings::ShadowMap::CascadeFarPlaneOffset }, 0.5f, "%.1f");
 			Utils::DrawFloatControl("Cascade FarPlane Offset", Tunti::SceneSettings::ShadowMap::CascadeFarPlaneOffset, -15.0f, glm::vec2{ Tunti::SceneSettings::ShadowMap::CascadeNearPlaneOffset, 100.0f }, 0.5f, "%.1f");
+
+			ImGui::Image(reinterpret_cast<void*>((uint64_t)Tunti::Renderer::GetRenderPipeline()->GetDebugOutputTexture()), ImVec2(360, 360), ImVec2(0, 1), ImVec2(1, 0));
 		}
 		ImGui::End();
 

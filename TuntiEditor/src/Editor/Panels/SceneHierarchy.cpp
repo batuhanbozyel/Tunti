@@ -139,9 +139,12 @@ namespace TEditor
 			if (ImGui::MenuItem("Import Model"))
 			{
 				std::string modelPath = Utils::OpenFileDialog();
-				Tunti::Ref<Tunti::Model> model = Tunti::ModelLibrary::Load(modelPath);
-				Tunti::Entity modelEntity = context.CreateEntity("New Model");
-				modelEntity.AddComponent<Tunti::MeshRendererComponent>(model);
+				if (!modelPath.empty())
+				{
+					Tunti::Ref<Tunti::Model> model = Tunti::ModelLibrary::Load(modelPath);
+					Tunti::Entity modelEntity = context.CreateEntity("New Model");
+					modelEntity.AddComponent<Tunti::MeshRendererComponent>(model);
+				}
 			}
 
 			ImGui::EndPopup();

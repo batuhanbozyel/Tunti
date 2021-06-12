@@ -34,6 +34,7 @@ namespace Tunti
 		void SubmitMesh(const MeshBuffer& mesh, const SubmeshQueueElementList& submeshes, const glm::mat4& transform);
 
 		Texture2D Execute(const ShaderCameraContainer& shaderCamera);
+		virtual Texture2D GetDebugOutputTexture(uint32_t idx = 0) const { return Texture2D(); };
 		virtual void OnWindowResize(uint32_t width, uint32_t height) = 0;
 	protected:
 		virtual Texture2D ExecuteImpl(const ShaderCameraContainer& shaderCamera) const = 0;

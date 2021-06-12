@@ -63,7 +63,7 @@ uniform float u_EnvironmentMapIntensity;
 uniform sampler2D u_DepthAttachment;
 uniform sampler2D u_NormalAttachment;
 uniform sampler2D u_AlbedoAttachment;
-uniform sampler2D u_RoughnessMetalnessAOAttachment;
+uniform sampler2D u_LightSpacePositionAttachment;
 uniform samplerCube u_IrradianceCubemap;
 uniform samplerCube u_SpecularCubemap;
 uniform sampler2D u_SpecularBRDF_LUT;
@@ -86,14 +86,16 @@ vec3 CalculateAmbientLighting(vec3 R, float NdotV, vec3 normal, vec3 F0, vec3 al
 void main()
 {
     vec3 fragPos = FragPosFromDepth(texture(u_DepthAttachment, VertexIn.TexCoord).r);
+    vec4 fragPosLightSpace = texture(u_LightSpacePositionAttachment, VertexIn.TexCoord);
+
+    vec4 gNormal = texture(u_NormalAttachment, VertexIn.TexCoord);
+    vec4 gAlbedo = texture(u_AlbedoAttachment, VertexIn.TexCoord);
 
     // Material Properties
-    vec3 albedo = texture(u_AlbedoAttachment, VertexIn.TexCoord).rgb;
-    vec3 normal = texture(u_NormalAttachment, VertexIn.TexCoord).rgb;
-    vec3 roughnessMetalnessAO = texture(u_RoughnessMetalnessAOAttachment, VertexIn.TexCoord).rgb;
-    float roughness = roughnessMetalnessAO.r;
-    float metalness = roughnessMetalnessAO.g;
-    float ambientOcclusion = roughnessMetalnessAO.b;
+    vec3 normal = gNormal.rgb;
+    vec3 albedo = gAlbedo.rgb;
+    float roughness = gNormal.a;
+    float metalness = gAlbedo.a;
 
     normal = normalize(normal);
 
@@ -112,15 +114,15 @@ void main()
     // Calculate Directional Lighting
     vec3 directionalLighting = CalculateDirectionalLighting(V, NdotV, normal, F0, albedo, roughness, metalness);
 
+    // Diffuse lighting
+    float shadow = CalculateDirectionalShadow(fragPosLightSpace);
+    vec3 diffuseLighting = directionalLighting * (1.0f - shadow);
+
     // Ambient lighting (IBL).
 	vec3 ambientLighting = CalculateAmbientLighting(R, NdotV, normal, F0, albedo, roughness, metalness);
 
-    // Diffuse lighting
-    float shadow = CalculateDirectionalShadow(directionalLight.ViewProjection * vec4(fragPos, 1.0f));
-    vec3 diffuseLighting = directionalLighting * (1.0f - shadow);
-
     // Combine to get the final color
-    vec3 color = ambientLighting * ambientOcclusion + diffuseLighting;
+    vec3 color = ambientLighting + diffuseLighting;
     
     // HDR tonemapping
     color = color / (color + vec3(1.0f));
@@ -129,10 +131,6 @@ void main()
 
     outColor = vec4(color, 1.0f);
 }
-
-/*
-    PBR Functions
-*/
 
 // GGX/Towbridge-Reitz normal distribution function.
 // Uses Disney's reparametrization of alpha = roughness^2.
@@ -191,11 +189,6 @@ float CalculateDirectionalShadow(vec4 fragPosLightSpace)
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     projCoords = projCoords * 0.5f + 0.5f;
 
-	if(projCoords.z > 1.0f)
-	{
-		return 0.0f;
-	}
-
     float shadow = 0.0f;
     vec2 texelSize = 1.0f / textureSize(u_DirectionalLightShadowMap, 0);
     for (int y = -1 ; y <= 1 ; y++) 
@@ -203,7 +196,7 @@ float CalculateDirectionalShadow(vec4 fragPosLightSpace)
         for (int x = -1 ; x <= 1 ; x++) 
         {
             vec2 uv = projCoords.xy + vec2(x, y) * texelSize;
-            shadow += texture(u_DirectionalLightShadowMap, vec3(uv, projCoords.z + Epsilon)).r;
+            shadow += texture(u_DirectionalLightShadowMap, vec3(uv, projCoords.z + Epsilon));
         }
     }
     return (0.5f + (shadow / 18.0f));
@@ -236,7 +229,7 @@ vec3 CalculateDirectionalLighting(vec3 V, float NdotV, vec3 normal, vec3 F0, vec
     // Lambert diffuse BRDF.
     // We don't scale by 1/PI for lighting & material units to be more convenient.
     // See: https://seblagarde.wordpress.com/2012/01/08/pi-or-not-to-pi-in-game-lighting-equation/
-    vec3 diffuseBRDF = Kd * albedo / PI;
+    vec3 diffuseBRDF = Kd * albedo;
 
     // Cook-Torrance specular microfacet BRDF.
     vec3 specularBRDF = (D * G * F) / (4.0f * NdotV * NdotL + Epsilon);

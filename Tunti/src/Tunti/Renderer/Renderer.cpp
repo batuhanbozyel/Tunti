@@ -22,14 +22,14 @@ namespace Tunti
 
 	void Renderer::Destroy()
 	{
-		if (s_Renderer)
-		{
-			delete s_Renderer;
-		}
-
 		if (s_RenderPipeline)
 		{
 			delete s_RenderPipeline;
+		}
+
+		if (s_Renderer)
+		{
+			delete s_Renderer;
 		}
 	}
 
