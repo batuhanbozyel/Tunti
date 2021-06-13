@@ -123,7 +123,7 @@ namespace Tunti
 		glCullFace(GL_FRONT);
 		glDepthMask(GL_TRUE);
 
-		glBindFramebuffer(GL_FRAMEBUFFER, m_ShadowPass.Framebuffer);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_ShadowPass.Framebuffer);
 		glViewport(0, 0, m_ShadowPass.Resolution, m_ShadowPass.Resolution);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -272,7 +272,7 @@ namespace Tunti
 
 		// GBuffer Material Attachment
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_GBuffer.LightSpacePositionAttachment);
-		glTextureStorage2D(m_GBuffer.LightSpacePositionAttachment, 1, GL_RGBA8, m_OutputWidth, m_OutputHeight);
+		glTextureStorage2D(m_GBuffer.LightSpacePositionAttachment, 1, GL_RGBA16F, m_OutputWidth, m_OutputHeight);
 		glTextureParameteri(m_GBuffer.LightSpacePositionAttachment, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTextureParameteri(m_GBuffer.LightSpacePositionAttachment, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glNamedFramebufferTexture(m_GBuffer.Framebuffer, GL_COLOR_ATTACHMENT2, m_GBuffer.LightSpacePositionAttachment, 0);

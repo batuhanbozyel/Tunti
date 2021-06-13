@@ -191,9 +191,9 @@ float CalculateDirectionalShadow(vec4 fragPosLightSpace)
 
     float shadow = 0.0f;
     vec2 texelSize = 1.0f / textureSize(u_DirectionalLightShadowMap, 0);
-    for (int y = -1 ; y <= 1 ; y++) 
+    for (int x = -1 ; x <= 1 ; x++) 
     {
-        for (int x = -1 ; x <= 1 ; x++) 
+        for (int y = -1 ; y <= 1 ; y++) 
         {
             vec2 uv = projCoords.xy + vec2(x, y) * texelSize;
             shadow += texture(u_DirectionalLightShadowMap, vec3(uv, projCoords.z + Epsilon));

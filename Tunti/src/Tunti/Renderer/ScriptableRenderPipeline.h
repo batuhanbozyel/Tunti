@@ -5,8 +5,6 @@
 #include "BufferManager.h"
 #include "RendererBindingTable.h"
 
-#include "Tunti/Events/WindowEvent.h"
-
 namespace Tunti
 {
 	using SubmeshQueueElementList = std::pair<std::vector<SubmeshBuffer>, std::vector<Ref<MaterialInstance>>>;

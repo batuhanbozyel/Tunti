@@ -89,7 +89,9 @@ namespace TEditor
 		});
 
 		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+		{
 			s_Data.SelectedEntity = {};
+		}
 
 		if (ImGui::BeginPopupContextWindow(0, 1, false))
 		{

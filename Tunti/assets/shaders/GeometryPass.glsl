@@ -62,8 +62,9 @@ void main()
 		vertexBuffer.data[posIndex + 1],
 		vertexBuffer.data[posIndex + 2], 1.0f);
 
-	VertexOut.WorldPosition = vec3(u_Model * vertexPosition);
-	VertexOut.LightSpacePosition = directionalLight.ViewProjection * vertexPosition;
+	vec4 worldPosition = u_Model * vertexPosition;
+	VertexOut.WorldPosition = vec3(worldPosition);
+	VertexOut.LightSpacePosition = directionalLight.ViewProjection * worldPosition;
 
 	mat3 normalMatrix = transpose(inverse(mat3(u_Model)));
 	uint normalIndex = u_VertexCount * 3 + gl_VertexID * 3;
@@ -79,7 +80,7 @@ void main()
 
 	VertexOut.MaterialIndex = materialIndexBuffer.indices[gl_VertexID];
 
-	gl_Position = Camera.Projection * Camera.View * vec4(VertexOut.WorldPosition, 1.0f);
+	gl_Position = Camera.Projection * Camera.View * worldPosition;
 }
 
 #type fragment
