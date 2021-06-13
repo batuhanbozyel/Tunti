@@ -20,7 +20,7 @@ namespace TEditor
 	{
 		ImGui::Begin("Inspector");
 		Tunti::Entity& selectedEntity = SceneHierarchy::GetSelectedEntity();
-		if (selectedEntity)
+		if (selectedEntity.IsValid())
 		{
 			if (selectedEntity.HasComponent<Tunti::TagComponent>())
 			{
