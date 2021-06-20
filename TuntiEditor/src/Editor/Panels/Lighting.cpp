@@ -32,6 +32,8 @@ namespace TEditor
 					Tunti::Renderer::GetRenderPipeline()->SubmitEnvironmentMap(environmentMap);
 				}
 			}
+
+			Utils::DrawFloatControl("Intensity", Tunti::SceneSettings::Lighting::EnvironmentMapIntensity, 0.5f, glm::vec2{ 0.0f, 5.0f }, 0.01f, "%.2f");
 		});
 
 		ImGui::End();

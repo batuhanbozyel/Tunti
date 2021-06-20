@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 #include "Tunti.h"
 #include "EditorLayer.h"
+#include "Utils.h"
 
 #include <commdlg.h>
 
@@ -121,9 +122,24 @@ namespace TEditor
 		Inspector::OnImGuiRender();
 		Lighting::OnImGuiRender();
 
-		ImGui::Begin("Renderer Stats");
+		ImGui::Begin("Renderer Info");
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		ImGui::SameLine();
+		{
+			// VSync
+			bool vsync = Tunti::Application::GetWindow()->IsVSync();
+			ImGui::Checkbox("VSync", &vsync);
+			Tunti::Application::GetWindow()->SetVSync(vsync);
+		}
+		ImGui::End();
+		
+		ImGui::Begin("Shadows");
+		{
+			Utils::DrawFloatControl("Max Shadow Distance", Tunti::SceneSettings::ShadowMap::MaxShadowDistance, 100.0f, glm::vec2{ 0.0f, 1000.0f }, 1.0f, "%.1f");
+			Utils::DrawFloatControl("Cascade NearPlane Offset", Tunti::SceneSettings::ShadowMap::CascadeNearPlaneOffset, -15.0f, glm::vec2{ -100.0f,  Tunti::SceneSettings::ShadowMap::CascadeFarPlaneOffset }, 0.5f, "%.1f");
+			Utils::DrawFloatControl("Cascade FarPlane Offset", Tunti::SceneSettings::ShadowMap::CascadeFarPlaneOffset, -15.0f, glm::vec2{ Tunti::SceneSettings::ShadowMap::CascadeNearPlaneOffset, 100.0f }, 0.5f, "%.1f");
+
+			ImGui::Image(reinterpret_cast<void*>((uint64_t)Tunti::Renderer::GetRenderPipeline()->GetDebugOutputTexture()), ImVec2(360, 360), ImVec2(0, 1), ImVec2(1, 0));
+		}
 		ImGui::End();
 
 		End();

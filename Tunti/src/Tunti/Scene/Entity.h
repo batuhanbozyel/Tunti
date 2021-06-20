@@ -48,15 +48,12 @@ namespace Tunti
 			return !(m_EntityHandle == other.m_EntityHandle && m_Scene == other.m_Scene);
 		}
 
+		bool IsValid() const { return static_cast<uint32_t>(m_EntityHandle) != std::numeric_limits<uint32_t>::max(); }
+
 		operator entt::entity() const { return m_EntityHandle; }
 		operator uint32_t() const { return static_cast<uint32_t>(m_EntityHandle); }
 	private:
-		entt::entity m_EntityHandle;
+		entt::entity m_EntityHandle = static_cast<entt::entity>(std::numeric_limits<uint32_t>::max());
 		Scene* m_Scene;
-	};
-
-	class Subentity
-	{
-		
 	};
 }

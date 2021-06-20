@@ -59,10 +59,11 @@ layout(std140, binding = 4) uniform LightsUniform
     int NumPointLights;
 };
 
+uniform float u_EnvironmentMapIntensity;
 uniform sampler2D u_DepthAttachment;
 uniform sampler2D u_NormalAttachment;
 uniform sampler2D u_AlbedoAttachment;
-uniform sampler2D u_RoughnessMetalnessAOAttachment;
+uniform sampler2D u_LightSpacePositionAttachment;
 uniform samplerCube u_IrradianceCubemap;
 uniform samplerCube u_SpecularCubemap;
 uniform sampler2D u_SpecularBRDF_LUT;
@@ -77,7 +78,6 @@ float GeometrySchlickGGX(float cosTheta, float k);
 float GeometrySmith(float cosLi, float cosLo, float roughness);
 vec3 FresnelSchlick(vec3 F0, float cosTheta);
 vec3 FresnelSchlickRoughness(vec3 F0, float cosTheta, float roughness);
-vec4 WorldToFragSpace(vec3 v, mat4 viewProj);
 vec3 FragPosFromDepth(float depth);
 float CalculateDirectionalShadow(vec4 fragPosLightSpace);
 vec3 CalculateDirectionalLighting(vec3 V, float NdotV, vec3 normal, vec3 F0, vec3 albedo, float roughness, float metalness);
@@ -86,14 +86,16 @@ vec3 CalculateAmbientLighting(vec3 R, float NdotV, vec3 normal, vec3 F0, vec3 al
 void main()
 {
     vec3 fragPos = FragPosFromDepth(texture(u_DepthAttachment, VertexIn.TexCoord).r);
+    vec4 fragPosLightSpace = texture(u_LightSpacePositionAttachment, VertexIn.TexCoord);
+
+    vec4 gNormal = texture(u_NormalAttachment, VertexIn.TexCoord);
+    vec4 gAlbedo = texture(u_AlbedoAttachment, VertexIn.TexCoord);
 
     // Material Properties
-    vec3 albedo = texture(u_AlbedoAttachment, VertexIn.TexCoord).rgb;
-    vec3 normal = texture(u_NormalAttachment, VertexIn.TexCoord).rgb;
-    vec3 roughnessMetalnessAO = texture(u_RoughnessMetalnessAOAttachment, VertexIn.TexCoord).rgb;
-    float roughness = roughnessMetalnessAO.r;
-    float metalness = roughnessMetalnessAO.g;
-    float ambientOcclusion = roughnessMetalnessAO.b;
+    vec3 normal = gNormal.rgb;
+    vec3 albedo = gAlbedo.rgb;
+    float roughness = gNormal.a;
+    float metalness = gAlbedo.a;
 
     normal = normalize(normal);
 
@@ -112,11 +114,15 @@ void main()
     // Calculate Directional Lighting
     vec3 directionalLighting = CalculateDirectionalLighting(V, NdotV, normal, F0, albedo, roughness, metalness);
 
+    // Diffuse lighting
+    float shadow = CalculateDirectionalShadow(fragPosLightSpace);
+    vec3 diffuseLighting = directionalLighting * (1.0f - shadow);
+
     // Ambient lighting (IBL).
 	vec3 ambientLighting = CalculateAmbientLighting(R, NdotV, normal, F0, albedo, roughness, metalness);
 
-    float shadow = CalculateDirectionalShadow(WorldToFragSpace(fragPos, directionalLight.ViewProjection));
-    vec3 color = ambientLighting * ambientOcclusion + directionalLighting * (1.0f - shadow);
+    // Combine to get the final color
+    vec3 color = ambientLighting + diffuseLighting;
     
     // HDR tonemapping
     color = color / (color + vec3(1.0f));
@@ -125,10 +131,6 @@ void main()
 
     outColor = vec4(color, 1.0f);
 }
-
-/*
-    PBR Functions
-*/
 
 // GGX/Towbridge-Reitz normal distribution function.
 // Uses Disney's reparametrization of alpha = roughness^2.
@@ -165,15 +167,6 @@ vec3 FresnelSchlick(vec3 F0, float cosTheta)
 vec3 FresnelSchlickRoughness(vec3 F0, float cosTheta, float roughness)
 {
     return F0 + (max(vec3(1.0f - roughness), F0) - F0) * pow(max(1.0f - cosTheta, 0.0f), 5.0f);
-}   
-
-// Convert World Space to Fragment Space
-vec4 WorldToFragSpace(vec3 v, mat4 viewProj)
-{
-    vec4 proj = viewProj * vec4(v, 1.0f);
-	proj.xyz /= proj.w;
-	proj.xy = proj.xy * 0.5f + vec2(0.5f);
-	return proj;
 }
 
 // Retrieve Fragment Position from Depth Buffer
@@ -193,29 +186,20 @@ vec3 FragPosFromDepth(float depth)
 // Shadow Mapping
 float CalculateDirectionalShadow(vec4 fragPosLightSpace)
 {
-	vec2 texelSize = textureSize(u_DirectionalLightShadowMap, 0);
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    projCoords = projCoords * 0.5f + 0.5f;
 
-    float xOffset = 1.0f / texelSize.x;
-    float yOffset = 1.0f / texelSize.y;
-
-    float Factor = 0.0f;
-
-	if(fragPosLightSpace.z > 1.0f)
-	{
-		return 1.0f;
-	}
-
-    for (int y = -1 ; y <= 1 ; y++) 
+    float shadow = 0.0f;
+    vec2 texelSize = 1.0f / textureSize(u_DirectionalLightShadowMap, 0);
+    for (int x = -1 ; x <= 1 ; x++) 
     {
-        for (int x = -1 ; x <= 1 ; x++) 
+        for (int y = -1 ; y <= 1 ; y++) 
         {
-            vec2 Offsets = vec2(x * xOffset, y * yOffset);
-            vec3 UVC = vec3(fragPosLightSpace.xy + Offsets, (fragPosLightSpace.z - 0.05f) + 0.001f);
-            Factor += texture(u_DirectionalLightShadowMap, UVC);
+            vec2 uv = projCoords.xy + vec2(x, y) * texelSize;
+            shadow += texture(u_DirectionalLightShadowMap, vec3(uv, projCoords.z + Epsilon));
         }
     }
-
-    return (0.5f + (Factor / 9.0f));
+    return (0.5f + (shadow / 18.0f));
 }
 
 // Directional Lighting
@@ -245,7 +229,7 @@ vec3 CalculateDirectionalLighting(vec3 V, float NdotV, vec3 normal, vec3 F0, vec
     // Lambert diffuse BRDF.
     // We don't scale by 1/PI for lighting & material units to be more convenient.
     // See: https://seblagarde.wordpress.com/2012/01/08/pi-or-not-to-pi-in-game-lighting-equation/
-    vec3 diffuseBRDF = Kd * albedo / PI;
+    vec3 diffuseBRDF = Kd * albedo;
 
     // Cook-Torrance specular microfacet BRDF.
     vec3 specularBRDF = (D * G * F) / (4.0f * NdotV * NdotL + Epsilon);
@@ -283,5 +267,5 @@ vec3 CalculateAmbientLighting(vec3 R, float NdotV, vec3 normal, vec3 F0, vec3 al
     vec3 specularIBL = specularIrradiance * (F * specularBRDF.x + specularBRDF.y) ;
 
     // Total ambient lighting contribution.
-    return (diffuseIBL + specularIBL);
+    return (diffuseIBL + specularIBL) * u_EnvironmentMapIntensity;
 }

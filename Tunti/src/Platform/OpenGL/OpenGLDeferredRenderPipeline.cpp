@@ -9,6 +9,7 @@
 
 #include "Tunti/Core/Window.h"
 #include "Tunti/Core/Application.h"
+#include "Tunti/Scene/SceneSettings.h"
 
 namespace Tunti
 {
@@ -28,7 +29,7 @@ namespace Tunti
 
 		ConstructOutputBuffer();
 		ConstructGBuffer();
-		ConstructShadowMapBuffer(1024);
+		ConstructShadowMapBuffer(SceneSettings::ShadowMap::Resolution);
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glEnable(GL_CULL_FACE);
@@ -43,7 +44,7 @@ namespace Tunti
 		m_PBRLightingPassShader->SetUniformInt("u_DepthAttachment", RendererBindingTable::GBufferDepthTextureUnit);
 		m_PBRLightingPassShader->SetUniformInt("u_NormalAttachment", RendererBindingTable::GBufferNormalTextureUnit);
 		m_PBRLightingPassShader->SetUniformInt("u_AlbedoAttachment", RendererBindingTable::GBufferAlbedoTextureUnit);
-		m_PBRLightingPassShader->SetUniformInt("u_RoughnessMetalnessAOAttachment", RendererBindingTable::GBufferRoughnessMetalnessAOTextureUnit);
+		m_PBRLightingPassShader->SetUniformInt("u_LightSpacePositionAttachment", RendererBindingTable::GBufferLightSpacePositionTextureUnit);
 		m_PBRLightingPassShader->SetUniformInt("u_SpecularCubemap", RendererBindingTable::PrefilterSpecularCubemapTextureUnit);
 		m_PBRLightingPassShader->SetUniformInt("u_IrradianceCubemap", RendererBindingTable::IrradianceCubemapTextureUnit);
 		m_PBRLightingPassShader->SetUniformInt("u_SpecularBRDF_LUT", RendererBindingTable::BRDF_LUTCubemapTextureUnit);
@@ -82,6 +83,11 @@ namespace Tunti
 		return Texture2D(m_OutputBuffer.ColorAttachment);
 	}
 
+	Texture2D OpenGLDeferredRenderPipeline::GetDebugOutputTexture(uint32_t idx) const
+	{
+		return Texture2D(m_ShadowPass.ShadowMap);
+	}
+
 	void OpenGLDeferredRenderPipeline::OnWindowResize(uint32_t width, uint32_t height)
 	{
 		if (width == 0 || height == 0 || (m_OutputWidth == width && m_OutputHeight == height))
@@ -114,32 +120,15 @@ namespace Tunti
 	{
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);
 		glDepthMask(GL_TRUE);
 
-		glBindFramebuffer(GL_FRAMEBUFFER, m_ShadowPass.Framebuffer);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_ShadowPass.Framebuffer);
 		glViewport(0, 0, m_ShadowPass.Resolution, m_ShadowPass.Resolution);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
-		m_ShadowPassShader->Bind();
-
 		// Directional Light Shadow Mapping
-		for (const auto& [material, meshQueue] : MeshQueue)
-		{
-			for (const auto& [mesh, submeshQueue] : meshQueue)
-			{
-				OpenGLBufferCache::GetInstance()->GetOpenGLMeshBufferWithKey(mesh).Bind();
-				for (auto& [submeshQueueElementList, transform] : submeshQueue)
-				{
-					m_ShadowPassShader->SetUniformMat4("u_Model", transform);
-					const auto& [submeshes, _] = submeshQueueElementList;
-					for (const auto& submesh : submeshes)
-					{
-						DrawElementsIndirectParams indirectParams(submesh.Count, 1, submesh.BaseIndex, submesh.BaseVertex, 0);
-						glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, &indirectParams);
-					}
-				}
-			}
-		}
+		DrawSceneGeometry(m_ShadowPassShader);
 
 		// Point Lights Shadow Mapping
 		for (uint32_t i = 0; i < LightQueue.PointLightCount; i++)
@@ -150,32 +139,13 @@ namespace Tunti
 
 	void OpenGLDeferredRenderPipeline::GeometryPass() const
 	{
+		glCullFace(GL_BACK);
+
 		glBindFramebuffer(GL_FRAMEBUFFER, m_GBuffer.Framebuffer);
 		glViewport(0, 0, m_OutputWidth, m_OutputHeight);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		m_GeometryPassShader->Bind();
-		for (const auto& [material, meshQueue] : MeshQueue)
-		{
-			(*OpenGLMaterialCache::GetInstance())[material->Index].Bind();
-			for (const auto& [mesh, submeshQueue] : meshQueue)
-			{
-				const OpenGLMeshBuffer& meshBuffer = OpenGLBufferCache::GetInstance()->GetOpenGLMeshBufferWithKey(mesh);
-				meshBuffer.Bind();
-				m_GeometryPassShader->SetUniformUInt("u_VertexCount", meshBuffer.GetVertexCount());
-				for (const auto& [submeshQueueElementList, transform] : submeshQueue)
-				{
-					m_GeometryPassShader->SetUniformMat4("u_Model", transform);
-					const auto& [submeshes, materialInstances] = submeshQueueElementList;
-
-					for (const auto& submesh : submeshes)
-					{
-						DrawElementsIndirectParams indirectParams(submesh.Count, 1, submesh.BaseIndex, submesh.BaseVertex, 0);
-						glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, &indirectParams);
-					}
-				}
-			}
-		}
+		DrawSceneGeometryWithMaterials(m_GeometryPassShader);
 	}
 
 	void OpenGLDeferredRenderPipeline::LightingPass() const
@@ -188,6 +158,7 @@ namespace Tunti
 		glDepthMask(GL_FALSE);
 
 		m_PBRLightingPassShader->Bind();
+		m_PBRLightingPassShader->SetUniformFloat("u_EnvironmentMapIntensity", SceneSettings::Lighting::EnvironmentMapIntensity);
 		glDrawArraysIndirect(GL_TRIANGLE_STRIP, &QuadIndirectParams);
 	}
 
@@ -205,8 +176,54 @@ namespace Tunti
 
 		glDepthRange(0.0f, 1.0f);
 		glDepthFunc(GL_LESS);
+	}
 
-		glCullFace(GL_BACK);
+	void OpenGLDeferredRenderPipeline::DrawSceneGeometry(const Ref<OpenGLShaderProgram>& shader) const
+	{
+		shader->Bind();
+		for (const auto& [material, meshQueue] : MeshQueue)
+		{
+			for (const auto& [mesh, submeshQueue] : meshQueue)
+			{
+				OpenGLBufferCache::GetInstance()->GetOpenGLMeshBufferWithKey(mesh).Bind();
+				for (auto& [submeshQueueElementList, transform] : submeshQueue)
+				{
+					shader->SetUniformMat4("u_Model", transform);
+					const auto& [submeshes, _] = submeshQueueElementList;
+					for (const auto& submesh : submeshes)
+					{
+						DrawElementsIndirectParams indirectParams(submesh.Count, 1, submesh.BaseIndex, submesh.BaseVertex, 0);
+						glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, &indirectParams);
+					}
+				}
+			}
+		}
+	}
+
+	void OpenGLDeferredRenderPipeline::DrawSceneGeometryWithMaterials(const Ref<OpenGLShaderProgram>& shader) const
+	{
+		shader->Bind();
+		for (const auto& [material, meshQueue] : MeshQueue)
+		{
+			(*OpenGLMaterialCache::GetInstance())[material->Index].Bind();
+			for (const auto& [mesh, submeshQueue] : meshQueue)
+			{
+				const OpenGLMeshBuffer& meshBuffer = OpenGLBufferCache::GetInstance()->GetOpenGLMeshBufferWithKey(mesh);
+				meshBuffer.Bind();
+				shader->SetUniformUInt("u_VertexCount", meshBuffer.GetVertexCount());
+				for (const auto& [submeshQueueElementList, transform] : submeshQueue)
+				{
+					shader->SetUniformMat4("u_Model", transform);
+					const auto& [submeshes, materialInstances] = submeshQueueElementList;
+
+					for (const auto& submesh : submeshes)
+					{
+						DrawElementsIndirectParams indirectParams(submesh.Count, 1, submesh.BaseIndex, submesh.BaseVertex, 0);
+						glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, &indirectParams);
+					}
+				}
+			}
+		}
 	}
 
 	void OpenGLDeferredRenderPipeline::ConstructOutputBuffer()
@@ -241,24 +258,24 @@ namespace Tunti
 
 		// GBuffer Normal Attachment
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_GBuffer.NormalAttachment);
-		glTextureStorage2D(m_GBuffer.NormalAttachment, 1, GL_RGB16F, m_OutputWidth, m_OutputHeight);
+		glTextureStorage2D(m_GBuffer.NormalAttachment, 1, GL_RGBA16F, m_OutputWidth, m_OutputHeight);
 		glTextureParameteri(m_GBuffer.NormalAttachment, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTextureParameteri(m_GBuffer.NormalAttachment, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glNamedFramebufferTexture(m_GBuffer.Framebuffer, GL_COLOR_ATTACHMENT0, m_GBuffer.NormalAttachment, 0);
 
 		// GBuffer Albedo Attachment
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_GBuffer.AlbedoAttachment);
-		glTextureStorage2D(m_GBuffer.AlbedoAttachment, 1, GL_RGB8, m_OutputWidth, m_OutputHeight);
+		glTextureStorage2D(m_GBuffer.AlbedoAttachment, 1, GL_RGBA8, m_OutputWidth, m_OutputHeight);
 		glTextureParameteri(m_GBuffer.AlbedoAttachment, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTextureParameteri(m_GBuffer.AlbedoAttachment, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glNamedFramebufferTexture(m_GBuffer.Framebuffer, GL_COLOR_ATTACHMENT1, m_GBuffer.AlbedoAttachment, 0);
 
 		// GBuffer Material Attachment
-		glCreateTextures(GL_TEXTURE_2D, 1, &m_GBuffer.RoughnessMetalnessAOAttachment);
-		glTextureStorage2D(m_GBuffer.RoughnessMetalnessAOAttachment, 1, GL_RGB8, m_OutputWidth, m_OutputHeight);
-		glTextureParameteri(m_GBuffer.RoughnessMetalnessAOAttachment, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTextureParameteri(m_GBuffer.RoughnessMetalnessAOAttachment, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glNamedFramebufferTexture(m_GBuffer.Framebuffer, GL_COLOR_ATTACHMENT2, m_GBuffer.RoughnessMetalnessAOAttachment, 0);
+		glCreateTextures(GL_TEXTURE_2D, 1, &m_GBuffer.LightSpacePositionAttachment);
+		glTextureStorage2D(m_GBuffer.LightSpacePositionAttachment, 1, GL_RGBA16F, m_OutputWidth, m_OutputHeight);
+		glTextureParameteri(m_GBuffer.LightSpacePositionAttachment, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTextureParameteri(m_GBuffer.LightSpacePositionAttachment, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glNamedFramebufferTexture(m_GBuffer.Framebuffer, GL_COLOR_ATTACHMENT2, m_GBuffer.LightSpacePositionAttachment, 0);
 
 		const GLenum attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
 		glNamedFramebufferDrawBuffers(m_GBuffer.Framebuffer, 3, attachments);
@@ -273,7 +290,7 @@ namespace Tunti
 		glBindTextureUnit(RendererBindingTable::GBufferDepthTextureUnit, m_GBuffer.DepthAttachment);
 		glBindTextureUnit(RendererBindingTable::GBufferNormalTextureUnit, m_GBuffer.NormalAttachment);
 		glBindTextureUnit(RendererBindingTable::GBufferAlbedoTextureUnit, m_GBuffer.AlbedoAttachment);
-		glBindTextureUnit(RendererBindingTable::GBufferRoughnessMetalnessAOTextureUnit, m_GBuffer.RoughnessMetalnessAOAttachment);
+		glBindTextureUnit(RendererBindingTable::GBufferLightSpacePositionTextureUnit, m_GBuffer.LightSpacePositionAttachment);
 		glViewport(0, 0, m_OutputWidth, m_OutputHeight);
 
 		glNamedFramebufferRenderbuffer(m_OutputBuffer.Framebuffer, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_GBuffer.DepthAttachment);
@@ -286,12 +303,12 @@ namespace Tunti
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_ShadowPass.ShadowMap);
 		glTextureStorage2D(m_ShadowPass.ShadowMap, 1, GL_DEPTH_COMPONENT32F, m_ShadowPass.Resolution, m_ShadowPass.Resolution);
-		glTextureParameteri(m_ShadowPass.ShadowMap, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTextureParameteri(m_ShadowPass.ShadowMap, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteri(m_ShadowPass.ShadowMap, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTextureParameteri(m_ShadowPass.ShadowMap, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTextureParameteri(m_ShadowPass.ShadowMap, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
 		glTextureParameteri(m_ShadowPass.ShadowMap, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-		glTextureParameteri(m_ShadowPass.ShadowMap, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTextureParameteri(m_ShadowPass.ShadowMap, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTextureParameteri(m_ShadowPass.ShadowMap, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTextureParameteri(m_ShadowPass.ShadowMap, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glNamedFramebufferTexture(m_ShadowPass.Framebuffer, GL_DEPTH_ATTACHMENT, m_ShadowPass.ShadowMap, 0);
 
 		glNamedFramebufferDrawBuffer(m_ShadowPass.Framebuffer, GL_NONE);

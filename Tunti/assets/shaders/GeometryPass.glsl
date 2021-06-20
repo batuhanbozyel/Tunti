@@ -1,13 +1,29 @@
 #type vertex
 #version 450 core
+#define MAX_POINT_LIGHTS 100
 
 layout(location = 0) out VertexInOut
 {
+	vec4 LightSpacePosition;
 	vec3 WorldPosition;
 	vec3 Normal;
 	vec2 TexCoord;
 	flat uint MaterialIndex;
 } VertexOut;
+
+struct DirectionalLight
+{
+    mat4 ViewProjection;
+    vec4 DirectionAndIntensity;
+    vec4 Color;
+};
+
+struct PointLight
+{
+    vec4 Position;
+    vec4 Color;
+    vec4 ConstantLinearQuadratic;
+};
 
 layout(std140, binding = 0) uniform CameraUniform
 {
@@ -17,6 +33,13 @@ layout(std140, binding = 0) uniform CameraUniform
 	mat4 InvProjection;
 	vec3 Position;
 } Camera;
+
+layout(std140, binding = 4) uniform LightsUniform
+{
+    DirectionalLight directionalLight;
+    PointLight PointLights[MAX_POINT_LIGHTS];
+    int NumPointLights;
+};
 
 layout(std430, binding = 1) readonly buffer MaterialIndexBuffer
 {
@@ -34,10 +57,14 @@ uniform mat4 u_Model;
 void main()
 {
 	uint posIndex = gl_VertexID * 3;
-	VertexOut.WorldPosition = vec3(u_Model * vec4(
+	vec4 vertexPosition = vec4(
 		vertexBuffer.data[posIndex],
 		vertexBuffer.data[posIndex + 1],
-		vertexBuffer.data[posIndex + 2], 1.0f));
+		vertexBuffer.data[posIndex + 2], 1.0f);
+
+	vec4 worldPosition = u_Model * vertexPosition;
+	VertexOut.WorldPosition = vec3(worldPosition);
+	VertexOut.LightSpacePosition = directionalLight.ViewProjection * worldPosition;
 
 	mat3 normalMatrix = transpose(inverse(mat3(u_Model)));
 	uint normalIndex = u_VertexCount * 3 + gl_VertexID * 3;
@@ -53,19 +80,20 @@ void main()
 
 	VertexOut.MaterialIndex = materialIndexBuffer.indices[gl_VertexID];
 
-	gl_Position = Camera.Projection * Camera.View * vec4(VertexOut.WorldPosition, 1.0f);
+	gl_Position = Camera.Projection * Camera.View * worldPosition;
 }
 
 #type fragment
 #version 450 core
 #extension GL_ARB_bindless_texture : require
 
-layout(location = 0) out vec3 g_Normal;
-layout(location = 1) out vec3 g_Albedo;
-layout(location = 2) out vec3 g_RoughnessMetalnessAO;
+layout(location = 0) out vec4 g_Normal;
+layout(location = 1) out vec4 g_Albedo;
+layout(location = 2) out vec4 g_LightSpacePosition;
 
 layout(location = 0) in VertexInOut
 {
+	vec4 LightSpacePosition;
 	vec3 WorldPosition;
 	vec3 Normal;
 	vec2 TexCoord;
@@ -89,23 +117,24 @@ layout(std430, binding = 3) readonly buffer MaterialBuffer
 	Material materials[];
 } materialBuffer;
 
-vec3 computeNormal(vec3 normalMap);
+vec3 ComputeNormal(vec3 normalMap);
 
 void main()
 {
 	Material material = materialBuffer.materials[VertexIn.MaterialIndex];
 
-	g_Normal = computeNormal(texture(sampler2D(material.NormalMap), VertexIn.TexCoord).rgb);
+	g_Normal = vec4(
+		ComputeNormal(texture(sampler2D(material.NormalMap), VertexIn.TexCoord).rgb),
+		texture(sampler2D(material.RoughnessMap), VertexIn.TexCoord).r * material.Roughness);
 
-	g_Albedo = texture(sampler2D(material.AlbedoMap), VertexIn.TexCoord).rgb * material.Albedo.rgb;
+	g_Albedo = vec4(
+		texture(sampler2D(material.AlbedoMap), VertexIn.TexCoord).rgb * material.Albedo.rgb,
+		texture(sampler2D(material.MetalnessMap), VertexIn.TexCoord).r * material.Metalness);
 
-	g_RoughnessMetalnessAO = vec3(
-		texture(sampler2D(material.RoughnessMap), VertexIn.TexCoord).r * material.Roughness,
-		texture(sampler2D(material.MetalnessMap), VertexIn.TexCoord).r * material.Metalness,
-		texture(sampler2D(material.AmbientOcclusionMap), VertexIn.TexCoord).r);
+	g_LightSpacePosition = VertexIn.LightSpacePosition;
 }
 
-vec3 computeNormal(vec3 normalMap)
+vec3 ComputeNormal(vec3 normalMap)
 {
 	vec3 texNormal = normalMap * 2.0f - 1.0f;
 

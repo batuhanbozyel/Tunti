@@ -19,6 +19,7 @@
 #include "Tunti/Scene/Entity.h"
 #include "Tunti/Scene/SceneCamera.h"
 #include "Tunti/Scene/Components.h"
+#include "Tunti/Scene/SceneSettings.h"
 
 // Utility
 #include "Tunti/Utility/ModelLibrary.h"
