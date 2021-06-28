@@ -116,7 +116,7 @@ void main()
 
     // Diffuse lighting
     float shadow = CalculateDirectionalShadow(fragPosLightSpace);
-    vec3 diffuseLighting = directionalLighting * (1.0f - shadow);
+    vec3 diffuseLighting = directionalLighting * shadow;
 
     // Ambient lighting (IBL).
 	vec3 ambientLighting = CalculateAmbientLighting(R, NdotV, normal, F0, albedo, roughness, metalness);
